@@ -8,11 +8,7 @@
 
 
 ## 📌 Visão Geral do Projeto
-# Projeto de Análise Espacial
 
-Abaixo você pode visualizar o mapa de calor de São Paulo:
-
-<iframe src="mapa.html" width="100%" height="600px" style="border:none;"></iframe>
 
 Este projeto realiza a ingestão, tratamento e integração de dados geoespaciais abertos da cidade de São Paulo para analisar a distribuição espacial de ocorrências de alagamentos e inundações.
 
