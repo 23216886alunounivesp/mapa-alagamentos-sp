@@ -1,38 +1,36 @@
 # 🌊 Mapeamento Interativo de Alagamentos e Macro-Zonas de São Paulo
 
-> **Visualização geoespacial interativa combinando mapa de calor de eventos históricos de alagamento/inundação com os limites territoriais das 5 Macro-Zonas da cidade de São Paulo.**
+> **Visualização geoespacial interativa combinando mapa de calor de eventos históricos de alagamento com os limites territoriais das 5 Macro-Zonas da cidade de São Paulo.**
 
-🔗 **[Clique aqui para acessar o Mapa Interativo Online](https://SEU-USUARIO.github.io/NOME-DO-REPOSITORIO/)**
+🌐 **[Acessar o Mapa Interativo Online (GitHub Pages)](https://23216886alunounivesp.github.io/mapa-alagamentos-sp/)**
 
 ---
 
 ## 📌 Visão Geral do Projeto
 
-Este projeto realiza a ingestão, tratamento e integração de dados geoespaciais abertos da cidade de São Paulo para analisar a distribuição espacial de ocorrências de alagamentos e inundações. 
+Este projeto realiza a ingestão, tratamento e integração de dados geoespaciais abertos da cidade de São Paulo para analisar a distribuição espacial de ocorrências de alagamentos e inundações.
 
-A solução sobrepõe duas camadas cruciais em um mapa web interativo (Folium/Leaflet):
-1. **Mapa de Calor (HeatMap):** Densidade espacial dos eventos de alagamento registrados.
-2. **Camada Vetorial (Macro-Zonas):** Agrupamento administrativo das 32 subprefeituras de São Paulo em 5 regiões territoriais (Centro, Norte, Leste, Oeste e Sul).
-
-![Demonstração do Mapa](https://23216886alunounivesp.github.io/mapa-alagamentos-sp/) <!-- Adicione uma print do mapa aqui -->
+A aplicação web sobrepõe duas camadas em um mapa interativo desenvolvido em Python (Folium/Leaflet):
+1. **Mapa de Calor (HeatMap):** Densidade espacial e concentração histórica dos registros de alagamento.
+2. **Camada Vetorial (Macro-Zonas):** Limites territoriais municipais gerados a partir do agrupamento das 32 subprefeituras em 5 regiões (Centro, Norte, Leste, Oeste e Sul).
 
 ---
 
-## 🛠️ Desafios Técnicos & Engenharia de Dados
+## 🛠️ Engenharia de Dados & Desafios Geoespaciais
 
-Durante o desenvolvimento do pipeline de dados, foram aplicadas as seguintes técnicas geoespaciais:
+Durante o desenvolvimento do pipeline de dados (ETL), foram resolvidas as seguintes etapas técnicas:
 
 * **Reprojeção do Sistema de Coordenadas (CRS):**
   * Os dados brutos de alagamentos estavam projetados em **UTM SIRGAS 2000 (EPSG:31983)** em metros.
-  * Foi realizada a conversão reprojetando para **WGS84 (EPSG:4326)** em graus decimais, garantindo a renderização precisa das coordenadas no Folium/Leaflet.
+  * Foi realizada a conversão vetorial reprojetando as coordenadas para **WGS84 (EPSG:4326)** em graus decimais, garantindo o alinhamento no Folium/Leaflet.
 
 * **Agregação Territorial (Dissolve & Mapping):**
-  * Cruzamento e limpeza da tabela de atributos do Shapefile oficial do GeoSampa (`nm_subpref`).
+  * Limpeza da tabela de atributos do Shapefile oficial das subprefeituras (`nm_subpref`).
   * Agrupamento espacial (`.dissolve()`) das 32 subprefeituras originais nas 5 Macro-Zonas municipais.
 
 * **Otimização Geoespacial (Emagrecimento de Dados):**
-  * Aplicação do algoritmo de simplificação de polígonos (`.simplify(tolerance=0.001)`) para reduzir o número de vértices sem perder a precisão visual do contorno.
-  * Filtro e eliminação de colunas administrativas pesadas e incompatíveis (como *Timestamps*), exportando um arquivo GeoJSON enxuto de alta performance para a web.
+  * Aplicação do algoritmo de simplificação de polígonos (`.simplify(tolerance=0.001)`) para reduzir o número de vértices sem comprometer a precisão visual do contorno.
+  * Remoção de colunas administrativas e tipos não serializáveis (*Timestamps*), gerando um arquivo `.geojson` enxuto e de alta performance para carregamento web instantâneo.
 
 ---
 
@@ -40,7 +38,7 @@ Durante o desenvolvimento do pipeline de dados, foram aplicadas as seguintes té
 
 * **Linguagem:** Python 3.13
 * **Análise de Dados & GIS:** `pandas`, `geopandas`, `shapely`, `pyproj`
-* **Visualização Interativa:** `folium` (Plugin `HeatMap`, `GeoJson`, `LayerControl`)
+* **Visualização Interativa:** `folium` (Plugins `HeatMap`, `GeoJson`, `LayerControl`)
 * **Hospedagem Web:** GitHub Pages
 
 ---
@@ -48,10 +46,11 @@ Durante o desenvolvimento do pipeline de dados, foram aplicadas as seguintes té
 ## 📁 Estrutura do Repositório
 
 ```text
+.
 ├── data/
-│   ├── alagamentos_e_inundacoes_sp.csv   # Dataset de eventos históricos
-│   └── macro_zonas_sp_otimizado.geojson  # Limites territoriais simplificados
+│   ├── alagamentos_e_inundacoes_sp.csv   # Dataset de eventos históricos (UTM)
+│   └── macro_zonas_sp_otimizado.geojson  # GeoJSON otimizado das 5 Macro-Zonas
 ├── notebooks/
-│   └── mapa_alagamentos_sp.ipynb         # Notebook completo do processamento ETL
-├── index.html                            # Aplicação web final gerada pelo Folium
+│   └── mapa_alagamentos_sp.ipynb         # Notebook completo do tratamento e geração
+├── index.html                            # Aplicação web standalone gerada pelo Folium
 └── README.md                             # Documentação do projeto
