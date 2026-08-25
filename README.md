@@ -14,7 +14,7 @@ A solução sobrepõe duas camadas cruciais em um mapa web interativo (Folium/Le
 1. **Mapa de Calor (HeatMap):** Densidade espacial dos eventos de alagamento registrados.
 2. **Camada Vetorial (Macro-Zonas):** Agrupamento administrativo das 32 subprefeituras de São Paulo em 5 regiões territoriais (Centro, Norte, Leste, Oeste e Sul).
 
-![Demonstração do Mapa](https://raw.githubusercontent.com/SEU-USUARIO/NOME-DO-REPOSITORIO/main/imagem_mapa.png) <!-- Adicione uma print do mapa aqui -->
+![Demonstração do Mapa](https://23216886alunounivesp.github.io/mapa-alagamentos-sp/) <!-- Adicione uma print do mapa aqui -->
 
 ---
 
