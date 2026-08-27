@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapeamento Interativo de Alagamentos - SP</title>
     <!-- Estilo Markdown do GitHub para manter o visual profissional do README -->
-    <link rel="stylesheet" href="https://cloudflare.com">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
     <style>
         body {
             box-sizing: border-box;
@@ -31,6 +31,13 @@
             height: 100%;
             border: none;
         }
+        .links-destaque {
+            background-color: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 16px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body class="markdown-body">
@@ -43,12 +50,22 @@
 
     <hr>
 
+    <!-- LINKS PARA OS MAPAS INTERATIVOS -->
+    <div class="links-destaque">
+        <h3>🗺️ Exploração dos Mapas Interativos</h3>
+        <p>Acesse diretamente os arquivos gerados:</p>
+        <ul>
+            <li><a href="mapa.html" target="_blank">Abrir Mapa Padrão (mapa.html)</a></li>
+            <li><a href="mapa_zonas_interativo.html" target="_blank"><strong>Abrir Mapa Interativo de Macro-Zonas (mapa_zonas_interativo.html)</strong></a></li>
+        </ul>
+    </div>
+
     <!-- MAPA INTERATIVO INCORPORADO VIA IFRAME -->
-    <h2>🗺️ Mapa Interativo Online</h2>
-    <p>Utilize os controles do mapa para alternar as camadas e explorar as regiões da cidade:</p>
+    <h2>🗺️ Visualização embutida (Mapa Principal)</h2>
+    <p>Utilize os controles do mapa abaixo para alternar as camadas e explorar as regiões da cidade:</p>
     <div class="map-container">
-        <!-- O iframe aponta para o mapa que você renomeou para mapa.html -->
-        <iframe src="mapa.html" title="Mapa de Alagamentos SP"></iframe>
+        <!-- O iframe aponta para o mapa interativo principal -->
+        <iframe src="mapa_zonas_interativo.html" title="Mapa Interativo de Macro-Zonas e Alagamentos SP"></iframe>
     </div>
 
     <hr>
@@ -104,13 +121,14 @@
     <h2>📁 Estrutura do Repositório Atualizada</h2>
     <pre><code>.
 ├── data/
-│   ├── alagamentos_e_inundacoes_sp.csv   # Dataset de eventos históricos (UTM)
-│   └── macro_zonas_sp_otimizado.geojson  # GeoJSON otimizado das 5 Macro-Zonas
+│   ├── alagamentos_e_inundacoes_sp.csv     # Dataset de eventos históricos (UTM)
+│   └── macro_zonas_sp_otimizado.geojson    # GeoJSON otimizado das 5 Macro-Zonas
 ├── notebooks/
-│   └── mapa_alagamentos_sp.ipynb         # Notebook completo do tratamento e geração
-├── mapa.html                             # Mapa interativo gerado pelo Folium (Antigo index.html)
-├── index.html                            # Nova página principal (Documentação + iframe)
-└── README.md                             # Documentação do repositório</code></pre>
+│   └── mapa_alagamentos_sp.ipynb           # Notebook completo do tratamento e geração
+├── mapa.html                               # Mapa interativo básico gerado pelo Folium
+├── mapa_zonas_interativo.html              # Mapa interativo focado nas Macro-Zonas
+├── index.html                              # Nova página principal (Documentação + iframe)
+└── README.md                               # Documentação do repositório</code></pre>
 
 </body>
 </html>
