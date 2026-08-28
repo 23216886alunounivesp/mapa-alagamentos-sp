@@ -42,29 +42,37 @@
 </head>
 <body class="markdown-body">
 
-    <h1>🌊 Mapeamento Interativo de Alagamentos e Macro-Zonas de São Paulo</h1>
+    <h1>🌊 Mapeamento Interativo de Alagamentos em São Paulo</h1>
     
     <blockquote>
-        <p><strong>Visualização geoespacial interativa combinando mapa de calor de eventos históricos de alagamento com os limites territoriais das 5 Macro-Zonas da cidade de São Paulo.</strong></p>
+        <p><strong>Visualização geoespacial interativa combinando mapa de calor de eventos históricos de alagamento com os limites territoriais da cidade de São Paulo (Subprefeituras e Macro-Zonas).</strong></p>
     </blockquote>
 
     <hr>
 
     <!-- LINKS PARA OS MAPAS INTERATIVOS -->
     <div class="links-destaque">
-        <h3>🗺️ Exploração dos Mapas Interativos</h3>
-        <p>Acesse diretamente os arquivos gerados:</p>
+        <h3>🗺️ Exploração em Tela Cheia</h3>
+        <p>Acesse diretamente os arquivos gerados em abas separadas:</p>
         <ul>
-            <li><a href="mapa.html" target="_blank">Abrir Mapa Padrão (mapa.html)</a></li>
-            <li><a href="mapa_zonas_interativo.html" target="_blank"><strong>Abrir Mapa Interativo de Macro-Zonas (mapa_zonas_interativo.html)</strong></a></li>
+            <li><a href="mapa.html" target="_blank">Abrir Mapa por Subprefeituras (mapa.html)</a></li>
+            <li><a href="mapa_zonas_interativo.html" target="_blank"><strong>Abrir Mapa por Macro-Zonas (mapa_zonas_interativo.html)</strong></a></li>
         </ul>
     </div>
 
-    <!-- MAPA INTERATIVO INCORPORADO VIA IFRAME -->
-    <h2>🗺️ Visualização embutida (Mapa Principal)</h2>
-    <p>Utilize os controles do mapa abaixo para alternar as camadas e explorar as regiões da cidade:</p>
+    <!-- MAPA 1 INCORPORADO VIA IFRAME -->
+    <h2>🗺️ Mapa 1: Densidade por Subprefeituras</h2>
+    <p>Visualização da mancha de calor sobreposta aos limites das 32 subprefeituras de São Paulo. Utilize os controles do mapa para alternar as camadas:</p>
     <div class="map-container">
-        <!-- O iframe aponta para o mapa interativo principal -->
+        <!-- O iframe aponta para o mapa base de subprefeituras -->
+        <iframe src="mapa.html" title="Mapa Interativo de Subprefeituras e Alagamentos SP"></iframe>
+    </div>
+
+    <!-- MAPA 2 INCORPORADO VIA IFRAME -->
+    <h2>🗺️ Mapa 2: Densidade por Macro-Zonas</h2>
+    <p>Visualização focada no agrupamento das 5 Macro-Zonas da cidade (Centro, Norte, Leste, Oeste e Sul):</p>
+    <div class="map-container">
+        <!-- O iframe aponta para o mapa interativo de macro-zonas -->
         <iframe src="mapa_zonas_interativo.html" title="Mapa Interativo de Macro-Zonas e Alagamentos SP"></iframe>
     </div>
 
@@ -72,10 +80,10 @@
 
     <h2>📌 Visão Geral do Projeto</h2>
     <p>Este projeto realiza a ingestão, tratamento e integração de dados geoespaciais abertos da cidade de São Paulo para analisar a distribuição espacial de ocorrências de alagamentos e inundações.</p>
-    <p>A aplicação web sobrepõe duas camadas em um mapa interativo desenvolvido em Python (Folium/Leaflet):</p>
+    <p>A aplicação web sobrepõe duas camadas em mapas interativos desenvolvidos em Python (Folium/Leaflet):</p>
     <ol>
         <li><strong>Mapa de Calor (HeatMap):</strong> Densidade espacial e concentração histórica dos registros de alagamento.</li>
-        <li><strong>Camada Vetorial (Macro-Zonas):</strong> Limites territoriais municipais gerados a partir do agrupamento das 32 subprefeituras em 5 regiões (Centro, Norte, Leste, Oeste e Sul).</li>
+        <li><strong>Camadas Vetoriais:</strong> Limites territoriais municipais separados em Subprefeituras e Macro-Zonas.</li>
     </ol>
 
     <hr>
@@ -111,7 +119,7 @@
     <h2>🧰 Tecnologias Utilizadas</h2>
     <ul>
         <li><strong>Linguagem:</strong> Python 3.13</li>
-        <li><strong>Análise de Dados &amp; GIS:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code>, <code>pyproj</code></li>
+        <li><strong>Análise de Dados &amp; GIS:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code></li>
         <li><strong>Visualização Interativa:</strong> <code>folium</code> (Plugins <code>HeatMap</code>, <code>GeoJson</code>, <code>LayerControl</code>)</li>
         <li><strong>Hospedagem Web:</strong> GitHub Pages</li>
     </ul>
@@ -125,9 +133,9 @@
 │   └── macro_zonas_sp_otimizado.geojson    # GeoJSON otimizado das 5 Macro-Zonas
 ├── notebooks/
 │   └── mapa_alagamentos_sp.ipynb           # Notebook completo do tratamento e geração
-├── mapa.html                               # Mapa interativo básico gerado pelo Folium
-├── mapa_zonas_interativo.html              # Mapa interativo focado nas Macro-Zonas
-├── index.html                              # Nova página principal (Documentação + iframe)
+├── mapa.html                               # Mapa 1: Subprefeituras
+├── mapa_zonas_interativo.html              # Mapa 2: Macro-Zonas
+├── index.html                              # Página principal atual (Documentação + iframes)
 └── README.md                               # Documentação do repositório</code></pre>
 
 </body>
