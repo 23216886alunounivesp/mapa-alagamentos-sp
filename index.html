@@ -55,32 +55,46 @@
         <h3>🗺️ Exploração em Tela Cheia</h3>
         <p>Acesse diretamente os arquivos gerados em abas separadas:</p>
         <ul>
-            <li><a href="mapa.html" target="_blank">Abrir Mapa por Subprefeituras (mapa.html)</a></li>
-            <li><a href="mapa_zonas_interativo.html" target="_blank"><strong>Abrir Mapa por Macro-Zonas (mapa_zonas_interativo.html)</strong></a></li>
+            <li><a href="mapa_calor_puro.html" target="_blank">Abrir Mapa 0: Calor Histórico Pura (mapa_calor_puro.html)</a></li>
+            <li><a href="mapa_zonas_interativo.html" target="_blank">Abrir Mapa 1: Macro-Zonas (mapa_zonas_interativo.html)</a></li>
+            <li><a href="mapa.html" target="_blank">Abrir Mapa 2: Subprefeituras Geral (mapa.html)</a></li>
+            <li><a href="mapa_por_subprefeitura.html" target="_blank"><strong>Abrir Mapa 3: Individualização por Subprefeitura (mapa_por_subprefeitura.html)</strong></a></li>
         </ul>
     </div>
 
-    <!-- MAPA 1 INCORPORADO VIA IFRAME -->
-    <h2>🗺️ Mapa 1: Densidade por Subprefeituras</h2>
-    <p>Visualização da mancha de calor sobreposta aos limites das 32 subprefeituras de São Paulo. Utilize os controles do mapa para alternar as camadas:</p>
+    <!-- MAPA 0 -->
+    <h2>🗺️ Mapa 0: Densidade (Mapa de Calor) dos Registros de Alagamentos e Inundações</h2>
+    <p>Visualização pura da mancha de calor (densidade espacial) representando o acumulado dos registros históricos ao longo dos últimos anos em São Paulo, sem interferência de limites administrativos:</p>
     <div class="map-container">
-        <!-- O iframe aponta para o mapa base de subprefeituras -->
+        <iframe src="mapa_calor_puro.html" title="Mapa de Calor Puro de Alagamentos SP"></iframe>
+    </div>
+
+    <!-- MAPA 1 -->
+    <h2>🗺️ Mapa 1: Densidade por Macro-Zonas</h2>
+    <p>Visualização focada no agrupamento das 5 Macro-Zonas da cidade (Centro, Norte, Leste, Oeste e Sul):</p>
+    <div class="map-container">
+        <iframe src="mapa_zonas_interativo.html" title="Mapa Interativo de Macro-Zonas e Alagamentos SP"></iframe>
+    </div>
+
+    <!-- MAPA 2 -->
+    <h2>🗺️ Mapa 2: Densidade por Subprefeituras (Geral)</h2>
+    <p>Visualização da mancha de calor sobreposta aos limites gerais das 32 subprefeituras de São Paulo:</p>
+    <div class="map-container">
         <iframe src="mapa.html" title="Mapa Interativo de Subprefeituras e Alagamentos SP"></iframe>
     </div>
 
-    <!-- MAPA 2 INCORPORADO VIA IFRAME -->
-    <h2>🗺️ Mapa 2: Densidade por Macro-Zonas</h2>
-    <p>Visualização focada no agrupamento das 5 Macro-Zonas da cidade (Centro, Norte, Leste, Oeste e Sul):</p>
+    <!-- MAPA 3 -->
+    <h2>🗺️ Mapa 3: Individualização por Subprefeitura</h2>
+    <p>Mapa interativo avançado onde é possível selecionar ou isolar subprefeituras específicas através do menu de camadas lateral:</p>
     <div class="map-container">
-        <!-- O iframe aponta para o mapa interativo de macro-zonas -->
-        <iframe src="mapa_zonas_interativo.html" title="Mapa Interativo de Macro-Zonas e Alagamentos SP"></iframe>
+        <iframe src="mapa_por_subprefeitura.html" title="Mapa Filtrado por Subprefeitura"></iframe>
     </div>
 
     <hr>
 
     <h2>📌 Visão Geral do Projeto</h2>
     <p>Este projeto realiza a ingestão, tratamento e integração de dados geoespaciais abertos da cidade de São Paulo para analisar a distribuição espacial de ocorrências de alagamentos e inundações.</p>
-    <p>A aplicação web sobrepõe duas camadas em mapas interativos desenvolvidos em Python (Folium/Leaflet):</p>
+    <p>A aplicação web sobrepõe diferentes camadas em mapas interativos desenvolvidos em Python (Folium/Leaflet):</p>
     <ol>
         <li><strong>Mapa de Calor (HeatMap):</strong> Densidade espacial e concentração histórica dos registros de alagamento.</li>
         <li><strong>Camadas Vetoriais:</strong> Limites territoriais municipais separados em Subprefeituras e Macro-Zonas.</li>
@@ -133,9 +147,11 @@
 │   └── macro_zonas_sp_otimizado.geojson    # GeoJSON otimizado das 5 Macro-Zonas
 ├── notebooks/
 │   └── mapa_alagamentos_sp.ipynb           # Notebook completo do tratamento e geração
-├── mapa.html                               # Mapa 1: Subprefeituras
-├── mapa_zonas_interativo.html              # Mapa 2: Macro-Zonas
-├── index.html                              # Página principal atual (Documentação + iframes)
+├── mapa_calor_puro.html                    # Mapa 0: Apenas calor histórico puro
+├── mapa.html                               # Mapa 2: Subprefeituras geral
+├── mapa_zonas_interativo.html              # Mapa 1: Macro-Zonas
+├── mapa_por_subprefeitura.html             # Mapa 3: Individualização por subprefeitura
+├── index.html                              # Página principal atualizada (Documentação + iframes)
 └── README.md                               # Documentação do repositório</code></pre>
 
 </body>
