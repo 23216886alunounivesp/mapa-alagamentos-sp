@@ -38,6 +38,13 @@
             padding: 16px;
             margin-bottom: 20px;
         }
+        .audit-box {
+            background-color: #fff8f8;
+            border-left: 4px solid #d73a49;
+            padding: 12px 16px;
+            margin: 15px 0;
+            border-radius: 0 6px 6px 0;
+        }
     </style>
 </head>
 <body class="markdown-body">
@@ -45,7 +52,7 @@
     <h1>🌊 Mapeamento Interativo de Alagamentos em São Paulo</h1>
     
     <blockquote>
-        <p><strong>Visualização geoespacial interativa combinando mapa de calor de eventos históricos de alagamento com os limites territoriais da cidade de São Paulo (Subprefeituras e Macro-Zonas).</strong></p>
+        <p><strong>Visualização geoespacial interativa combinando dados oficiais de ocorrências hídricas, seletor temporal por ano, limites territoriais de subprefeituras e análise de risco da cidade de São Paulo.</strong></p>
     </blockquote>
 
     <hr>
@@ -55,10 +62,11 @@
         <h3>🗺️ Exploração em Tela Cheia</h3>
         <p>Acesse diretamente os arquivos gerados em abas separadas:</p>
         <ul>
-            <li><a href="mapa_calor_puro.html" target="_blank">Abrir Mapa 0: Calor Histórico Pura (mapa_calor_puro.html)</a></li>
+            <li><a href="mapa_calor_puro.html" target="_blank">Abrir Mapa 0: Calor Histórico Puro (mapa_calor_puro.html)</a></li>
             <li><a href="mapa_zonas_interativo.html" target="_blank">Abrir Mapa 1: Macro-Zonas (mapa_zonas_interativo.html)</a></li>
             <li><a href="mapa.html" target="_blank">Abrir Mapa 2: Subprefeituras Geral (mapa.html)</a></li>
-            <li><a href="mapa_por_subprefeitura.html" target="_blank"><strong>Abrir Mapa 3: Individualização por Subprefeitura (mapa_por_subprefeitura.html)</strong></a></li>
+            <li><a href="mapa_por_subprefeitura.html" target="_blank">Abrir Mapa 3: Individualização por Subprefeitura (mapa_por_subprefeitura.html)</a></li>
+            <li><a href="mapa_alagamentos_seletor_por_ano.html" target="_blank"><strong>Abrir Mapa 4: Seletor Histórico por Ano e Subprefeituras (mapa_alagamentos_seletor_por_ano.html)</strong></a></li>
         </ul>
     </div>
 
@@ -90,15 +98,29 @@
         <iframe src="mapa_por_subprefeitura.html" title="Mapa Filtrado por Subprefeitura"></iframe>
     </div>
 
+    <!-- MAPA 4 -->
+    <h2>🗺️ Mapa 4: Seletor Histórico por Ano e Subprefeituras</h2>
+    <p>Mapa avançado integrando a malha oficial de subprefeituras e um painel interativo de camadas para alternar, auditar e isolar os pontos de alagamento e inundação ano a ano (2013-2026):</p>
+    <div class="map-container">
+        <iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa com Seletor por Ano de Alagamentos SP"></iframe>
+    </div>
+
     <hr>
 
-    <h2>📌 Visão Geral do Projeto</h2>
+    <h2>📌 Visão Geral do Projeto &amp; Auditoria Oficial</h2>
     <p>Este projeto realiza a ingestão, tratamento e integração de dados geoespaciais abertos da cidade de São Paulo para analisar a distribuição espacial de ocorrências de alagamentos e inundações.</p>
-    <p>A aplicação web sobrepõe diferentes camadas em mapas interativos desenvolvidos em Python (Folium/Leaflet):</p>
-    <ol>
-        <li><strong>Mapa de Calor (HeatMap):</strong> Densidade espacial e concentração histórica dos registros de alagamento.</li>
-        <li><strong>Camadas Vetoriais:</strong> Limites territoriais municipais separados em Subprefeituras e Macro-Zonas.</li>
-    </ol>
+    
+    <div class="audit-box">
+        <h3>📊 Auditoria Oficial da Fonte de Dados (Defesa Civil / GeoSampa)</h3>
+        <p>A base master unificada de ocorrências registra um total de <strong>68.310 eventos</strong> brutos. Após a auditoria estrutural dos metadados, as categorias foram segmentadas da seguinte forma:</p>
+        <ul>
+            <li><strong>QUEDA DE ARVORE:</strong> 52.464 registros (isolados e removidos do escopo hídrico)</li>
+            <li><strong>ALAGAMENTO:</strong> 7.224 registros (mantidos na análise)</li>
+            <li><strong>INUNDACAO:</strong> 5.263 registros (mantidos na análise)</li>
+            <li><strong>DESLIZAMENTO:</strong> 3.359 registros (isolados e removidos do escopo hídrico)</li>
+        </ul>
+        <p><strong>Total de Ocorrências Hídricas Auditadas:</strong> 12.487 pontos precisos.</p>
+    </div>
 
     <hr>
 
@@ -116,14 +138,14 @@
             <strong>Agregação Territorial (Dissolve &amp; Mapping):</strong>
             <ul>
                 <li>Limpeza da tabela de atributos do Shapefile oficial das subprefeituras (<code>nm_subpref</code>).</li>
-                <li>Agrupamento espacial (<code>.dissolve()</code>) das 32 subprefeituras originais nas 5 Macro-Zonas municipais.</li>
+                <li>Agrupamento espacial (<code>.dissolve()</code>) das subprefeituras municipais e cruzamento com os pontos hídricos.</li>
             </ul>
         </li>
         <li>
             <strong>Otimização Geoespacial (Emagrecimento de Dados):</strong>
             <ul>
-                <li>Aplicação do algoritmo de simplificação de polígonos (<code>.simplify(tolerance=0.001)</code>) para reduzir o número de vértices sem comprometer a precisão visual do contorno.</li>
-                <li>Remoção de colunas administrativas e tipos não serializáveis (<em>Timestamps</em>), gerando um arquivo <code>.geojson</code> enxuto e de alta performance para carregamento web instantâneo.</li>
+                <li>Aplicação de algoritmos de simplificação geométrica para reduzir o número de vértices sem comprometer a precisão visual.</li>
+                <li>Tratamento de séries temporais para permitir o seletor dinâmico por ano de ocorrência.</li>
             </ul>
         </li>
     </ul>
@@ -134,7 +156,7 @@
     <ul>
         <li><strong>Linguagem:</strong> Python 3.13</li>
         <li><strong>Análise de Dados &amp; GIS:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code></li>
-        <li><strong>Visualização Interativa:</strong> <code>folium</code> (Plugins <code>HeatMap</code>, <code>GeoJson</code>, <code>LayerControl</code>)</li>
+        <li><strong>Visualização Interativa:</strong> <code>folium</code> (Plugins <code>GeoJson</code>, <code>LayerControl</code>)</li>
         <li><strong>Hospedagem Web:</strong> GitHub Pages</li>
     </ul>
 
@@ -143,16 +165,17 @@
     <h2>📁 Estrutura do Repositório Atualizada</h2>
     <pre><code>.
 ├── data/
-│   ├── alagamentos_e_inundacoes_sp.csv     # Dataset de eventos históricos (UTM)
-│   └── macro_zonas_sp_otimizado.geojson    # GeoJSON otimizado das 5 Macro-Zonas
+│   ├── alagamentos_e_inundacoes_sp.csv        # Dataset de eventos históricos (UTM)
+│   └── macro_zonas_sp_otimizado.geojson      # GeoJSON otimizado das 5 Macro-Zonas
 ├── notebooks/
-│   └── mapa_alagamentos_sp.ipynb           # Notebook completo do tratamento e geração
-├── mapa_calor_puro.html                    # Mapa 0: Apenas calor histórico puro
-├── mapa.html                               # Mapa 2: Subprefeituras geral
-├── mapa_zonas_interativo.html              # Mapa 1: Macro-Zonas
-├── mapa_por_subprefeitura.html             # Mapa 3: Individualização por subprefeitura
-├── index.html                              # Página principal atualizada (Documentação + iframes)
-└── README.md                               # Documentação do repositório</code></pre>
+│   └── mapa_alagamentos_sp.ipynb             # Notebook completo do tratamento e geração
+├── mapa_calor_puro.html                      # Mapa 0: Apenas calor histórico puro
+├── mapa.html                                 # Mapa 2: Subprefeituras geral
+├── mapa_zonas_interativo.html                # Mapa 1: Macro-Zonas
+├── mapa_por_subprefeitura.html               # Mapa 3: Individualização por subprefeitura
+├── mapa_alagamentos_seletor_por_ano.html     # Mapa 4: Seletor por ano + Subprefeituras
+├── index.html                                # Página principal atualizada (Documentação + iframes)
+└── README.md                                 # Documentação do repositório</code></pre>
 
 </body>
 </html>
