@@ -4,15 +4,14 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Mapeamento Interativo de Alagamentos e Risco Hidrológico - SP</title>
-    <!-- Estilo moderno e centralizado -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
     <style>
         body {
             box-sizing: border-box;
             min-width: 280px;
-            max-width: 1100px;
+            max-width: 1200px;
             margin: 0 auto;
-            padding: 40px 20px;
+            padding: 30px 15px;
             font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
             color: #24292f;
             background-color: #f6f8fa;
@@ -22,28 +21,60 @@
             background-color: #ffffff;
             border: 1px solid #d0d7de;
             border-radius: 8px;
-            padding: 40px;
+            padding: 30px;
             box-shadow: 0 4px 12px rgba(31, 35, 40, 0.05);
-        }
-        h1, h2, h3 {
-            border-bottom: none !important;
         }
         h1 {
             text-align: center;
             color: #1f2328;
-            margin-bottom: 10px;
+            margin-bottom: 5px;
+            font-size: 1.8em;
         }
         .subtitle {
             text-align: center;
             color: #57606a;
-            margin-bottom: 30px;
-            font-size: 1.1em;
+            margin-bottom: 25px;
+            font-size: 1em;
+        }
+        /* Sistema de Abas (Tabs) */
+        .tab-menu {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            margin-bottom: 20px;
+            border-bottom: 2px solid #d0d7de;
+            padding-bottom: 10px;
+        }
+        .tab-btn {
+            background-color: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 6px;
+            padding: 8px 14px;
+            font-size: 0.9em;
+            font-weight: 600;
+            cursor: pointer;
+            color: #24292f;
+            transition: all 0.2s ease;
+        }
+        .tab-btn:hover {
+            background-color: #eaeef2;
+        }
+        .tab-btn.active {
+            background-color: #0969da;
+            color: #ffffff;
+            border-color: #0969da;
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
         }
         .map-container {
             position: relative;
             width: 100%;
-            height: 600px;
-            margin: 20px 0 40px 0;
+            height: 700px;
+            margin: 15px 0;
             border: 1px solid #d0d7de;
             border-radius: 6px;
             overflow: hidden;
@@ -54,47 +85,31 @@
             height: 100%;
             border: none;
         }
-        .links-destaque {
-            background-color: #f0f6fc;
-            border: 1px solid #0969da1a;
-            border-radius: 6px;
-            padding: 20px;
-            margin-bottom: 30px;
-        }
-        .links-destaque ul {
-            columns: 2;
-            padding-left: 20px;
-        }
-        @media (max-width: 768px) {
-            .links-destaque ul { columns: 1; }
-            body { padding: 10px; }
-            .wrapper { padding: 15px; }
-        }
-        .audit-box {
-            background-color: #fff8f8;
-            border-left: 4px solid #d73a49;
-            padding: 16px;
-            margin: 20px 0;
+        .info-box, .audit-box {
+            padding: 15px;
+            margin: 15px 0;
             border-radius: 0 6px 6px 0;
         }
         .info-box {
             background-color: #f0f6fc;
             border-left: 4px solid #1f6feb;
-            padding: 16px;
-            margin: 20px 0;
-            border-radius: 0 6px 6px 0;
+        }
+        .audit-box {
+            background-color: #fff8f8;
+            border-left: 4px solid #d73a49;
         }
         hr {
             border: 0;
             height: 1px;
             background: #d0d7de;
-            margin: 35px 0;
+            margin: 25px 0;
         }
         pre {
             background-color: #f6f8fa;
-            padding: 16px;
+            padding: 12px;
             border-radius: 6px;
             overflow-x: auto;
+            font-size: 0.85em;
         }
     </style>
 </head>
@@ -102,121 +117,135 @@
 
     <div class="wrapper">
 
-        <h1>🌊 Mapeamento Interativo de Alagamentos e Análise Hidrológica em São Paulo</h1>
-        <p class="subtitle">Visualização geoespacial avançada combinando ocorrências históricas, rede de drenagem, altimetria e manchas preditivas de inundação municipal.</p>
+        <h1>🌊 Mapeamento Interativo de Alagamentos e Risco Hidrológico - SP</h1>
+        <p class="subtitle">Selecione uma aba abaixo para explorar interativamente cada modelo geoespacial sem sobreposição.</p>
 
-        <hr>
-
-        <!-- LINKS PARA OS MAPAS EM TELA CHEIA -->
-        <div class="links-destaque">
-            <h3 style="margin-top: 0;">🗺️ Navegação Rápida (Exploração em Tela Cheia)</h3>
-            <p>Acesse diretamente qualquer um dos painéis gerados:</p>
-            <ul>
-                <li><a href="mapa_calor_puro.html" target="_blank">Mapa 0: Calor Histórico Puro</a></li>
-                <li><a href="mapa_zonas_interativo.html" target="_blank">Mapa 1: Macro-Zonas</a></li>
-                <li><a href="mapa.html" target="_blank">Mapa 2: Subprefeituras Geral</a></li>
-                <li><a href="mapa_por_subprefeitura.html" target="_blank">Mapa 3: Individualização por Subprefeitura</a></li>
-                <li><a href="mapa_alagamentos_seletor_por_ano.html" target="_blank">Mapa 4: Seletor Histórico por Ano</a></li>
-                <li><a href="mapa_pontos_por_altitude (4).html" target="_blank">Mapa 5: Pontos por Altitude</a></li>
-                <li><a href="mapa_subprefeituras_com_drenagem_e_anos.html" target="_blank"><strong>Mapa 6: Drenagem + Seletor Anual</strong></a></li>
-                <li><a href="mapa_subprefeituras_drenagem_mancha5_anos.html" target="_blank"><strong>Mapa 7: Drenagem + Mancha Preditiva (5 Anos)</strong></a></li>
-                <li><a href="figura_piramide_altitudes (1).html" target="_blank">Figura: Pirâmide de Altitudes</a></li>
-            </ul>
+        <!-- MENU DE ABAS -->
+        <div class="tab-menu">
+            <button class="tab-btn active" onclick="openTab(event, 'tab-mapa6')">Mapa 6: Drenagem + Anos</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mapa7')">Mapa 7: Mancha Preditiva (5 Anos)</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mapa0')">Mapa 0: Calor Puro</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mapa1')">Mapa 1: Macro-Zonas</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mapa2')">Mapa 2: Subprefeituras Geral</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mapa3')">Mapa 3: Individual</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mapa4')">Mapa 4: Seletor Anual</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-mapa5')">Mapa 5: Altitude</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-piramide')">Pirâmide de Altitudes</button>
+            <button class="tab-btn" onclick="openTab(event, 'tab-sobre')">Sobre &amp; Auditoria</button>
         </div>
 
-        <!-- MAPA 6 -->
-        <h2>🗺️ Mapa 6: Rede de Drenagem, Subprefeituras e Seletor Histórico por Anos</h2>
-        <p>Integração completa da hidrografia oficial do município (rios, canais e córregos simplificados) associada à malha territorial das subprefeituras e aos pontos de alagamento filtrados por ano de ocorrência:</p>
-        <div class="map-container">
-            <iframe src="mapa_subprefeituras_com_drenagem_e_anos.html" title="Mapa de Drenagem e Subprefeituras com Anos"></iframe>
+        <!-- ABA MAPA 6 (Principal) -->
+        <div id="tab-mapa6" class="tab-content active">
+            <h2>🗺️ Mapa 6: Rede de Drenagem, Subprefeituras e Seletor Histórico por Anos</h2>
+            <p>Integração completa da hidrografia oficial do município associada à malha territorial das subprefeituras e aos pontos de alagamento filtrados por ano de ocorrência.</p>
+            <div class="map-container">
+                <iframe src="mapa_subprefeituras_com_drenagem_e_anos.html" title="Mapa 6"></iframe>
+            </div>
         </div>
 
-        <!-- MAPA 7 -->
-        <h2>🗺️ Mapa 7: Análise Preditiva de Risco (Mancha de Inundação - Retorno de 5 Anos)</h2>
-        <p>Modelo avançado cruzando a rede hidrográfica com o mapa de calor hidrológico ponderado pela profundidade estimada da lâmina d'água (<code>m5_profu</code>), mapeando as áreas de maior vulnerabilidade a inundações na capital:</p>
-        <div class="map-container">
-            <iframe src="mapa_subprefeituras_drenagem_mancha5_anos.html" title="Mapa com Mancha Preditiva de Inundação de 5 Anos"></iframe>
+        <!-- ABA MAPA 7 -->
+        <div id="tab-mapa7" class="tab-content">
+            <h2>🗺️ Mapa 7: Análise Preditiva de Risco (Mancha de Inundação - Retorno de 5 Anos)</h2>
+            <p>Modelo avançado cruzando a rede hidrográfica com o mapa de calor hidrológico ponderado pela profundidade estimada da lâmina d'água (<code>m5_profu</code>).</p>
+            <div class="map-container">
+                <iframe src="mapa_subprefeituras_drenagem_mancha5_anos.html" title="Mapa 7"></iframe>
+            </div>
         </div>
 
-        <!-- MAPAS ANTERIORES (0 a 5) -->
-        <h2>🗺️ Mapas Históricos Complementares (0 a 5)</h2>
-        <p>Explore também as visualizações de densidade pura, macro-zonas, subprefeituras isoladas e perfis altimétricos:</p>
-        
-        <h3>Mapa 0: Densidade de Calor Histórico</h3>
-        <div class="map-container"><iframe src="mapa_calor_puro.html" title="Calor Puro"></iframe></div>
-
-        <h3>Mapa 1: Densidade por Macro-Zonas</h3>
-        <div class="map-container"><iframe src="mapa_zonas_interativo.html" title="Macro-Zonas"></iframe></div>
-
-        <h3>Mapa 2: Subprefeituras (Geral)</h3>
-        <div class="map-container"><iframe src="mapa.html" title="Subprefeituras Geral"></iframe></div>
-
-        <h3>Mapa 3: Individualização por Subprefeitura</h3>
-        <div class="map-container"><iframe src="mapa_por_subprefeitura.html" title="Individualização"></iframe></div>
-
-        <h3>Mapa 4: Seletor Histórico por Ano</h3>
-        <div class="map-container"><iframe src="mapa_alagamentos_seletor_por_ano.html" title="Seletor por Ano"></iframe></div>
-
-        <h3>Mapa 5: Ocorrências Cruzadas por Altitude</h3>
-        <div class="map-container"><iframe src="mapa_pontos_por_altitude (4).html" title="Pontos por Altitude"></iframe></div>
-
-        <h3>Análise Gráfica: Pirâmide de Altitudes e Risco</h3>
-        <div class="map-container"><iframe src="figura_piramide_altitudes (1).html" title="Pirâmide de Altitudes"></iframe></div>
-
-        <div class="info-box">
-            <h3>💡 Contexto Técnico e Hidrológico</h3>
-            <p>A união entre o <strong>Mapa 6 (Drenagem e Anos)</strong> e o <strong>Mapa 7 (Mancha Preditiva de 5 Anos)</strong> permite confrontar os registros reais acumulados ao longo das décadas com a modelagem matemática preditiva da prefeitura, evidenciando como os talvegues e fundos de vale canalizados concentram os maiores riscos hidrológicos de São Paulo.</p>
+        <!-- ABA MAPA 0 -->
+        <div id="tab-mapa0" class="tab-content">
+            <h2>🗺️ Mapa 0: Densidade de Calor Histórico</h2>
+            <p>Visualização pura da mancha de calor representando o acumulado dos registros históricos.</p>
+            <div class="map-container"><iframe src="mapa_calor_puro.html" title="Mapa 0"></iframe></div>
         </div>
 
-        <hr>
-
-        <h2>📌 Visão Geral do Projeto &amp; Auditoria Oficial</h2>
-        <p>Pipeline analítico de dados geoespaciais abertos voltado à auditoria de ocorrências hídricas e planejamento urbano na cidade de São Paulo.</p>
-        
-        <div class="audit-box">
-            <h3>📊 Auditoria Oficial da Fonte de Dados (Defesa Civil / GeoSampa)</h3>
-            <p>De um total de <strong>68.310 eventos</strong> brutos auditados:</p>
-            <ul>
-                <li><strong>QUEDA DE ARVORE:</strong> 52.464 registros (isolados)</li>
-                <li><strong>ALAGAMENTO:</strong> 7.224 registros (integrados)</li>
-                <li><strong>INUNDACAO:</strong> 5.263 registros (integrados)</li>
-                <li><strong>DESLIZAMENTO:</strong> 3.359 registros (isolados)</li>
-            </ul>
-            <p><strong>Total de Ocorrências Hídricas Efetivas:</strong> 12.487 pontos precisos.</p>
+        <!-- ABA MAPA 1 -->
+        <div id="tab-mapa1" class="tab-content">
+            <h2>🗺️ Mapa 1: Densidade por Macro-Zonas</h2>
+            <p>Visualização focada no agrupamento das 5 Macro-Zonas da cidade.</p>
+            <div class="map-container"><iframe src="mapa_zonas_interativo.html" title="Mapa 1"></iframe></div>
         </div>
 
-        <hr>
+        <!-- ABA MAPA 2 -->
+        <div id="tab-mapa2" class="tab-content">
+            <h2>🗺️ Mapa 2: Subprefeituras (Geral)</h2>
+            <p>Visualização da mancha de calor sobreposta aos limites gerais das 32 subprefeituras.</p>
+            <div class="map-container"><iframe src="mapa.html" title="Mapa 2"></iframe></div>
+        </div>
 
-        <h2>🧰 Tecnologias Utilizadas</h2>
-        <ul>
-            <li><strong>Linguagem:</strong> Python 3.13</li>
-            <li><strong>Análise Geoespacial:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code></li>
-            <li><strong>Visualização Interativa:</strong> <code>folium</code> (Plugins <code>GeoJson</code>, <code>LayerControl</code>, <code>HeatMap</code>)</li>
-            <li><strong>Hospedagem Web:</strong> GitHub Pages</li>
-        </ul>
+        <!-- ABA MAPA 3 -->
+        <div id="tab-mapa3" class="tab-content">
+            <h2>🗺️ Mapa 3: Individualização por Subprefeitura</h2>
+            <p>Permite isolar subprefeituras específicas através do menu de camadas lateral.</p>
+            <div class="map-container"><iframe src="mapa_por_subprefeitura.html" title="Mapa 3"></iframe></div>
+        </div>
 
-        <hr>
+        <!-- ABA MAPA 4 -->
+        <div id="tab-mapa4" class="tab-content">
+            <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
+            <p>Integração da malha oficial e painel interativo de camadas para alternar os pontos ano a ano.</p>
+            <div class="map-container"><iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4"></iframe></div>
+        </div>
 
-        <h2>📁 Estrutura Atualizada do Repositório</h2>
-        <pre><code>.
-├── data/
-│   ├── alagamentos_e_inundacoes_sp.csv
-│   └── macro_zonas_sp_otimizado.geojson
-├── notebooks/
-│   └── mapa_alagamentos_sp.ipynb
-├── mapa_calor_puro.html
-├── mapa.html
-├── mapa_zonas_interativo.html
-├── mapa_por_subprefeitura.html
-├── mapa_alagamentos_seletor_por_ano.html
-├── mapa_pontos_por_altitude (4).html
-├── figura_piramide_altitudes (1).html
-├── mapa_subprefeituras_com_drenagem_e_anos.html     # Mapa 6: Drenagem + Seletor Anual
-├── mapa_subprefeituras_drenagem_mancha5_anos.html  # Mapa 7: Drenagem + Mancha Preditiva
-├── index.html                                      # Página principal centralizada
-└── README.md</code></pre>
+        <!-- ABA MAPA 5 -->
+        <div id="tab-mapa5" class="tab-content">
+            <h2>🗺️ Mapa 5: Ocorrências Cruzadas por Altitude</h2>
+            <p>Cruzamento espacial entre os pontos históricos de alagamento e o modelo digital de elevação.</p>
+            <div class="map-container"><iframe src="mapa_pontos_por_altitude (4).html" title="Mapa 5"></iframe></div>
+        </div>
+
+        <!-- ABA PIRÂMIDE -->
+        <div id="tab-piramide" class="tab-content">
+            <h2>📊 Análise Estrutural: Pirâmide de Altitudes e Risco</h2>
+            <p>Correlação gráfica entre o volume de ocorrências e as cotas altimétricas urbanas.</p>
+            <div class="map-container"><iframe src="figura_piramide_altitudes (1).html" title="Pirâmide"></iframe></div>
+        </div>
+
+        <!-- ABA SOBRE & AUDITORIA -->
+        <div id="tab-sobre" class="tab-content">
+            <h2>📌 Visão Geral do Projeto &amp; Auditoria Oficial</h2>
+            <p>Pipeline analítico de dados geoespaciais abertos voltado à auditoria de ocorrências hídricas e planejamento urbano na cidade de São Paulo.</p>
+            
+            <div class="audit-box">
+                <h3>📊 Auditoria Oficial da Fonte de Dados (Defesa Civil / GeoSampa)</h3>
+                <p>De um total de <strong>68.310 eventos</strong> brutos auditados:</p>
+                <ul>
+                    <li><strong>QUEDA DE ARVORE:</strong> 52.464 registros (isolados)</li>
+                    <li><strong>ALAGAMENTO:</strong> 7.224 registros (integrados)</li>
+                    <li><strong>INUNDACAO:</strong> 5.263 registros (integrados)</li>
+                    <li><strong>DESLIZAMENTO:</strong> 3.359 registros (isolados)</li>
+                </ul>
+                <p><strong>Total de Ocorrências Hídricas Efetivas:</strong> 12.487 pontos precisos.</p>
+            </div>
+
+            <div class="info-box">
+                <h3>🧰 Tecnologias Utilizadas</h3>
+                <ul>
+                    <li><strong>Linguagem:</strong> Python 3.13</li>
+                    <li><strong>Análise Geoespacial:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code></li>
+                    <li><strong>Visualização Interativa:</strong> <code>folium</code> (Plugins <code>GeoJson</code>, <code>LayerControl</code>, <code>HeatMap</code>)</li>
+                    <li><strong>Hospedagem Web:</strong> GitHub Pages</li>
+                </ul>
+            </div>
+        </div>
 
     </div>
+
+    <!-- SCRIPT DE CONTROLE DAS ABAS -->
+    <script>
+        function openTab(evt, tabName) {
+            const contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
+            }
+            const buttons = document.getElementsByClassName("tab-btn");
+            for (let i = 0; i < buttons.length; i++) {
+                buttons[i].classList.remove("active");
+            }
+            document.getElementById(tabName).classList.add("active");
+            evt.currentTarget.classList.add("active");
+        }
+    </script>
 
 </body>
 </html>
