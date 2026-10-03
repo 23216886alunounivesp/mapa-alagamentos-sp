@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>🌊 Mapeamento Interativo de Alagamentos e Macro-Zonas de São Paulo</title>
+    <title>🌊 Mapeamento Interativo de Alagamentos, Vulnerabilidade e Macro-Zonas de São Paulo</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
     <style>
         body {
@@ -34,11 +34,30 @@
         .subtitle {
             text-align: center;
             color: #57606a;
-            margin-bottom: 30px;
+            margin-bottom: 20px;
             font-size: 1.1em;
         }
-
-        /* Botão Principal de Documentação */
+        /* CABEÇALHO ACADÊMICO UNIVESP */
+        .academic-header {
+            background-color: #f6f8fa;
+            border: 1px solid #d0d7de;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .academic-title {
+            font-weight: bold;
+            color: #0969da;
+            font-size: 1.05em;
+            margin-bottom: 8px;
+        }
+        .academic-authors {
+            font-size: 0.9em;
+            color: #57606a;
+            margin-top: 5px;
+        }
+        /* BOTÃO DE DOCUMENTAÇÃO */
         .doc-bar {
             text-align: center;
             margin-bottom: 30px;
@@ -59,8 +78,7 @@
             background-color: #0969da;
             transform: translateY(-2px);
         }
-
-        /* Roadmap / Trilha de Fases */
+        /* ROADMAP / TRILHA DE FASES */
         .roadmap-container {
             display: flex;
             flex-direction: column;
@@ -117,7 +135,6 @@
             border-color: #0969da;
             box-shadow: 0 2px 6px rgba(9, 105, 218, 0.4);
         }
-
         .tab-content {
             display: none;
         }
@@ -159,34 +176,54 @@
             margin: 20px 0;
             border-radius: 0 8px 8px 0;
         }
+        /* ESTILO DO INFOGRÁFICO DE PIPELINE */
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 15px;
+            margin: 25px 0;
+        }
+        .pipeline-card {
+            background-color: #ffffff;
+            border: 1px solid #d0d7de;
+            border-top: 4px solid #0969da;
+            border-radius: 6px;
+            padding: 15px;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+        }
+        .pipeline-card h4 {
+            margin-top: 0;
+            color: #0969da;
+            font-size: 1em;
+        }
         hr {
             border: 0;
             height: 1px;
             background: #d0d7de;
             margin: 40px 0;
         }
-        pre {
-            background-color: #f6f8fa;
-            padding: 16px;
-            border-radius: 6px;
-            overflow-x: auto;
-            border: 1px solid #d0d7de;
-            font-size: 0.9em;
-        }
         ul { padding-left: 20px; }
         li { margin-bottom: 8px; }
     </style>
 </head>
 <body>
-
     <div class="wrapper">
+        <h1>🌊 Mapeamento Interativo de Alagamentos e Vulnerabilidade Social de São Paulo</h1>
+        <p class="subtitle">Plataforma analítica geoespacial baseada em dados abertos (GeoSampa, Defesa Civil &amp; SEADE)</p>
 
-        <h1>🌊 Mapeamento Interativo de Alagamentos e Macro-Zonas de São Paulo</h1>
-        <p class="subtitle">Trilha analítica geoespacial: siga o roadmap interativo abaixo para explorar desde o macro-contexto até os modelos preditivos e operacionais.</p>
+        <!-- CABEÇALHO ACADÊMICO UNIVESP -->
+        <div class="academic-header">
+            <div class="academic-title">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO — UNIVESP</div>
+            <div><strong>Projeto Integrador Extensionista IV (DRP14 - Turma 003)</strong> — Polo Carrão</div>
+            <div class="academic-authors">
+                <strong>Pesquisadores:</strong> Daniel Martins Queiroz, Leonardo Tomaz de Souza Neto, Livia Maria Roncoleta, Mateus Fujita Silveira, Nailah Carolina Silva, Roberto Joaquim dos Santos, Rodrigo Jose de Melo, William Yang Chen Fan.<br>
+                <strong>Orientadora:</strong> Prof.ª Millena de Araujo Rodrigues
+            </div>
+        </div>
 
         <!-- BOTÃO DE DOCUMENTAÇÃO EM DESTAQUE -->
         <div class="doc-bar">
-            <button class="doc-btn active" onclick="openTab(event, 'tab-documentacao')">📖 Acessar Documentação Completa &amp; Visão Geral</button>
+            <button class="doc-btn active" onclick="openTab(event, 'tab-documentacao')">📖 Acessar Documentação Completa &amp; Engenharia de Dados</button>
         </div>
 
         <!-- ROADMAP / TRILHA INTERATIVA DE MAPAS -->
@@ -201,7 +238,6 @@
                     <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa3')">🔍 Mapa 3: Individual</button>
                 </div>
             </div>
-
             <!-- FASE 2 -->
             <div class="roadmap-phase" style="border-left-color: #8250df;">
                 <div class="phase-title">📈 Fase 2: Variação Temporal, Altimétrica &amp; Estrutural</div>
@@ -211,7 +247,6 @@
                     <button class="roadmap-btn" onclick="openTab(event, 'tab-piramide')">📊 Pirâmide Altitudinal</button>
                 </div>
             </div>
-
             <!-- FASE 3 -->
             <div class="roadmap-phase" style="border-left-color: #1a7f37;">
                 <div class="phase-title">⚡ Fase 3: Infraestrutura, Drenagem &amp; Modelagem Preditiva</div>
@@ -221,6 +256,13 @@
                     <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa8')">🔧 Mapa 8: Bueiros &amp; Alagamentos</button>
                 </div>
             </div>
+            <!-- FASE 4 -->
+            <div class="roadmap-phase" style="border-left-color: #cf222e;">
+                <div class="phase-title">🎯 Fase 4: Matriz de Risco Socioambiental &amp; Utilidade Pública</div>
+                <div class="phase-steps">
+                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa9')">📊 Mapa 9: Matriz IPVS x Bueiros x Alagamentos (Mapa Integrado Final)</button>
+                </div>
+            </div>
         </div>
 
         <!-- CONTEÚDO DAS ABAS -->
@@ -228,10 +270,30 @@
         <!-- ABA 1: DOCUMENTAÇÃO -->
         <div id="tab-documentacao" class="tab-content active">
             <h2>📌 Visão Geral do Projeto</h2>
-            <p>Este projeto realiza a ingestão, tratamento e integração de dados geoespaciais abertos da cidade de São Paulo para analisar a distribuição espacial de ocorrências de alagamentos, inundações e manutenção da infraestrutura de drenagem urbana.</p>
-
+            <p>Esta plataforma interativa foi concebida para apoiar os cidadãos paulistanos e a gestão pública na prevenção e mitigação de riscos de enchentes. Através da ingestão, tratamento e cruzamento espacial de bases de dados abertas da cidade de São Paulo, o projeto relaciona a infraestrutura de drenagem urbana com o histórico de ocorrências hídricas e os níveis de vulnerabilidade social.</p>
+            
             <div class="info-box">
-                <p><strong>🌐 Acesso Externo:</strong> Visualização online publicada através do <a href="https://23216886alunounivesp.github.io/mapa-alagamentos-sp/" target="_blank">GitHub Pages oficial</a>.</p>
+                <p><strong>📜 Conformidade Legal &amp; Ética de Dados:</strong> O projeto utiliza dados públicos disponibilizados pelo Portal GeoSampa sob o Decreto Municipal nº 57.770/2017 e a Lei de Acesso à Informação (Lei 12.527/2011), respeitando integralmente as diretrizes de transparência e utilidade pública.</p>
+            </div>
+
+            <h2>⚙️ Pipeline de Processamento de Dados (Engenharia de Dados)</h2>
+            <div class="pipeline-grid">
+                <div class="pipeline-card">
+                    <h4>1. Ingestão e Fontes</h4>
+                    <p style="font-size: 0.85em;">Coleta automática de GeoJSONs do GeoSampa (subprefeituras, drenagem, bueiros AMLURB), histórico da Defesa Civil e setores do IPVS (SEADE).</p>
+                </div>
+                <div class="pipeline-card">
+                    <h4>2. ETL &amp; Reprojeção</h4>
+                    <p style="font-size: 0.85em;">Expurgo de ruídos em Python, conversão cartográfica de UTM SIRGAS 2000 (EPSG:31983) para WGS84 (EPSG:4326) e sanitização de objetos para JSON.</p>
+                </div>
+                <div class="pipeline-card">
+                    <h4>3. Spatial Join</h4>
+                    <p style="font-size: 0.85em;">Agregação topológica de 27.301 setores do IPVS em 32 Subprefeituras e cálculo de densidade de alagamentos por km².</p>
+                </div>
+                <div class="pipeline-card">
+                    <h4>4. Visualização Web</h4>
+                    <p style="font-size: 0.85em;">Renderização interativa leve em HTML5/Leaflet.js via Folium com Tiles Esri, sem limites de zoom e hospedada no GitHub Pages.</p>
+                </div>
             </div>
 
             <h2>🗺️ Trilha Analítica e Descrição das Camadas</h2>
@@ -240,48 +302,42 @@
                 <li><strong>Fase 1 - Mapa 1 (Macro-Zonas):</strong> Agrupamento das 32 subprefeituras em 5 regiões (Centro, Norte, Leste, Oeste e Sul).</li>
                 <li><strong>Fase 1 - Mapa 2 (Subprefeituras Geral):</strong> Malha territorial detalhada das 32 subprefeituras sobreposta ao calor.</li>
                 <li><strong>Fase 1 - Mapa 3 (Individualização):</strong> Ferramenta para isolar subprefeituras específicas via painel lateral.</li>
-                <li><strong>Fase 2 - Mapa 4 (Seletor Histórico por Ano):</strong> Painel cronológico para filtrar eventos de alagamento ano a ano.</li>
+                <li><strong>Fase 2 - Mapa 4 (Seletor Histórico por Ano):</strong> Painel cronológico para filtrar eventos de alagamento ano a ano (2013-2026).</li>
                 <li><strong>Fase 2 - Mapa 5 (Altitude):</strong> Cruzamento entre ocorrências e o Modelo Digital de Elevação municipal.</li>
                 <li><strong>Fase 2 - Pirâmide Altitudinal:</strong> Correlação gráfica entre frequência de alagamentos e cotas altimétricas.</li>
                 <li><strong>Fase 3 - Mapa 6 (Drenagem + Anos):</strong> Hidrografia oficial (rios, canais e córregos) integrada ao filtro temporal.</li>
                 <li><strong>Fase 3 - Mapa 7 (Mancha Preditiva de 5 Anos):</strong> Modelo hidrológico cruzando drenagem com a lâmina d'água estimada (<code>m5_profu</code>).</li>
                 <li><strong>Fase 3 - Mapa 8 (Bueiros &amp; Alagamentos):</strong> Consolidação cruzando chamados de desentupimento da AMLURB com alagamentos.</li>
+                <li><strong>Fase 4 - Mapa 9 (Matriz IPVS x Bueiros x Alagamentos):</strong> Ocorrência espacial completa sobrepondo o Índice Paulista de Vulnerabilidade Social (IPVS) em escala semafórica por Subprefeitura aos pontos de manutenção urbana e alagamentos.</li>
             </ul>
 
             <hr>
-
-            <h2>🛠️ Engenharia de Dados &amp; Desafios Geoespaciais</h2>
-            <ul>
-                <li><strong>Reprojeção CRS:</strong> Conversão de <strong>UTM SIRGAS 2000 (EPSG:31983)</strong> para <strong>WGS84 (EPSG:4326)</strong>.</li>
-                <li><strong>Agregação Territorial:</strong> Agrupamento espacial (<code>.dissolve()</code>) das subprefeituras.</li>
-                <li><strong>Otimização:</strong> Simplificação de polígonos (<code>.simplify()</code>) para alta performance web.</li>
-            </ul>
 
             <div class="audit-box">
                 <h3>📊 Auditoria Oficial da Fonte de Dados (Defesa Civil / GeoSampa)</h3>
                 <p>De <strong>68.310 eventos</strong> brutos auditados:</p>
                 <ul>
-                    <li><strong>QUEDA DE ARVORE:</strong> 52.464 (isolados)</li>
+                    <li><strong>QUEDA DE ARVORE:</strong> 52.464 (expurgados para escopo hídrico)</li>
                     <li><strong>ALAGAMENTO:</strong> 7.224 (integrados)</li>
                     <li><strong>INUNDACAO:</strong> 5.263 (integrados)</li>
-                    <li><strong>DESLIZAMENTO:</strong> 3.359 (isolados)</li>
+                    <li><strong>DESLIZAMENTO:</strong> 3.359 (expurgados)</li>
                 </ul>
-                <p><strong>Total de Ocorrências Hídricas Efetivas:</strong> 12.487 pontos precisos.</p>
+                <p><strong>Total de Ocorrências Hídricas Efetivas Analisadas:</strong> 12.487 pontos consolidados.</p>
             </div>
 
             <h2>🧰 Tecnologias Utilizadas</h2>
             <ul>
                 <li><strong>Linguagem:</strong> Python 3.13</li>
-                <li><strong>GIS:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code>, <code>pyproj</code></li>
-                <li><strong>Visualização:</strong> <code>folium</code> (HeatMap, GeoJson, LayerControl, MarkerCluster)</li>
-                <li><strong>Hospedagem:</strong> GitHub Pages</li>
+                <li><strong>GIS &amp; Engenharia de Dados:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code>, <code>pyproj</code></li>
+                <li><strong>Visualização:</strong> <code>folium</code> (TileLayer Esri, GeoJson, LayerControl, MarkerCluster, Choropleth)</li>
+                <li><strong>Hospedagem &amp; Deploy:</strong> GitHub Pages</li>
             </ul>
         </div>
 
         <!-- ABA MAPA 0 -->
         <div id="tab-mapa0" class="tab-content">
             <h2>🗺️ Mapa 0: Densidade de Calor Histórico</h2>
-            <p>Visualização pura da mancha de calor concentrando os registros históricos.</p>
+            <p>Visualização pura da mancha de calor concentrando os registros históricos de alagamentos.</p>
             <div class="map-container"><iframe src="mapa_calor_puro.html" title="Mapa 0"></iframe></div>
         </div>
 
@@ -295,21 +351,21 @@
         <!-- ABA MAPA 2 -->
         <div id="tab-mapa2" class="tab-content">
             <h2>🗺️ Mapa 2: Subprefeituras (Geral)</h2>
-            <p>Malha territorial geral das 32 subprefeituras.</p>
+            <p>Malha territorial geral das 32 subprefeituras paulistanas.</p>
             <div class="map-container"><iframe src="mapa.html" title="Mapa 2"></iframe></div>
         </div>
 
         <!-- ABA MAPA 3 -->
         <div id="tab-mapa3" class="tab-content">
             <h2>🗺️ Mapa 3: Individualização por Subprefeitura</h2>
-            <p>Isolamento seletivo de subprefeituras específicas.</p>
+            <p>Isolamento seletivo de subprefeituras específicas para análise pontual.</p>
             <div class="map-container"><iframe src="mapa_por_subprefeitura.html" title="Mapa 3"></iframe></div>
         </div>
 
         <!-- ABA MAPA 4 -->
         <div id="tab-mapa4" class="tab-content">
             <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
-            <p>Painel cronológico para alternar os pontos ano a ano.</p>
+            <p>Painel cronológico para alternar os pontos ano a ano (2013 a 2026).</p>
             <div class="map-container"><iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4"></iframe></div>
         </div>
 
@@ -348,6 +404,13 @@
             <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_e_bueiros.html" title="Mapa 8"></iframe></div>
         </div>
 
+        <!-- ABA MAPA 9 -->
+        <div id="tab-mapa9" class="tab-content">
+            <h2>🗺️ Mapa 9: Matriz Integrada de Risco Socioambiental (IPVS x Bueiros x Alagamentos)</h2>
+            <p>Cruzamento analítico definitivo sobrepondo a média da Vulnerabilidade Social (IPVS em escala semafórica por Subprefeitura) aos chamados de manutenção e histórico de alagamentos.</p>
+            <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs.html" title="Mapa 9"></iframe></div>
+        </div>
+
     </div>
 
     <!-- SCRIPT DE CONTROLE DO ROADMAP E ABAS -->
@@ -357,7 +420,6 @@
             for (let i = 0; i < contents.length; i++) {
                 contents[i].classList.remove("active");
             }
-            // Remove active de todos os botões (roadmap e doc)
             const roadmapBtns = document.getElementsByClassName("roadmap-btn");
             for (let i = 0; i < roadmapBtns.length; i++) {
                 roadmapBtns[i].classList.remove("active");
@@ -366,11 +428,9 @@
             for (let i = 0; i < docBtns.length; i++) {
                 docBtns[i].classList.remove("active");
             }
-
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
         }
     </script>
-
 </body>
 </html>
