@@ -4,105 +4,216 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>🌊 Mapeamento Interativo de Alagamentos, Vulnerabilidade e Macro-Zonas de São Paulo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
     <style>
+        :root {
+            --navy: #12141f;
+            --navy-2: #1b2340;
+            --ink: #1f2430;
+            --muted: #57606a;
+            --bg: #eef1f6;
+            --surface: #ffffff;
+            --line: #dfe4ec;
+            --cyan: #22d3ee;
+            --cyan-deep: #0891b2;
+            --blue: #1f6feb;
+            --purple: #8250df;
+            --green: #1a7f37;
+            --red: #cf222e;
+            --mono: 'JetBrains Mono', ui-monospace, monospace;
+            --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
         body {
-            box-sizing: border-box;
             min-width: 280px;
-            max-width: 1280px;
-            margin: 0 auto;
-            padding: 40px 20px;
-            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
-            color: #24292f;
-            background-color: #f0f4f8;
+            margin: 0;
+            padding: 0 0 60px;
+            font-family: var(--sans);
+            color: var(--ink);
+            background-color: var(--bg);
             line-height: 1.7;
         }
+        /* ============ HERO ============ */
+        .hero {
+            position: relative;
+            background:
+                radial-gradient(900px 500px at 85% -10%, rgba(34, 211, 238, 0.18), transparent 60%),
+                radial-gradient(700px 420px at 8% 110%, rgba(31, 111, 235, 0.22), transparent 60%),
+                linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+            color: #f0f4fa;
+            padding: 64px 20px 56px;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: "";
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 3px);
+            pointer-events: none;
+        }
+        .hero-inner { max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--mono); font-size: 11px; font-weight: 600;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--cyan);
+            border: 1px solid rgba(34, 211, 238, 0.35);
+            border-radius: 100px;
+            padding: 6px 16px;
+            margin-bottom: 22px;
+            background: rgba(34, 211, 238, 0.06);
+        }
+        .hero-badge .dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan);
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+        .hero h1 {
+            margin: 0 0 14px;
+            font-size: clamp(1.7em, 4.2vw, 2.9em);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            max-width: 900px;
+        }
+        .hero h1 .accent { color: var(--cyan); }
+        .hero .subtitle {
+            color: #aab4c8;
+            font-size: 1.08em;
+            max-width: 720px;
+            margin: 0 0 36px;
+        }
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 1px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            overflow: hidden;
+            max-width: 860px;
+        }
+        .hero-stat {
+            background: rgba(12, 16, 28, 0.55);
+            backdrop-filter: blur(6px);
+            padding: 18px 20px;
+        }
+        .hero-stat .num {
+            font-family: var(--mono);
+            font-size: 1.7em; font-weight: 700;
+            color: var(--cyan);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        .hero-stat .lbl {
+            font-family: var(--mono);
+            font-size: 0.62em; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.14em;
+            color: #8b96ab;
+            margin-top: 6px;
+        }
+        /* ============ WRAPPER ============ */
         .wrapper {
-            background-color: #ffffff;
-            border: 1px solid #d0d7de;
-            border-radius: 10px;
-            padding: 45px;
-            box-shadow: 0 8px 24px rgba(140, 149, 159, 0.2);
+            max-width: 1180px;
+            margin: -28px auto 0;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
         }
-        h1 {
-            text-align: center;
-            color: #0969da;
-            margin-bottom: 8px;
-            font-size: 2.1em;
-            border-bottom: none !important;
+        .panel {
+            background-color: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(18, 20, 31, 0.08);
         }
-        .subtitle {
-            text-align: center;
-            color: #57606a;
-            margin-bottom: 20px;
-            font-size: 1.1em;
+        h2 {
+            font-size: 1.45em; font-weight: 800;
+            letter-spacing: -0.01em;
+            color: var(--navy);
+            border-bottom: 2px solid var(--line);
+            padding-bottom: 10px;
+            margin: 34px 0 16px;
+        }
+        h2:first-child { margin-top: 0; }
+        code {
+            font-family: var(--mono); font-size: 0.85em;
+            background: #f1f4f9; border: 1px solid var(--line);
+            border-radius: 5px; padding: 1px 6px;
+            color: var(--navy);
         }
         /* CABEÇALHO ACADÊMICO UNIVESP */
         .academic-header {
-            background-color: #f6f8fa;
-            border: 1px solid #d0d7de;
-            border-radius: 8px;
-            padding: 20px;
+            background: linear-gradient(180deg, #f7f9fc, #eef2f8);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 24px;
             margin-bottom: 30px;
             text-align: center;
         }
         .academic-title {
-            font-weight: bold;
-            color: #0969da;
-            font-size: 1.05em;
+            font-family: var(--mono);
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 0.82em;
+            letter-spacing: 0.12em;
             margin-bottom: 8px;
         }
         .academic-authors {
-            font-size: 0.9em;
-            color: #57606a;
-            margin-top: 5px;
+            font-size: 0.88em;
+            color: var(--muted);
+            margin-top: 8px;
         }
         /* BOTÃO DE DOCUMENTAÇÃO */
-        .doc-bar {
-            text-align: center;
-            margin-bottom: 30px;
-        }
+        .doc-bar { text-align: center; margin-bottom: 34px; }
         .doc-btn {
-            background-color: #1f2328;
+            background-color: var(--navy);
             color: #ffffff;
             border: none;
-            border-radius: 8px;
-            padding: 12px 24px;
-            font-size: 1em;
+            border-radius: 100px;
+            padding: 14px 32px;
+            font-family: var(--mono);
+            font-size: 0.82em;
             font-weight: 600;
+            letter-spacing: 0.06em;
             cursor: pointer;
             transition: all 0.2s ease;
-            box-shadow: 0 4px 10px rgba(31, 35, 40, 0.2);
+            box-shadow: 0 6px 18px rgba(18, 20, 31, 0.25);
         }
         .doc-btn:hover, .doc-btn.active {
-            background-color: #0969da;
+            background-color: var(--cyan-deep);
             transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(8, 145, 178, 0.35);
         }
         /* ROADMAP / TRILHA DE FASES */
         .roadmap-container {
             display: flex;
             flex-direction: column;
-            gap: 20px;
-            margin-bottom: 30px;
-            background-color: #f6f8fa;
-            border: 1px solid #d0d7de;
-            border-radius: 8px;
-            padding: 20px;
+            gap: 16px;
+            margin-bottom: 34px;
         }
         .roadmap-phase {
-            border-left: 4px solid #0969da;
-            background-color: #ffffff;
-            padding: 15px 20px;
-            border-radius: 0 6px 6px 0;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.02);
+            border-left: 4px solid var(--phase, var(--blue));
+            background-color: var(--surface);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--phase, var(--blue));
+            padding: 16px 20px;
+            border-radius: 0 10px 10px 0;
+            box-shadow: 0 2px 6px rgba(18,20,31,0.04);
         }
         .phase-title {
-            font-size: 0.95em;
+            font-family: var(--mono);
+            font-size: 0.72em;
             font-weight: 700;
-            color: #0969da;
+            color: var(--phase, var(--blue));
             text-transform: uppercase;
-            margin-bottom: 10px;
-            letter-spacing: 0.5px;
+            margin-bottom: 12px;
+            letter-spacing: 0.14em;
         }
         .phase-steps {
             display: flex;
@@ -110,307 +221,479 @@
             gap: 8px;
         }
         .roadmap-btn {
-            background-color: #f0f6fc;
-            border: 1px solid #b6d5ff;
-            border-radius: 6px;
-            padding: 8px 14px;
-            font-size: 0.85em;
+            background-color: #f4f7fb;
+            border: 1px solid var(--line);
+            border-radius: 100px;
+            padding: 9px 18px;
+            font-size: 0.84em;
             font-weight: 600;
             cursor: pointer;
-            color: #0550ae;
+            color: var(--ink);
             transition: all 0.2s ease;
-            display: flex;
+            display: inline-flex;
             align-items: center;
-            gap: 6px;
+            gap: 7px;
         }
         .roadmap-btn:hover {
-            background-color: #0969da;
-            color: #ffffff;
-            border-color: #0969da;
+            border-color: var(--phase, var(--blue));
+            color: var(--phase, var(--blue));
             transform: translateY(-1px);
         }
         .roadmap-btn.active {
-            background-color: #0969da;
+            background-color: var(--phase, var(--blue));
             color: #ffffff;
-            border-color: #0969da;
-            box-shadow: 0 2px 6px rgba(9, 105, 218, 0.4);
+            border-color: var(--phase, var(--blue));
+            box-shadow: 0 3px 10px rgba(18, 20, 31, 0.22);
         }
-        .tab-content {
-            display: none;
-        }
+        .roadmap-btn.active:hover { color: #ffffff; }
+        /* ABAS */
+        .tab-content { display: none; }
         .tab-content.active {
             display: block;
             animation: fadeIn 0.4s ease-in-out;
         }
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(4px); }
+            from { opacity: 0; transform: translateY(6px); }
             to { opacity: 1; transform: translateY(0); }
         }
         .map-container {
             position: relative;
             width: 100%;
             height: 720px;
-            margin: 20px 0;
-            border: 1px solid #d0d7de;
-            border-radius: 8px;
+            margin: 20px 0 10px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
             overflow: hidden;
-            background-color: #f6f8fa;
-            box-shadow: inset 0 1px 3px rgba(0,0,0,0.05);
+            background-color: #f4f7fb;
+            box-shadow: 0 4px 16px rgba(18, 20, 31, 0.08);
         }
-        iframe {
-            width: 100%;
-            height: 100%;
-            border: none;
+        iframe { width: 100%; height: 100%; border: none; }
+        .map-meta {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            margin: 12px 0 4px;
         }
+        .map-chip {
+            font-family: var(--mono);
+            font-size: 0.66em; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--muted);
+            background: #f1f4f9;
+            border: 1px solid var(--line);
+            border-radius: 100px;
+            padding: 4px 12px;
+        }
+        /* CAIXAS DE DESTAQUE */
         .info-box {
-            background-color: #f0f6fc;
-            border-left: 4px solid #0969da;
-            padding: 18px;
-            margin: 20px 0;
-            border-radius: 0 8px 8px 0;
+            background-color: #ecfeff;
+            border-left: 4px solid var(--cyan-deep);
+            padding: 18px 20px;
+            margin: 22px 0;
+            border-radius: 0 10px 10px 0;
         }
         .audit-box {
-            background-color: #fff8f8;
-            border-left: 4px solid #cf222e;
-            padding: 18px;
-            margin: 20px 0;
-            border-radius: 0 8px 8px 0;
+            background-color: #fff5f5;
+            border-left: 4px solid var(--red);
+            padding: 20px 22px;
+            margin: 22px 0;
+            border-radius: 0 10px 10px 0;
         }
-        /* ESTILO DO INFOGRÁFICO DE PIPELINE */
+        .audit-box h3 { margin-top: 0; color: var(--red); }
+        /* INFOGRÁFICO DE PIPELINE */
         .pipeline-grid {
             display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 15px;
-            margin: 25px 0;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+            margin: 26px 0;
         }
         .pipeline-card {
-            background-color: #ffffff;
-            border: 1px solid #d0d7de;
-            border-top: 4px solid #0969da;
-            border-radius: 6px;
-            padding: 15px;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.03);
+            background-color: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(18,20,31,0.04);
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .pipeline-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(18,20,31,0.09);
+        }
+        .pipeline-card .step-num {
+            font-family: var(--mono);
+            font-size: 0.66em; font-weight: 700;
+            letter-spacing: 0.14em;
+            color: var(--cyan-deep);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 6px;
         }
         .pipeline-card h4 {
-            margin-top: 0;
-            color: #0969da;
+            margin: 0 0 8px;
+            color: var(--navy);
             font-size: 1em;
+            font-weight: 700;
         }
+        /* NOVAS SEÇÕES */
+        .howto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin: 22px 0;
+        }
+        .howto-item {
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            padding: 16px 18px;
+            background: #fafbfe;
+        }
+        .howto-item .k {
+            font-family: var(--mono); font-size: 0.66em; font-weight: 700;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            color: var(--cyan-deep); display: block; margin-bottom: 5px;
+        }
+        .source-list { list-style: none; padding-left: 0; }
+        .source-list li {
+            padding: 10px 0 10px 30px;
+            position: relative;
+            border-bottom: 1px dashed var(--line);
+            margin-bottom: 0;
+        }
+        .source-list li::before {
+            content: "▸";
+            position: absolute; left: 6px;
+            color: var(--cyan-deep); font-weight: 700;
+        }
+        .faq-item {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+        .faq-item summary {
+            cursor: pointer;
+            padding: 14px 18px;
+            font-weight: 600;
+            color: var(--navy);
+            list-style: none;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .faq-item summary::before { content: "+"; font-family: var(--mono); color: var(--cyan-deep); font-weight: 700; }
+        .faq-item[open] summary::before { content: "−"; }
+        .faq-item .faq-body { padding: 0 18px 16px 40px; color: var(--muted); font-size: 0.94em; }
         hr {
-            border: 0;
-            height: 1px;
-            background: #d0d7de;
+            border: 0; height: 1px;
+            background: var(--line);
             margin: 40px 0;
         }
         ul { padding-left: 20px; }
         li { margin-bottom: 8px; }
+        /* RODAPÉ */
+        .footer {
+            max-width: 1180px;
+            margin: 40px auto 0;
+            padding: 28px 20px 0;
+            border-top: 1px solid var(--line);
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85em;
+        }
+        .footer .f-mono {
+            font-family: var(--mono); font-size: 0.78em;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--navy); font-weight: 600;
+        }
+        /* RESPONSIVO */
+        @media (max-width: 720px) {
+            .panel { padding: 24px 18px; }
+            .map-container { height: 480px; }
+            .hero { padding: 44px 16px 44px; }
+        }
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after { animation: none !important; transition: none !important; }
+            html { scroll-behavior: auto; }
+        }
     </style>
 </head>
 <body>
+    <!-- ============ HERO ============ -->
+    <header class="hero">
+        <div class="hero-inner">
+            <span class="hero-badge"><span class="dot"></span> Plataforma Geoespacial · Dados 2013–2026</span>
+            <h1>🌊 Mapeamento Interativo de <span class="accent">Alagamentos</span> e Vulnerabilidade Social de São Paulo</h1>
+            <p class="subtitle">Plataforma analítica geoespacial baseada em dados abertos (GeoSampa, Defesa Civil &amp; SEADE) — do calor histórico à matriz integrada de risco socioambiental.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><div class="num">12.487</div><div class="lbl">Ocorrências hídricas</div></div>
+                <div class="hero-stat"><div class="num">68.310</div><div class="lbl">Eventos auditados</div></div>
+                <div class="hero-stat"><div class="num">32</div><div class="lbl">Subprefeituras</div></div>
+                <div class="hero-stat"><div class="num">27.301</div><div class="lbl">Setores IPVS</div></div>
+                <div class="hero-stat"><div class="num">11</div><div class="lbl">Camadas de mapas</div></div>
+            </div>
+        </div>
+    </header>
+
     <div class="wrapper">
-        <h1>🌊 Mapeamento Interativo de Alagamentos e Vulnerabilidade Social de São Paulo</h1>
-        <p class="subtitle">Plataforma analítica geoespacial baseada em dados abertos (GeoSampa, Defesa Civil &amp; SEADE)</p>
-
-        <!-- CABEÇALHO ACADÊMICO UNIVESP -->
-        <div class="academic-header">
-            <div class="academic-title">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO — UNIVESP</div>
-            <div><strong>Projeto Integrador Extensionista IV (DRP14 - Turma 003)</strong> — Polo Carrão</div>
-            <div class="academic-authors">
-                <strong>Pesquisadores:</strong> Daniel Martins Queiroz, Leonardo Tomaz de Souza Neto, Livia Maria Roncoleta, Mateus Fujita Silveira, Nailah Carolina Silva, Roberto Joaquim dos Santos, Rodrigo Jose de Melo, William Yang Chen Fan.<br>
-                <strong>Orientadora:</strong> Prof.ª Millena de Araujo Rodrigues
-            </div>
-        </div>
-
-        <!-- BOTÃO DE DOCUMENTAÇÃO EM DESTAQUE -->
-        <div class="doc-bar">
-            <button class="doc-btn active" onclick="openTab(event, 'tab-documentacao')">📖 Acessar Documentação Completa &amp; Engenharia de Dados</button>
-        </div>
-
-        <!-- ROADMAP / TRILHA INTERATIVA DE MAPAS -->
-        <div class="roadmap-container">
-            <!-- FASE 1 -->
-            <div class="roadmap-phase" style="border-left-color: #1f6feb;">
-                <div class="phase-title">🚀 Fase 1: Fundamentos &amp; Macro-Contexto Territorial</div>
-                <div class="phase-steps">
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa0')">📍 Mapa 0: Calor Puro</button>
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa1')">🏙️ Mapa 1: Macro-Zonas</button>
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa2')">🏛️ Mapa 2: Subprefeituras Geral</button>
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa3')">🔍 Mapa 3: Individual</button>
-                </div>
-            </div>
-            <!-- FASE 2 -->
-            <div class="roadmap-phase" style="border-left-color: #8250df;">
-                <div class="phase-title">📈 Fase 2: Variação Temporal, Altimétrica &amp; Estrutural</div>
-                <div class="phase-steps">
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa4')">📅 Mapa 4: Seletor Anual</button>
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa5')">⛰️ Mapa 5: Altitude</button>
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-piramide')">📊 Pirâmide Altitudinal</button>
-                </div>
-            </div>
-            <!-- FASE 3 -->
-            <div class="roadmap-phase" style="border-left-color: #1a7f37;">
-                <div class="phase-title">⚡ Fase 3: Infraestrutura, Drenagem &amp; Modelagem Preditiva</div>
-                <div class="phase-steps">
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa6')">🌊 Mapa 6: Drenagem + Anos</button>
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa7')">⚠️ Mapa 7: Mancha Preditiva (5 Anos)</button>
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa8')">🔧 Mapa 8: Bueiros &amp; Alagamentos</button>
-                </div>
-            </div>
-            <!-- FASE 4 -->
-            <div class="roadmap-phase" style="border-left-color: #cf222e;">
-                <div class="phase-title">🎯 Fase 4: Matriz de Risco Socioambiental &amp; Utilidade Pública</div>
-                <div class="phase-steps">
-                    <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa9')">📊 Mapa 9: Matriz IPVS x Bueiros x Alagamentos (Mapa Integrado Final)</button>
-                </div>
-            </div>
-        </div>
-
-        <!-- CONTEÚDO DAS ABAS -->
-
-        <!-- ABA 1: DOCUMENTAÇÃO -->
-        <div id="tab-documentacao" class="tab-content active">
-            <h2>📌 Visão Geral do Projeto</h2>
-            <p>Esta plataforma interativa foi concebida para apoiar os cidadãos paulistanos e a gestão pública na prevenção e mitigação de riscos de enchentes. Através da ingestão, tratamento e cruzamento espacial de bases de dados abertas da cidade de São Paulo, o projeto relaciona a infraestrutura de drenagem urbana com o histórico de ocorrências hídricas e os níveis de vulnerabilidade social.</p>
-            
-            <div class="info-box">
-                <p><strong>📜 Conformidade Legal &amp; Ética de Dados:</strong> O projeto utiliza dados públicos disponibilizados pelo Portal GeoSampa sob o Decreto Municipal nº 57.770/2017 e a Lei de Acesso à Informação (Lei 12.527/2011), respeitando integralmente as diretrizes de transparência e utilidade pública.</p>
-            </div>
-
-            <h2>⚙️ Pipeline de Processamento de Dados (Engenharia de Dados)</h2>
-            <div class="pipeline-grid">
-                <div class="pipeline-card">
-                    <h4>1. Ingestão e Fontes</h4>
-                    <p style="font-size: 0.85em;">Coleta automática de GeoJSONs do GeoSampa (subprefeituras, drenagem, bueiros AMLURB), histórico da Defesa Civil e setores do IPVS (SEADE).</p>
-                </div>
-                <div class="pipeline-card">
-                    <h4>2. ETL &amp; Reprojeção</h4>
-                    <p style="font-size: 0.85em;">Expurgo de ruídos em Python, conversão cartográfica de UTM SIRGAS 2000 (EPSG:31983) para WGS84 (EPSG:4326) e sanitização de objetos para JSON.</p>
-                </div>
-                <div class="pipeline-card">
-                    <h4>3. Spatial Join</h4>
-                    <p style="font-size: 0.85em;">Agregação topológica de 27.301 setores do IPVS em 32 Subprefeituras e cálculo de densidade de alagamentos por km².</p>
-                </div>
-                <div class="pipeline-card">
-                    <h4>4. Visualização Web</h4>
-                    <p style="font-size: 0.85em;">Renderização interativa leve em HTML5/Leaflet.js via Folium com Tiles Esri, sem limites de zoom e hospedada no GitHub Pages.</p>
+        <div class="panel">
+            <!-- CABEÇALHO ACADÊMICO UNIVESP -->
+            <div class="academic-header">
+                <div class="academic-title">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO — UNIVESP</div>
+                <div><strong>Projeto Integrador Extensionista IV (DRP14 - Turma 003)</strong> — Polo Carrão</div>
+                <div class="academic-authors">
+                    <strong>Pesquisadores:</strong> Daniel Martins Queiroz, Leonardo Tomaz de Souza Neto, Livia Maria Roncoleta, Mateus Fujita Silveira, Nailah Carolina Silva, Roberto Joaquim dos Santos, Rodrigo Jose de Melo, William Yang Chen Fan.<br>
+                    <strong>Orientadora:</strong> Prof.ª Millena de Araujo Rodrigues
                 </div>
             </div>
 
-            <h2>🗺️ Trilha Analítica e Descrição das Camadas</h2>
-            <ul>
-                <li><strong>Fase 1 - Mapa 0 (Calor Histórico Puro):</strong> Concentração espacial dos registros históricos de alagamentos na capital.</li>
-                <li><strong>Fase 1 - Mapa 1 (Macro-Zonas):</strong> Agrupamento das 32 subprefeituras em 5 regiões (Centro, Norte, Leste, Oeste e Sul).</li>
-                <li><strong>Fase 1 - Mapa 2 (Subprefeituras Geral):</strong> Malha territorial detalhada das 32 subprefeituras sobreposta ao calor.</li>
-                <li><strong>Fase 1 - Mapa 3 (Individualização):</strong> Ferramenta para isolar subprefeituras específicas via painel lateral.</li>
-                <li><strong>Fase 2 - Mapa 4 (Seletor Histórico por Ano):</strong> Painel cronológico para filtrar eventos de alagamento ano a ano (2013-2026).</li>
-                <li><strong>Fase 2 - Mapa 5 (Altitude):</strong> Cruzamento entre ocorrências e o Modelo Digital de Elevação municipal.</li>
-                <li><strong>Fase 2 - Pirâmide Altitudinal:</strong> Correlação gráfica entre frequência de alagamentos e cotas altimétricas.</li>
-                <li><strong>Fase 3 - Mapa 6 (Drenagem + Anos):</strong> Hidrografia oficial (rios, canais e córregos) integrada ao filtro temporal.</li>
-                <li><strong>Fase 3 - Mapa 7 (Mancha Preditiva de 5 Anos):</strong> Modelo hidrológico cruzando drenagem com a lâmina d'água estimada (<code>m5_profu</code>).</li>
-                <li><strong>Fase 3 - Mapa 8 (Bueiros &amp; Alagamentos):</strong> Consolidação cruzando chamados de desentupimento da AMLURB com alagamentos.</li>
-                <li><strong>Fase 4 - Mapa 9 (Matriz IPVS x Bueiros x Alagamentos):</strong> Ocorrência espacial completa sobrepondo o Índice Paulista de Vulnerabilidade Social (IPVS) em escala semafórica por Subprefeitura aos pontos de manutenção urbana e alagamentos.</li>
-            </ul>
+            <!-- BOTÃO DE DOCUMENTAÇÃO EM DESTAQUE -->
+            <div class="doc-bar">
+                <button class="doc-btn active" onclick="openTab(event, 'tab-documentacao')">📖 Acessar Documentação Completa &amp; Engenharia de Dados</button>
+            </div>
 
-            <hr>
+            <!-- ROADMAP / TRILHA INTERATIVA DE MAPAS -->
+            <div class="roadmap-container">
+                <!-- FASE 1 -->
+                <div class="roadmap-phase" style="--phase: #1f6feb;">
+                    <div class="phase-title">🚀 Fase 1: Fundamentos &amp; Macro-Contexto Territorial</div>
+                    <div class="phase-steps">
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa0')">📍 Mapa 0: Calor Puro</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa1')">🏙️ Mapa 1: Macro-Zonas</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa2')">🏛️ Mapa 2: Subprefeituras Geral</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa3')">🔍 Mapa 3: Individual</button>
+                    </div>
+                </div>
+                <!-- FASE 2 -->
+                <div class="roadmap-phase" style="--phase: #8250df;">
+                    <div class="phase-title">📈 Fase 2: Variação Temporal, Altimétrica &amp; Estrutural</div>
+                    <div class="phase-steps">
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa4')">📅 Mapa 4: Seletor Anual</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa5')">⛰️ Mapa 5: Altitude</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-piramide')">📊 Pirâmide Altitudinal</button>
+                    </div>
+                </div>
+                <!-- FASE 3 -->
+                <div class="roadmap-phase" style="--phase: #1a7f37;">
+                    <div class="phase-title">⚡ Fase 3: Infraestrutura, Drenagem &amp; Modelagem Preditiva</div>
+                    <div class="phase-steps">
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa6')">🌊 Mapa 6: Drenagem + Anos</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa7')">⚠️ Mapa 7: Mancha Preditiva (5 Anos)</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa8')">🔧 Mapa 8: Bueiros &amp; Alagamentos</button>
+                    </div>
+                </div>
+                <!-- FASE 4 -->
+                <div class="roadmap-phase" style="--phase: #cf222e;">
+                    <div class="phase-title">🎯 Fase 4: Matriz de Risco Socioambiental &amp; Utilidade Pública</div>
+                    <div class="phase-steps">
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa9')">📊 Mapa 9: Matriz IPVS x Bueiros x Alagamentos (Mapa Integrado Final)</button>
+                    </div>
+                </div>
+            </div>
 
-            <div class="audit-box">
-                <h3>📊 Auditoria Oficial da Fonte de Dados (Defesa Civil / GeoSampa)</h3>
-                <p>De <strong>68.310 eventos</strong> brutos auditados:</p>
+            <!-- CONTEÚDO DAS ABAS -->
+
+            <!-- ABA 1: DOCUMENTAÇÃO -->
+            <div id="tab-documentacao" class="tab-content active">
+                <h2>📌 Visão Geral do Projeto</h2>
+                <p>Esta plataforma interativa foi concebida para apoiar os cidadãos paulistanos e a gestão pública na prevenção e mitigação de riscos de enchentes. Através da ingestão, tratamento e cruzamento espacial de bases de dados abertas da cidade de São Paulo, o projeto relaciona a infraestrutura de drenagem urbana com o histórico de ocorrências hídricas e os níveis de vulnerabilidade social.</p>
+
+                <div class="info-box">
+                    <p><strong>📜 Conformidade Legal &amp; Ética de Dados:</strong> O projeto utiliza dados públicos disponibilizados pelo Portal GeoSampa sob o Decreto Municipal nº 57.770/2017 e a Lei de Acesso à Informação (Lei 12.527/2011), respeitando integralmente as diretrizes de transparência e utilidade pública.</p>
+                </div>
+
+                <h2>🧭 Como Navegar na Plataforma</h2>
+                <div class="howto-grid">
+                    <div class="howto-item">
+                        <span class="k">Passo 01</span>
+                        <strong>Escolha uma fase.</strong> A trilha acima organiza os mapas em 4 fases analíticas — do contexto territorial à matriz de risco final.
+                    </div>
+                    <div class="howto-item">
+                        <span class="k">Passo 02</span>
+                        <strong>Abra um mapa.</strong> Cada botão carrega uma camada interativa (zoom, filtros e painéis laterais) renderizada via Leaflet/Folium.
+                    </div>
+                    <div class="howto-item">
+                        <span class="k">Passo 03</span>
+                        <strong>Compare as camadas.</strong> Alterne entre temporal, altimétrico, drenagem e IPVS para identificar padrões e prioridades de ação.
+                    </div>
+                </div>
+
+                <h2>⚙️ Pipeline de Processamento de Dados (Engenharia de Dados)</h2>
+                <div class="pipeline-grid">
+                    <div class="pipeline-card">
+                        <span class="step-num">Etapa 01</span>
+                        <h4>Ingestão e Fontes</h4>
+                        <p style="font-size: 0.85em;">Coleta automática de GeoJSONs do GeoSampa (subprefeituras, drenagem, bueiros AMLURB), histórico da Defesa Civil e setores do IPVS (SEADE).</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <span class="step-num">Etapa 02</span>
+                        <h4>ETL &amp; Reprojeção</h4>
+                        <p style="font-size: 0.85em;">Expurgo de ruídos em Python, conversão cartográfica de UTM SIRGAS 2000 (EPSG:31983) para WGS84 (EPSG:4326) e sanitização de objetos para JSON.</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <span class="step-num">Etapa 03</span>
+                        <h4>Spatial Join</h4>
+                        <p style="font-size: 0.85em;">Agregação topológica de 27.301 setores do IPVS em 32 Subprefeituras e cálculo de densidade de alagamentos por km².</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <span class="step-num">Etapa 04</span>
+                        <h4>Visualização Web</h4>
+                        <p style="font-size: 0.85em;">Renderização interativa leve em HTML5/Leaflet.js via Folium com Tiles Esri, sem limites de zoom e hospedada no GitHub Pages.</p>
+                    </div>
+                </div>
+
+                <h2>🗺️ Trilha Analítica e Descrição das Camadas</h2>
                 <ul>
-                    <li><strong>QUEDA DE ARVORE:</strong> 52.464 (expurgados para escopo hídrico)</li>
-                    <li><strong>ALAGAMENTO:</strong> 7.224 (integrados)</li>
-                    <li><strong>INUNDACAO:</strong> 5.263 (integrados)</li>
-                    <li><strong>DESLIZAMENTO:</strong> 3.359 (expurgados)</li>
+                    <li><strong>Fase 1 - Mapa 0 (Calor Histórico Puro):</strong> Concentração espacial dos registros históricos de alagamentos na capital.</li>
+                    <li><strong>Fase 1 - Mapa 1 (Macro-Zonas):</strong> Agrupamento das 32 subprefeituras em 5 regiões (Centro, Norte, Leste, Oeste e Sul).</li>
+                    <li><strong>Fase 1 - Mapa 2 (Subprefeituras Geral):</strong> Malha territorial detalhada das 32 subprefeituras sobreposta ao calor.</li>
+                    <li><strong>Fase 1 - Mapa 3 (Individualização):</strong> Ferramenta para isolar subprefeituras específicas via painel lateral.</li>
+                    <li><strong>Fase 2 - Mapa 4 (Seletor Histórico por Ano):</strong> Painel cronológico para filtrar eventos de alagamento ano a ano (2013-2026).</li>
+                    <li><strong>Fase 2 - Mapa 5 (Altitude):</strong> Cruzamento entre ocorrências e o Modelo Digital de Elevação municipal.</li>
+                    <li><strong>Fase 2 - Pirâmide Altitudinal:</strong> Correlação gráfica entre frequência de alagamentos e cotas altimétricas.</li>
+                    <li><strong>Fase 3 - Mapa 6 (Drenagem + Anos):</strong> Hidrografia oficial (rios, canais e córregos) integrada ao filtro temporal.</li>
+                    <li><strong>Fase 3 - Mapa 7 (Mancha Preditiva de 5 Anos):</strong> Modelo hidrológico cruzando drenagem com a lâmina d'água estimada (<code>m5_profu</code>).</li>
+                    <li><strong>Fase 3 - Mapa 8 (Bueiros &amp; Alagamentos):</strong> Consolidação cruzando chamados de desentupimento da AMLURB com alagamentos.</li>
+                    <li><strong>Fase 4 - Mapa 9 (Matriz IPVS x Bueiros x Alagamentos):</strong> Ocorrência espacial completa sobrepondo o Índice Paulista de Vulnerabilidade Social (IPVS) em escala semafórica por Subprefeitura aos pontos de manutenção urbana e alagamentos.</li>
                 </ul>
-                <p><strong>Total de Ocorrências Hídricas Efetivas Analisadas:</strong> 12.487 pontos consolidados.</p>
+
+                <hr>
+
+                <div class="audit-box">
+                    <h3>📊 Auditoria Oficial da Fonte de Dados (Defesa Civil / GeoSampa)</h3>
+                    <p>De <strong>68.310 eventos</strong> brutos auditados:</p>
+                    <ul>
+                        <li><strong>QUEDA DE ARVORE:</strong> 52.464 (expurgados para escopo hídrico)</li>
+                        <li><strong>ALAGAMENTO:</strong> 7.224 (integrados)</li>
+                        <li><strong>INUNDACAO:</strong> 5.263 (integrados)</li>
+                        <li><strong>DESLIZAMENTO:</strong> 3.359 (expurgados)</li>
+                    </ul>
+                    <p><strong>Total de Ocorrências Hídricas Efetivas Analisadas:</strong> 12.487 pontos consolidados.</p>
+                </div>
+
+                <h2>🗃️ Fontes de Dados</h2>
+                <ul class="source-list">
+                    <li><strong>Portal GeoSampa (PMSP):</strong> malha de subprefeituras, rede de drenagem (rios, canais e córregos), modelo digital de elevação e mancha de inundação de retorno de 5 anos.</li>
+                    <li><strong>Defesa Civil / CGE:</strong> histórico oficial de ocorrências de alagamentos e inundações (2013–2026), auditado e deduplicado.</li>
+                    <li><strong>AMLURB:</strong> chamados de limpeza e desentupimento de bueiros, usados como proxy de manutenção da microdrenagem.</li>
+                    <li><strong>Fundação SEADE:</strong> Índice Paulista de Vulnerabilidade Social (IPVS) por setor censitário, agregado às 32 subprefeituras.</li>
+                </ul>
+
+                <h2>🧰 Tecnologias Utilizadas</h2>
+                <ul>
+                    <li><strong>Linguagem:</strong> Python 3.13</li>
+                    <li><strong>GIS &amp; Engenharia de Dados:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code>, <code>pyproj</code></li>
+                    <li><strong>Visualização:</strong> <code>folium</code> (TileLayer Esri, GeoJson, LayerControl, MarkerCluster, Choropleth)</li>
+                    <li><strong>Hospedagem &amp; Deploy:</strong> GitHub Pages</li>
+                </ul>
+
+                <h2>❓ Perguntas Frequentes</h2>
+                <details class="faq-item">
+                    <summary>Os mapas não carregaram. O que fazer?</summary>
+                    <div class="faq-body">Cada camada é um arquivo HTML hospedado no GitHub Pages e carregado dentro da página. Verifique sua conexão e aguarde alguns segundos; se o problema persistir, recarregue a página.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>Por que eventos de queda de árvore e deslizamento foram removidos?</summary>
+                    <div class="faq-body">A auditoria identificou 68.310 eventos brutos na base da Defesa Civil. Como o escopo do projeto é hídrico, apenas <em>ALAGAMENTO</em> e <em>INUNDACAO</em> foram integrados, totalizando 12.487 ocorrências consolidadas.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>O que significa a escala semafórica do Mapa 9?</summary>
+                    <div class="faq-body">As subprefeituras são coloridas conforme a média do IPVS: quanto mais alta a vulnerabilidade social do território, mais crítica a cor — permitindo cruzar risco social, manutenção de bueiros e histórico de alagamentos em uma única leitura.</div>
+                </details>
             </div>
 
-            <h2>🧰 Tecnologias Utilizadas</h2>
-            <ul>
-                <li><strong>Linguagem:</strong> Python 3.13</li>
-                <li><strong>GIS &amp; Engenharia de Dados:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code>, <code>pyproj</code></li>
-                <li><strong>Visualização:</strong> <code>folium</code> (TileLayer Esri, GeoJson, LayerControl, MarkerCluster, Choropleth)</li>
-                <li><strong>Hospedagem &amp; Deploy:</strong> GitHub Pages</li>
-            </ul>
+            <!-- ABA MAPA 0 -->
+            <div id="tab-mapa0" class="tab-content">
+                <h2>🗺️ Mapa 0: Densidade de Calor Histórico</h2>
+                <p>Visualização pura da mancha de calor concentrando os registros históricos de alagamentos.</p>
+                <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">Heatmap</span><span class="map-chip">Fonte: Defesa Civil</span></div>
+                <div class="map-container"><iframe src="mapa_calor_puro.html" title="Mapa 0" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 1 -->
+            <div id="tab-mapa1" class="tab-content">
+                <h2>🗺️ Mapa 1: Densidade por Macro-Zonas</h2>
+                <p>Foco na análise regional através das 5 Macro-Zonas de São Paulo.</p>
+                <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">5 Macro-Zonas</span><span class="map-chip">Fonte: GeoSampa</span></div>
+                <div class="map-container"><iframe src="mapa_zonas_interativo.html" title="Mapa 1" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 2 -->
+            <div id="tab-mapa2" class="tab-content">
+                <h2>🗺️ Mapa 2: Subprefeituras (Geral)</h2>
+                <p>Malha territorial geral das 32 subprefeituras paulistanas.</p>
+                <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">32 Subprefeituras</span><span class="map-chip">Fonte: GeoSampa</span></div>
+                <div class="map-container"><iframe src="mapa.html" title="Mapa 2" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 3 -->
+            <div id="tab-mapa3" class="tab-content">
+                <h2>🗺️ Mapa 3: Individualização por Subprefeitura</h2>
+                <p>Isolamento seletivo de subprefeituras específicas para análise pontual.</p>
+                <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">Painel lateral</span><span class="map-chip">Análise pontual</span></div>
+                <div class="map-container"><iframe src="mapa_por_subprefeitura.html" title="Mapa 3" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 4 -->
+            <div id="tab-mapa4" class="tab-content">
+                <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
+                <p>Painel cronológico para alternar os pontos ano a ano (2013 a 2026).</p>
+                <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">Série temporal</span><span class="map-chip">2013–2026</span></div>
+                <div class="map-container"><iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 5 -->
+            <div id="tab-mapa5" class="tab-content">
+                <h2>🗺️ Mapa 5: Ocorrências Cruzadas por Altitude</h2>
+                <p>Correlação topográfica entre as cotas altimétricas urbanas e os alagamentos.</p>
+                <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">MDE municipal</span><span class="map-chip">Topografia</span></div>
+                <div class="map-container"><iframe src="mapa_pontos_por_altitude (4).html" title="Mapa 5" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA PIRÂMIDE -->
+            <div id="tab-piramide" class="tab-content">
+                <h2>📊 Análise Estrutural: Pirâmide de Altitudes e Risco</h2>
+                <p>Gráfico analítico correlacionando frequência de alagamentos e faixas de altitude.</p>
+                <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">Gráfico analítico</span><span class="map-chip">Faixas altimétricas</span></div>
+                <div class="map-container"><iframe src="figura_piramide_altitudes (1).html" title="Pirâmide" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 6 -->
+            <div id="tab-mapa6" class="tab-content">
+                <h2>🗺️ Mapa 6: Rede de Drenagem, Subprefeituras e Seletor Histórico por Anos</h2>
+                <p>Hidrografia oficial associada à malha territorial e filtro temporal.</p>
+                <div class="map-meta"><span class="map-chip">Fase 3</span><span class="map-chip">Hidrografia</span><span class="map-chip">Filtro temporal</span></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_com_drenagem_e_anos.html" title="Mapa 6" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 7 -->
+            <div id="tab-mapa7" class="tab-content">
+                <h2>🗺️ Mapa 7: Análise Preditiva de Risco (Mancha de Inundação - Retorno de 5 Anos)</h2>
+                <p>Modelo hidrológico preditivo cruzando drenagem com lâmina d'água estimada.</p>
+                <div class="map-meta"><span class="map-chip">Fase 3</span><span class="map-chip">Modelo hidrológico</span><span class="map-chip">Retorno: 5 anos</span></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_drenagem_mancha5_anos.html" title="Mapa 7" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 8 -->
+            <div id="tab-mapa8" class="tab-content">
+                <h2>🗺️ Mapa 8: Chamados de Limpeza de Bueiros (AMLURB) &amp; Ocorrências Anuais</h2>
+                <p>Integração operacional cruzando manutenção de bueiros com alagamentos.</p>
+                <div class="map-meta"><span class="map-chip">Fase 3</span><span class="map-chip">AMLURB</span><span class="map-chip">Microdrenagem</span></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_e_bueiros.html" title="Mapa 8" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 9 -->
+            <div id="tab-mapa9" class="tab-content">
+                <h2>🗺️ Mapa 9: Matriz Integrada de Risco Socioambiental (IPVS x Bueiros x Alagamentos)</h2>
+                <p>Cruzamento analítico definitivo sobrepondo a média da Vulnerabilidade Social (IPVS em escala semafórica por Subprefeitura) aos chamados de manutenção e histórico de alagamentos.</p>
+                <div class="map-meta"><span class="map-chip">Fase 4</span><span class="map-chip">IPVS semafórico</span><span class="map-chip">Mapa integrado final</span></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs3.html" title="Mapa 9" loading="lazy"></iframe></div>
+            </div>
+
         </div>
 
-        <!-- ABA MAPA 0 -->
-        <div id="tab-mapa0" class="tab-content">
-            <h2>🗺️ Mapa 0: Densidade de Calor Histórico</h2>
-            <p>Visualização pura da mancha de calor concentrando os registros históricos de alagamentos.</p>
-            <div class="map-container"><iframe src="mapa_calor_puro.html" title="Mapa 0"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 1 -->
-        <div id="tab-mapa1" class="tab-content">
-            <h2>🗺️ Mapa 1: Densidade por Macro-Zonas</h2>
-            <p>Foco na análise regional através das 5 Macro-Zonas de São Paulo.</p>
-            <div class="map-container"><iframe src="mapa_zonas_interativo.html" title="Mapa 1"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 2 -->
-        <div id="tab-mapa2" class="tab-content">
-            <h2>🗺️ Mapa 2: Subprefeituras (Geral)</h2>
-            <p>Malha territorial geral das 32 subprefeituras paulistanas.</p>
-            <div class="map-container"><iframe src="mapa.html" title="Mapa 2"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 3 -->
-        <div id="tab-mapa3" class="tab-content">
-            <h2>🗺️ Mapa 3: Individualização por Subprefeitura</h2>
-            <p>Isolamento seletivo de subprefeituras específicas para análise pontual.</p>
-            <div class="map-container"><iframe src="mapa_por_subprefeitura.html" title="Mapa 3"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 4 -->
-        <div id="tab-mapa4" class="tab-content">
-            <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
-            <p>Painel cronológico para alternar os pontos ano a ano (2013 a 2026).</p>
-            <div class="map-container"><iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 5 -->
-        <div id="tab-mapa5" class="tab-content">
-            <h2>🗺️ Mapa 5: Ocorrências Cruzadas por Altitude</h2>
-            <p>Correlação topográfica entre as cotas altimétricas urbanas e os alagamentos.</p>
-            <div class="map-container"><iframe src="mapa_pontos_por_altitude (4).html" title="Mapa 5"></iframe></div>
-        </div>
-
-        <!-- ABA PIRÂMIDE -->
-        <div id="tab-piramide" class="tab-content">
-            <h2>📊 Análise Estrutural: Pirâmide de Altitudes e Risco</h2>
-            <p>Gráfico analítico correlacionando frequência de alagamentos e faixas de altitude.</p>
-            <div class="map-container"><iframe src="figura_piramide_altitudes (1).html" title="Pirâmide"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 6 -->
-        <div id="tab-mapa6" class="tab-content">
-            <h2>🗺️ Mapa 6: Rede de Drenagem, Subprefeituras e Seletor Histórico por Anos</h2>
-            <p>Hidrografia oficial associada à malha territorial e filtro temporal.</p>
-            <div class="map-container"><iframe src="mapa_subprefeituras_com_drenagem_e_anos.html" title="Mapa 6"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 7 -->
-        <div id="tab-mapa7" class="tab-content">
-            <h2>🗺️ Mapa 7: Análise Preditiva de Risco (Mancha de Inundação - Retorno de 5 Anos)</h2>
-            <p>Modelo hidrológico preditivo cruzando drenagem com lâmina d'água estimada.</p>
-            <div class="map-container"><iframe src="mapa_subprefeituras_drenagem_mancha5_anos.html" title="Mapa 7"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 8 -->
-        <div id="tab-mapa8" class="tab-content">
-            <h2>🗺️ Mapa 8: Chamados de Limpeza de Bueiros (AMLURB) &amp; Ocorrências Anuais</h2>
-            <p>Integração operacional cruzando manutenção de bueiros com alagamentos.</p>
-            <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_e_bueiros.html" title="Mapa 8"></iframe></div>
-        </div>
-
-        <!-- ABA MAPA 9 -->
-        <div id="tab-mapa9" class="tab-content">
-            <h2>🗺️ Mapa 9: Matriz Integrada de Risco Socioambiental (IPVS x Bueiros x Alagamentos)</h2>
-            <p>Cruzamento analítico definitivo sobrepondo a média da Vulnerabilidade Social (IPVS em escala semafórica por Subprefeitura) aos chamados de manutenção e histórico de alagamentos.</p>
-            <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs3.html" title="Mapa 9"></iframe></div>
-        </div>
-
+        <!-- RODAPÉ -->
+        <footer class="footer">
+            <p class="f-mono">UNIVESP · Projeto Integrador Extensionista IV · DRP14 — Turma 003 · Polo Carrão</p>
+            <p>Dados abertos: GeoSampa (Decreto nº 57.770/2017) · Defesa Civil · AMLURB · Fundação SEADE — sob a Lei de Acesso à Informação (Lei 12.527/2011).</p>
+        </footer>
     </div>
 
     <!-- SCRIPT DE CONTROLE DO ROADMAP E ABAS -->
@@ -430,6 +713,9 @@
             }
             document.getElementById(tabName).classList.add("active");
             evt.currentTarget.classList.add("active");
+            if (tabName !== 'tab-documentacao') {
+                document.querySelector('.panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+            }
         }
     </script>
 </body>
