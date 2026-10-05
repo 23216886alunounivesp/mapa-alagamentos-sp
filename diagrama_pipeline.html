@@ -4,14 +4,15 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Diagrama do Pipeline de Engenharia de Dados</title>
-    <!-- Carrega a biblioteca oficial do Mermaid -->
-    <script type="module">
-        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
-        mermaid.initialize({ 
-            startOnLoad: true, 
-            theme: 'default',
-            securityLevel: 'loose',
-            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+    <!-- Carrega a biblioteca clássica e estável do Mermaid -->
+    <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+    <script>
+        document.addEventListener("DOMContentLoaded", function() {
+            mermaid.initialize({ 
+                startOnLoad: true, 
+                theme: 'default',
+                securityLevel: 'loose'
+            });
         });
     </script>
     <style>
@@ -28,61 +29,57 @@
         }
         .mermaid {
             width: 100%;
-            max-width: 1100px;
+            max-width: 1000px;
             text-align: center;
         }
     </style>
 </head>
 <body>
 
-    <pre class="mermaid">
-flowchart TD
+    <div class="mermaid">
+graph TD
     classDef source fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#01579b;
     classDef etl fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20;
     classDef deploy fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100;
     classDef web fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c;
 
-    subgraph S1 ["1. FONTES DE DADOS ABERTOS"]
-        direction LR
-        A1["🏛️ GeoSampa<br/>(Shapefiles Drenagem e Bueiros)"]:::source
-        A2["🚨 Defesa Civil / SP156<br/>(68.310 Registros Brutos)"]:::source
-        A3["📊 Fundação SEADE<br/>(27.301 Setores IPVS)"]:::source
+    subgraph S1 [1. FONTES DE DADOS ABERTOS]
+        A1["GeoSampa - Drenagem e Bueiros"]:::source
+        A2["Defesa Civil - 68k Registros Brutos"]:::source
+        A3["Fundacao SEADE - 27k Setores IPVS"]:::source
     end
 
-    subgraph S2 ["2. PIPELINE ETL E GEOPROCESSAMENTO"]
-        direction TD
-        B1["🧹 Expurgo e Filtragem<br/>(12.487 eventos hídricos)"]:::etl
-        B2["🌐 Conversão de CRS<br/>(UTM EPSG:31983 para WGS84 EPSG:4326)"]:::etl
-        B3["🎯 Spatial Join Topológico<br/>(Centróides IPVS para Subprefeituras)"]:::etl
-        B4["⚡ Sanitização e Serialização<br/>(Exportação GeoJSON e HTML)"]:::etl
+    subgraph S2 [2. PIPELINE ETL E GEOPROCESSAMENTO]
+        B1["Expurgo e Filtragem Hidrica"]:::etl
+        B2["Conversao de CRS SIRGAS2000 em WGS84"]:::etl
+        B3["Spatial Join Topologico"]:::etl
+        B4["Sanitizacao e Exportacao GeoJSON HTML"]:::etl
         
         B1 --> B2
         B2 --> B3
         B3 --> B4
     end
 
-    subgraph S3 ["3. HOSPEDAGEM E DEPLOY CONTINUO"]
-        direction LR
-        C1["📦 Repositório GitHub<br/>(Branch Main Estática)"]:::deploy
-        C2["🌍 GitHub Pages<br/>(Global CDN Delivery)"]:::deploy
-        C1 -->|"CI/CD Deploy"| C2
+    subgraph S3 [3. HOSPEDAGEM E DEPLOY CONTINUO]
+        C1["Repositorio GitHub"]:::deploy
+        C2["GitHub Pages Global CDN"]:::deploy
+        C1 -->|CI CD Deploy| C2
     end
 
-    subgraph S4 ["4. INTERFACE E NAVEGAÇÃO INTERATIVA"]
-        direction LR
-        D1["🗺️ Leaflet.js / Folium<br/>(Tiles Esri World Street Map)"]:::web
-        D2["📊 Card Flutuante IPVS<br/>(Escala Semafórica 1 a 6)"]:::web
-        D3["🧭 index.html<br/>(Trilha Analítica em 4 Fases)"]:::web
+    subgraph S4 [4. INTERFACE E NAVEGACAO INTERATIVA]
+        D1["Leaflet.js e Folium"]:::web
+        D2["Card Flutuante IPVS"]:::web
+        D3["index.html Trilha Analitica"]:::web
     end
 
-    A1 -->|"Carga em Memória"| B1
-    A2 -->|"Carga em Memória"| B1
-    A3 -->|"Carga em Memória"| B1
-    B4 -->|"Git Commit Push"| C1
-    C2 -->|"Entrega HTTPS"| D3
+    A1 -->|Carga em Memoria| B1
+    A2 -->|Carga em Memoria| B1
+    A3 -->|Carga em Memoria| B1
+    B4 -->|Git Commit| C1
+    C2 -->|Entrega HTTPS| D3
     D3 --> D1
     D3 --> D2
-    </pre>
+    </div>
 
 </body>
 </html>
