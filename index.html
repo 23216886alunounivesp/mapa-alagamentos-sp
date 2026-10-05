@@ -479,7 +479,7 @@
                     <div class="phase-title">⚡ Fase 3: Infraestrutura, Drenagem &amp; Modelagem Preditiva</div>
                     <div class="phase-steps">
                         <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa6')">🌊 Mapa 6: Drenagem + Anos</button>
-                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa7')">⚠️️ Mapa 7: Mancha Preditiva (5 Anos)</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa7')">⚠️ Mapa 7: Mancha Preditiva (5 Anos)</button>
                         <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa8')">🔧 Mapa 8: Bueiros &amp; Alagamentos</button>
                     </div>
                 </div>
@@ -527,6 +527,12 @@
                 
                 <!-- INFOGRÁFICO DE ENGENHARIA DE DADOS -->
                 <img src="Pipeline_de_Engenharia_de_Dados_Espaciais.png" alt="Infográfico do Pipeline de Engenharia de Dados Espaciais (2013-2026)" class="infographic-img">
+
+                <!-- DIAGRAMA MERMAID (BYTEBYTEGO STYLE) VIA IFRAME -->
+                <h3>📐 Diagrama Técnico da Arquitetura (Mermaid / ByteByteGo)</h3>
+                <div class="map-container" style="height: 600px; margin-bottom: 25px;">
+                    <iframe src="diagrama_pipeline.html" title="Diagrama do Pipeline de Engenharia de Dados" loading="lazy"></iframe>
+                </div>
 
                 <div class="pipeline-grid">
                     <div class="pipeline-card">
@@ -649,7 +655,7 @@
 
             <!-- ABA MAPA 4 -->
             <div id="tab-mapa4" class="tab-content">
-                <h2>🗺️️ Mapa 4: Seletor Histórico por Ano</h2>
+                <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
                 <p>Painel cronológico para alternar os pontos ano a ano (2013 a 2026).</p>
                 <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">Série temporal</span><span class="map-chip">2013–2026</span></div>
                 <div class="map-container"><iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4" loading="lazy"></iframe></div>
@@ -660,7 +666,7 @@
                 <h2>🗺️ Mapa 5: Ocorrências Cruzadas por Altitude</h2>
                 <p>Correlação topográfica entre as cotas altimétricas urbanas e os alagamentos.</p>
                 <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">MDE municipal</span><span class="map-chip">Topografia</span></div>
-                <div class="map-container"><iframe src="mapa_pontos_por_altitude (4).html" title="Mapa 5" loading="lazy"></iframe></div>
+                <div class="map-container"><iframe src="mapa_pontos_por_altitude_4.html" title="Mapa 5" loading="lazy"></iframe></div>
             </div>
 
             <!-- ABA PIRÂMIDE -->
@@ -668,7 +674,7 @@
                 <h2>📊 Análise Estrutural: Pirâmide de Altitudes e Risco</h2>
                 <p>Gráfico analítico correlacionando frequência de alagamentos e faixas de altitude.</p>
                 <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">Gráfico analítico</span><span class="map-chip">Faixas altimétricas</span></div>
-                <div class="map-container"><iframe src="figura_piramide_altitudes (1).html" title="Pirâmide" loading="lazy"></iframe></div>
+                <div class="map-container"><iframe src="figura_piramide_altitudes_1.html" title="Pirâmide" loading="lazy"></iframe></div>
             </div>
 
             <!-- ABA MAPA 6 -->
@@ -712,7 +718,7 @@
         </footer>
     </div>
 
-    <!-- SCRIPT DE CONTROLE DO ROADMAP E ABAS -->
+    <!-- SCRIPT DE CONTROLE DO ROADMAP E ABAS (CORRIGIDO) -->
     <script>
         function openTab(evt, tabName) {
             const contents = document.getElementsByClassName("tab-content");
@@ -727,9 +733,14 @@
             for (let i = 0; i < docBtns.length; i++) {
                 docBtns[i].classList.remove("active");
             }
-            document.getElementById(tabName).classList.add("active");
-            evt.currentTarget.classList.add("active");
-            if (tabName !== 'tab-documentacao') {
+            
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add("active");
+                if (evt && evt.currentTarget) {
+                    evt.currentTarget.classList.add("active");
+                }
+                // Rola a página suavemente para o topo do painel em QUALQUER clique
                 document.querySelector('.panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
             }
         }
