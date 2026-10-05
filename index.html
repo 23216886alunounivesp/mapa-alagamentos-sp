@@ -299,6 +299,14 @@
         }
         .audit-box h3 { margin-top: 0; color: var(--red); }
         /* INFOGRÁFICO DE PIPELINE */
+        .infographic-img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            margin: 20px 0;
+            box-shadow: 0 4px 16px rgba(18,20,31,0.08);
+        }
         .pipeline-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
@@ -333,7 +341,7 @@
             font-size: 1em;
             font-weight: 700;
         }
-        /* NOVAS SEÇÕES */
+        /* SEÇÕES AUXILIARES */
         .howto-grid {
             display: grid;
             grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
@@ -409,10 +417,6 @@
             .map-container { height: 480px; }
             .hero { padding: 44px 16px 44px; }
         }
-        @media (prefers-reduced-motion: reduce) {
-            *, *::before, *::after { animation: none !important; transition: none !important; }
-            html { scroll-behavior: auto; }
-        }
     </style>
 </head>
 <body>
@@ -475,7 +479,7 @@
                     <div class="phase-title">⚡ Fase 3: Infraestrutura, Drenagem &amp; Modelagem Preditiva</div>
                     <div class="phase-steps">
                         <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa6')">🌊 Mapa 6: Drenagem + Anos</button>
-                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa7')">⚠️ Mapa 7: Mancha Preditiva (5 Anos)</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa7')">⚠️️ Mapa 7: Mancha Preditiva (5 Anos)</button>
                         <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa8')">🔧 Mapa 8: Bueiros &amp; Alagamentos</button>
                     </div>
                 </div>
@@ -495,27 +499,35 @@
                 <h2>📌 Visão Geral do Projeto</h2>
                 <p>Esta plataforma interativa foi concebida para apoiar os cidadãos paulistanos e a gestão pública na prevenção e mitigação de riscos de enchentes. Através da ingestão, tratamento e cruzamento espacial de bases de dados abertas da cidade de São Paulo, o projeto relaciona a infraestrutura de drenagem urbana com o histórico de ocorrências hídricas e os níveis de vulnerabilidade social.</p>
 
+                <!-- BLOCO DE DESTAQUE PARADIGMA DA PREVENÇÃO -->
                 <div class="info-box">
-                    <p><strong>📜 Conformidade Legal &amp; Ética de Dados:</strong> O projeto utiliza dados públicos disponibilizados pelo Portal GeoSampa sob o Decreto Municipal nº 57.770/2017 e a Lei de Acesso à Informação (Lei 12.527/2011), respeitando integralmente as diretrizes de transparência e utilidade pública.</p>
+                    <h3>💡 O Paradigma da Prevenção: De Dados Fragmentados à Inteligência Proativa</h3>
+                    <p>A abordagem convencional lida com a zeladoria de forma reativa ("Onde alagou ontem?"). Este piloto consolida dados abertos para permitir uma atuação proativa ("Quais áreas de risco crônico exigem intervenção e zeladoria hoje?"). Toda a solução foi projetada com <strong>arquitetura 100% Open Source e custo zero de infraestrutura</strong>.</p>
                 </div>
 
-                <h2>🧭 Como Navegar na Plataforma</h2>
-                <div class="howto-grid">
-                    <div class="howto-item">
-                        <span class="k">Passo 01</span>
-                        <strong>Escolha uma fase.</strong> A trilha acima organiza os mapas em 4 fases analíticas — do contexto territorial à matriz de risco final.
-                    </div>
-                    <div class="howto-item">
-                        <span class="k">Passo 02</span>
-                        <strong>Abra um mapa.</strong> Cada botão carrega uma camada interativa (zoom, filtros e painéis laterais) renderizada via Leaflet/Folium.
-                    </div>
-                    <div class="howto-item">
-                        <span class="k">Passo 03</span>
-                        <strong>Compare as camadas.</strong> Alterne entre temporal, altimétrico, drenagem e IPVS para identificar padrões e prioridades de ação.
+                <!-- BLOCO DE AUDITORIA DE DADOS -->
+                <div class="audit-box">
+                    <h3>📊 Anatomia e Auditoria do Dataset Hídrico (2013–2026)</h3>
+                    <p>A partir do volume bruto de <strong>68.310 registros</strong> extraídos da Defesa Civil / COMDEC via Canal SP156, aplicou-se um pipeline rigoroso em Python para expurgar eventos não hídricos (52.464 quedas de árvores e 3.359 deslizamentos), resultando em <strong>12.487 ocorrências hídricas auditadas</strong>:</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div style="background: #ffffff; border: 1px solid var(--line); border-left: 4px solid var(--cyan-deep); padding: 12px; border-radius: 6px;">
+                            <strong style="color: var(--cyan-deep); font-size: 1.1em;">57,85% (7.224)</strong><br>
+                            <span style="font-size: 0.85em; color: var(--muted);"><strong>Falha na Microdrenagem:</strong> Alagamentos por obstrução de galerias, bueiros e bocas de lobo.</span>
+                        </div>
+                        <div style="background: #ffffff; border: 1px solid var(--line); border-left: 4px solid var(--red); padding: 12px; border-radius: 6px;">
+                            <strong style="color: var(--red); font-size: 1.1em;">42,15% (5.263)</strong><br>
+                            <span style="font-size: 0.85em; color: var(--muted);"><strong>Gargalo na Macrodrenagem:</strong> Inundações por transbordamento de rios, córregos e piscinões.</span>
+                        </div>
                     </div>
                 </div>
 
-                <h2>⚙️ Pipeline de Processamento de Dados (Engenharia de Dados)</h2>
+                <h2>⚙️ Pipeline de Engenharia de Dados Espaciais</h2>
+                <p>Abaixo está representado o fluxo de transformação dos dados geoespaciais desde a coleta de fontes primárias públicas até a geração da Matriz de Risco Socioambiental:</p>
+                
+                <!-- INFOGRÁFICO DE ENGENHARIA DE DADOS -->
+                <img src="Pipeline_de_Engenharia_de_Dados_Espaciais.png" alt="Infográfico do Pipeline de Engenharia de Dados Espaciais (2013-2026)" class="infographic-img">
+
                 <div class="pipeline-grid">
                     <div class="pipeline-card">
                         <span class="step-num">Etapa 01</span>
@@ -539,6 +551,22 @@
                     </div>
                 </div>
 
+                <h2>🧭 Como Navegar na Plataforma</h2>
+                <div class="howto-grid">
+                    <div class="howto-item">
+                        <span class="k">Passo 01</span>
+                        <strong>Escolha uma fase.</strong> A trilha acima organiza os mapas em 4 fases analíticas — do contexto territorial à matriz de risco final.
+                    </div>
+                    <div class="howto-item">
+                        <span class="k">Passo 02</span>
+                        <strong>Abra um mapa.</strong> Cada botão carrega uma camada interativa (zoom, filtros e painéis laterais) renderizada via Leaflet/Folium.
+                    </div>
+                    <div class="howto-item">
+                        <span class="k">Passo 03</span>
+                        <strong>Compare as camadas.</strong> Alterne entre temporal, altimétrico, drenagem e IPVS para identificar padrões e prioridades de ação.
+                    </div>
+                </div>
+
                 <h2>🗺️ Trilha Analítica e Descrição das Camadas</h2>
                 <ul>
                     <li><strong>Fase 1 - Mapa 0 (Calor Histórico Puro):</strong> Concentração espacial dos registros históricos de alagamentos na capital.</li>
@@ -555,18 +583,6 @@
                 </ul>
 
                 <hr>
-
-                <div class="audit-box">
-                    <h3>📊 Auditoria Oficial da Fonte de Dados (Defesa Civil / GeoSampa)</h3>
-                    <p>De <strong>68.310 eventos</strong> brutos auditados:</p>
-                    <ul>
-                        <li><strong>QUEDA DE ARVORE:</strong> 52.464 (expurgados para escopo hídrico)</li>
-                        <li><strong>ALAGAMENTO:</strong> 7.224 (integrados)</li>
-                        <li><strong>INUNDACAO:</strong> 5.263 (integrados)</li>
-                        <li><strong>DESLIZAMENTO:</strong> 3.359 (expurgados)</li>
-                    </ul>
-                    <p><strong>Total de Ocorrências Hídricas Efetivas Analisadas:</strong> 12.487 pontos consolidados.</p>
-                </div>
 
                 <h2>🗃️ Fontes de Dados</h2>
                 <ul class="source-list">
@@ -633,7 +649,7 @@
 
             <!-- ABA MAPA 4 -->
             <div id="tab-mapa4" class="tab-content">
-                <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
+                <h2>🗺️️ Mapa 4: Seletor Histórico por Ano</h2>
                 <p>Painel cronológico para alternar os pontos ano a ano (2013 a 2026).</p>
                 <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">Série temporal</span><span class="map-chip">2013–2026</span></div>
                 <div class="map-container"><iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4" loading="lazy"></iframe></div>
@@ -684,7 +700,7 @@
                 <h2>🗺️ Mapa 9: Matriz Integrada de Risco Socioambiental (IPVS x Bueiros x Alagamentos)</h2>
                 <p>Cruzamento analítico definitivo sobrepondo a média da Vulnerabilidade Social (IPVS em escala semafórica por Subprefeitura) aos chamados de manutenção e histórico de alagamentos.</p>
                 <div class="map-meta"><span class="map-chip">Fase 4</span><span class="map-chip">IPVS semafórico</span><span class="map-chip">Mapa integrado final</span></div>
-                <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs3.html" title="Mapa 9" loading="lazy"></iframe></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs.html" title="Mapa 9" loading="lazy"></iframe></div>
             </div>
 
         </div>
