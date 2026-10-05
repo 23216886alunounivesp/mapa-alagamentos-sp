@@ -1,0 +1,90 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Diagrama do Pipeline de Engenharia de Dados</title>
+    <!-- Carrega a biblioteca oficial do Mermaid -->
+    <script type="module">
+        import mermaid from 'https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.esm.min.mjs';
+        mermaid.initialize({ 
+            startOnLoad: true, 
+            theme: 'default',
+            securityLevel: 'loose',
+            flowchart: { useMaxWidth: true, htmlLabels: true, curve: 'basis' }
+        });
+    </script>
+    <style>
+        body {
+            margin: 0;
+            padding: 20px;
+            background-color: #ffffff;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            box-sizing: border-box;
+        }
+        .mermaid {
+            width: 100%;
+            max-width: 1100px;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+    <pre class="mermaid">
+flowchart TD
+    %% Estilização de Cores (Estilo ByteByteGo / Modern Tech)
+    classDef source fill:#e1f5fe,stroke:#0288d1,stroke-width:2px,color:#01579b;
+    classDef etl fill:#e8f5e9,stroke:#388e3c,stroke-width:2px,color:#1b5e20;
+    classDef deploy fill:#fff3e0,stroke:#f57c00,stroke-width:2px,color:#e65100;
+    classDef web fill:#f3e5f5,stroke:#7b1fa2,stroke-width:2px,color:#4a148c;
+
+    %% ❶ FONTES DE DADOS
+    subgraph S1 ["❶ FONTES DE DADOS ABERTOS"]
+        direction LR
+        A1["🏛️ GeoSampa<br/><i>(Shapefiles Drenagem/Bueiros)</i>"]:::source
+        A2["🚨 Defesa Civil / SP156<br/><i>(68.310 Registros Brutos)</i>"]:::source
+        A3["📊 Fundação SEADE<br/><i>(27.301 Setores IPVS)</i>"]:::source
+    end
+
+    %% ❷ PIPELINE DE ENGENHARIA DE DADOS
+    subgraph S2 ["❷ PIPELINE ETL & GEOPROCESSAMENTO (PYTHON / COLAB)"]
+        direction TD
+        B1["🧹 Expurgo & Filtragem<br/><i>(Isolamento de 12.487 eventos hídricos)</i>"]:::etl
+        B2["🌐 Conversão de CRS<br/><i>(UTM EPSG:31983 ➔ WGS84 EPSG:4326)</i>"]:::etl
+        B3["🎯 Spatial Join Topológico<br/><i>(Centróides IPVS ➔ 32 Subprefeituras)</i>"]:::etl
+        B4["⚡ Sanitização & Serialização<br/><i>(Exportação de GeoJSON & HTML leves)</i>"]:::etl
+        
+        B1 --> B2 --> B3 --> B4
+    end
+
+    %% ❸ HOSPEDAGEM & DEPLOY CONTINUO
+    subgraph S3 ["❸ HOSPEDAGEM & DEPLOY CONTINUO (SERVERLESS)"]
+        direction LR
+        C1["📦 Repositório GitHub<br/><i>(Branch Main Estática)</i>"]:::deploy
+        C2["🌍 GitHub Pages / Netlify<br/><i>(Global CDN Delivery - Custo Zero)</i>"]:::deploy
+        C1 -- "CI/CD Deploy" --> C2
+    end
+
+    %% ❹ INTERFACE DO USUÁRIO
+    subgraph S4 ["❹ CLIENT-SIDE & NAVEGAÇÃO INTERATIVA (INDEX.HTML)"]
+        direction LR
+        D1["🗺️ Leaflet.js / Folium<br/><i>(Tiles Esri World Street Map)</i>"]:::web
+        D2["📊 Card Flutuante IPVS<br/><i>(Escala Semafórica 1 a 6)</i>"]:::web
+        D3["🧭 index.html<br/><i>(Trilha Analítica em 4 Fases)</i>"]:::web
+    end
+
+    %% CONEXÕES ENTRE ETAPAS
+    A1 & A2 & A3 -->|"Carga em Memória"| B1
+    B4 -->|"Git Commit & Push"| C1
+    C2 -->|"Entrega HTTPS"| D3
+    D3 --> D1
+    D3 --> D2
+    </pre>
+
+</body>
+</html>
