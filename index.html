@@ -251,7 +251,8 @@
             box-shadow: 0 3px 10px rgba(18, 20, 31, 0.22);
         }
         .roadmap-btn.active:hover { color: #ffffff; }
-        /* ABAS */
+        
+        /* ABAS E CONTAINERS */
         .tab-content { display: none; }
         .tab-content.active {
             display: block;
@@ -265,6 +266,7 @@
             position: relative;
             width: 100%;
             height: 720px;
+            min-height: 720px;
             margin: 20px 0 10px;
             border: 1px solid var(--line);
             border-radius: 12px;
@@ -272,7 +274,13 @@
             background-color: #f4f7fb;
             box-shadow: 0 4px 16px rgba(18, 20, 31, 0.08);
         }
-        iframe { width: 100%; height: 100%; border: none; }
+        iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 720px;
+            border: none;
+            display: block;
+        }
         .map-meta {
             display: flex; flex-wrap: wrap; gap: 8px;
             margin: 12px 0 4px;
@@ -420,7 +428,7 @@
         /* RESPONSIVO */
         @media (max-width: 720px) {
             .panel { padding: 24px 18px; }
-            .map-container { height: 480px; }
+            .map-container, iframe { height: 480px; min-height: 480px; }
             .hero { padding: 44px 16px 44px; }
         }
     </style>
@@ -494,6 +502,7 @@
                     <div class="phase-title">🎯 Fase 4: Matriz de Risco Socioambiental &amp; Utilidade Pública</div>
                     <div class="phase-steps">
                         <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa9')">📊 Mapa 9: Matriz IPVS x Bueiros x Alagamentos (Mapa Integrado Final)</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapainterativo')">🌐 Mapa Interativo (Versão Autônoma)</button>
                     </div>
                 </div>
             </div>
@@ -590,6 +599,7 @@
                     <li><strong>Fase 3 - Mapa 7 (Mancha Preditiva de 5 Anos):</strong> Modelo hidrológico cruzando drenagem com a lâmina d'água estimada (<code>m5_profu</code>).</li>
                     <li><strong>Fase 3 - Mapa 8 (Bueiros &amp; Alagamentos):</strong> Consolidação cruzando chamados de desentupimento da AMLURB com alagamentos.</li>
                     <li><strong>Fase 4 - Mapa 9 (Matriz IPVS x Bueiros x Alagamentos):</strong> Ocorrência espacial completa sobrepondo o Índice Paulista de Vulnerabilidade Social (IPVS) em escala semafórica por Subprefeitura aos pontos de manutenção urbana e alagamentos.</li>
+                    <li><strong>Mapa Interativo Autônomo:</strong> Aplicação geoespacial estendida oferecida como alternativa independente com cartografia Esri Topo.</li>
                 </ul>
 
                 <hr>
@@ -642,34 +652,7 @@
             </div>
 
             <!-- ABA MAPA 2 -->
-            <div id="tab-mapa2" class="tab-content"><!-- ABA MAPA 4 -->
-<div id="tab-mapa4" class="tab-content">
-    <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
-    <p>Painel cronológico interativo contendo os pontos de alagamento por ano (2013 a 2026), com limites do Município, Subprefeituras e Macro-Zonas.</p>
-    
-    <div class="map-meta">
-        <span class="map-chip">Fase 2</span>
-        <span class="map-chip">Série temporal</span>
-        <span class="map-chip">2013–2026</span>
-    </div>
-
-    <!-- CARD INTERATIVO DE COLABORAÇÃO -->
-    <div class="info-box" style="margin: 18px 0; background: #ecfeff; border-left: 4px solid var(--cyan-deep);">
-        <h3 style="margin-top: 0; color: var(--navy); font-size: 1.1em;">🚨 Viu um ponto de alagamento ou pista liberada agora?</h3>
-        <p style="font-size: 0.88em; margin-bottom: 12px; color: var(--muted);">
-            Colabore com o mapeamento enviando a posição exata pelo GPS do seu dispositivo e uma foto do local.
-        </p>
-        <button class="doc-btn" onclick="abrirModalColaboracao()" style="background-color: var(--cyan-deep); padding: 10px 24px;">
-            📸 Reportar Ocorrência em Tempo Real (GPS + Foto)
-        </button>
-    </div>
-
-    <!-- CHAMADA DO NOVO MAPA HTML DENTRO DO IFRAME -->
-    <div class="map-container">
-        <iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4: Seletor Histórico por Ano" loading="lazy"></iframe>
-    </div>
-</div>
-
+            <div id="tab-mapa2" class="tab-content">
                 <h2>🗺️ Mapa 2: Subprefeituras (Geral)</h2>
                 <p>Malha territorial geral das 32 subprefeituras paulistanas.</p>
                 <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">32 Subprefeituras</span><span class="map-chip">Fonte: GeoSampa</span></div>
@@ -684,7 +667,7 @@
                 <div class="map-container"><iframe src="mapa_por_subprefeitura.html" title="Mapa 3" loading="lazy"></iframe></div>
             </div>
 
-            <!-- ABA MAPA 4 (ATUALIZADA COM PAINEL E IFRAME DO NOVO MAPA) -->
+            <!-- ABA MAPA 4 -->
             <div id="tab-mapa4" class="tab-content">
                 <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
                 <p>Painel cronológico interativo contendo os pontos de alagamento por ano (2013 a 2026), com limites do Município, Subprefeituras e Macro-Zonas.</p>
@@ -706,7 +689,7 @@
                     </button>
                 </div>
 
-                <!-- CHAMADA DO NOVO MAPA HTML DENTRO DO IFRAME -->
+                <!-- CHAMADA DO MAPA HTML DENTRO DO IFRAME -->
                 <div class="map-container">
                     <iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4: Seletor Histórico por Ano" loading="lazy"></iframe>
                 </div>
@@ -758,6 +741,20 @@
                 <p>Cruzamento analítico definitivo sobrepondo a média da Vulnerabilidade Social (IPVS em escala semafórica por Subprefeitura) aos chamados de manutenção e histórico de alagamentos.</p>
                 <div class="map-meta"><span class="map-chip">Fase 4</span><span class="map-chip">IPVS semafórico</span><span class="map-chip">Mapa integrado final</span></div>
                 <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs_2.html" title="Mapa 9" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA INTERATIVO (VERSÃO AUTÔNOMA / INDEPENDENTE) -->
+            <div id="tab-mapainterativo" class="tab-content">
+                <h2>🌐 Mapa Interativo (Versão Autônoma)</h2>
+                <p>Aplicação geoespacial estendida oferecida como alternativa independente com cartografia Esri Topo de alta performance.</p>
+                <div class="map-meta">
+                    <span class="map-chip">Versão Independente</span>
+                    <span class="map-chip">Esri Topo</span>
+                    <span class="map-chip">Navegação Livre</span>
+                </div>
+                <div class="map-container">
+                    <iframe src="mapa_alagamentos_independente.html" title="Mapa Interativo Autônomo" loading="lazy"></iframe>
+                </div>
             </div>
 
         </div>
@@ -953,7 +950,6 @@
             let fotoUrlPublica = null;
 
             try {
-                // Upload da foto para o Supabase Storage se selecionada
                 if (inputFoto.files && inputFoto.files[0]) {
                     const fileOriginal = inputFoto.files[0];
                     const blobComprimido = await compressImage(fileOriginal, 1200, 0.8);
@@ -975,7 +971,6 @@
                     }
                 }
 
-                // Inserção do registro na tabela 'confirmacoes_alagamento'
                 const { error: dbError } = await supabaseClient
                     .from('confirmacoes_alagamento')
                     .insert([
