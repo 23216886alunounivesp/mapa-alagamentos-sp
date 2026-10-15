@@ -820,6 +820,9 @@
     <!-- ========================================================= -->
     <!-- SCRIPTS DE CONTROLE DO SITE E CONEXÃO SUPABASE -->
     <!-- ========================================================= -->
+  <!-- ========================================================= -->
+    <!-- SCRIPTS DE CONTROLE DO SITE E CONEXÃO SUPABASE -->
+    <!-- ========================================================= -->
     <script>
         // 1. INICIALIZAÇÃO DO CLIENTE SUPABASE
         const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
@@ -876,7 +879,6 @@
                         const lat = pos.coords.latitude;
                         const lon = pos.coords.longitude;
 
-                        // Validação simples do perímetro urbano de São Paulo
                         if (lat >= -24.1 && lat <= -23.3 && lon >= -46.9 && lon <= -46.3) {
                             latAtual = lat;
                             lonAtual = lon;
@@ -937,7 +939,7 @@
             });
         }
 
-        // 6. ENVIO DE DADOS E FOTO PARA O SUPABASE (DATABASE + STORAGE)
+        // 6. ENVIO DE DADOS E FOTO PARA O SUPABASE
         async function enviarOcorrencia(e) {
             e.preventDefault();
 
@@ -961,7 +963,7 @@
                         .upload(nomeArquivo, blobComprimido, { contentType: 'image/jpeg' });
 
                     if (storageError) {
-                        console.warn('Aviso ao enviar foto (continuando sem foto):', storageError.message);
+                        console.warn('Aviso ao enviar foto:', storageError.message);
                     } else {
                         const { data: urlData } = supabaseClient.storage
                             .from('fotos-alagamentos')
@@ -986,10 +988,13 @@
                 if (dbError) {
                     alert('Erro ao registrar no banco de dados: ' + dbError.message);
                 } else {
-                    alert('✅ Ocorrência registrada com sucesso! Obrigado por colaborar.');
+                    alert('✅ Ocorrência registrada com sucesso! Atualizando mapa...');
                     document.getElementById("form-colaborativo").reset();
                     document.getElementById("status-gps").innerText = "Aguardando...";
                     fecharModalColaboracao();
+                    
+                    // Recarrega os pontos no mapa imediatamente
+                    carregarPontosColaborativos();
                 }
 
             } catch (err) {
@@ -999,6 +1004,96 @@
                 btnSubmit.innerText = "✅ Enviar Confirmação";
             }
         }
+
+        // 7. CARREGAR E EXIBIR OCORRÊNCIAS COM FOTO NO MAPA
+        async function carregarPontosColaborativos() {
+            try {
+                const { data: pontos, error } = await supabaseClient
+                    .from('confirmacoes_alagamento')
+                    .select('*');
+
+                if (error) {
+                    console.error('Erro ao buscar ocorrências:', error.message);
+                    return;
+                }
+
+                if (!pontos || pontos.length === 0) return;
+
+                // Seleciona o iframe ativo do mapa
+                const iframes = document.querySelectorAll('.map-container iframe');
+                iframes.forEach(iframe => {
+                    if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
+                        plotaPontosNoIframe(iframe, pontos);
+                    } else {
+                        iframe.onload = () => plotaPontosNoIframe(iframe, pontos);
+                    }
+                });
+
+            } catch (err) {
+                console.error('Erro ao carregar pontos:', err);
+            }
+        }
+
+        function plotaPontosNoIframe(iframeElement, pontos) {
+            try {
+                const win = iframeElement.contentWindow;
+                if (!win || !win.L) return;
+
+                let mapObj = null;
+                for (let key in win) {
+                    if (key.startsWith('map_') || key === 'mapa_anos') {
+                        mapObj = win[key];
+                        break;
+                    }
+                }
+
+                if (!mapObj) return;
+
+                pontos.forEach(ponto => {
+                    if (ponto.latitude && ponto.longitude) {
+                        const corIcone = ponto.status === 'alagado' ? '#cf222e' : '#1a7f37';
+                        const statusTexto = ponto.status === 'alagado' ? '🚨 Ponto Alagado' : '🟢 Pista Liberada';
+                        const dataRegistro = ponto.created_at ? new Date(ponto.created_at).toLocaleString('pt-BR') : 'Data não informada';
+
+                        let popupHtml = `
+                            <div style="font-family: sans-serif; min-width: 210px; max-width: 260px; padding: 4px;">
+                                <strong style="color: ${corIcone}; font-size: 1.05em;">${statusTexto}</strong><br>
+                                <small style="color: #666; font-size: 0.8em;">📅 ${dataRegistro}</small>
+                                <hr style="margin: 8px 0; border: 0; border-top: 1px solid #e2e8f0;">
+                        `;
+
+                        if (ponto.foto_url) {
+                            popupHtml += `
+                                <div style="margin: 6px 0;">
+                                    <a href="${ponto.foto_url}" target="_blank" title="Clique para ampliar">
+                                        <img src="${ponto.foto_url}" alt="Foto do local" style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
+                                    </a>
+                                </div>
+                            `;
+                        } else {
+                            popupHtml += `<p style="font-size: 0.8em; color: #94a3b8; margin: 4px 0;">Sem foto anexada.</p>`;
+                        }
+
+                        popupHtml += `</div>`;
+
+                        win.L.circleMarker([ponto.latitude, ponto.longitude], {
+                            radius: 9,
+                            fillColor: corIcone,
+                            color: '#ffffff',
+                            weight: 2,
+                            opacity: 1,
+                            fillOpacity: 0.85
+                        }).bindPopup(popupHtml).addTo(mapObj);
+                    }
+                });
+
+            } catch (e) {
+                console.warn('Mapa ainda carregando...', e);
+            }
+        }
+
+        // Executa a busca ao carregar a página
+        window.addEventListener('DOMContentLoaded', carregarPontosColaborativos);
     </script>
 </body>
 </html>
