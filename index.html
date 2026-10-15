@@ -820,9 +820,6 @@
     <!-- ========================================================= -->
     <!-- SCRIPTS DE CONTROLE DO SITE E CONEXÃO SUPABASE -->
     <!-- ========================================================= -->
-  <!-- ========================================================= -->
-    <!-- SCRIPTS DE CONTROLE DO SITE E CONEXÃO SUPABASE -->
-    <!-- ========================================================= -->
     <script>
         // 1. INICIALIZAÇÃO DO CLIENTE SUPABASE
         const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
@@ -833,7 +830,7 @@
         let latAtual = null;
         let lonAtual = null;
 
-        // 2. CONTROLE DE ABAS E ROADMAP
+        // 2. CONTROLE DE ABAS E ROADMAP (ATUALIZADO PARA RECARREGAR OS PONTOS)
         function openTab(evt, tabName) {
             const contents = document.getElementsByClassName("tab-content");
             for (let i = 0; i < contents.length; i++) {
@@ -855,6 +852,11 @@
                     evt.currentTarget.classList.add("active");
                 }
                 document.querySelector('.panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Desenha os pontos no mapa assim que a aba fica visível
+                setTimeout(() => {
+                    carregarPontosColaborativos();
+                }, 300);
             }
         }
 
@@ -993,8 +995,10 @@
                     document.getElementById("status-gps").innerText = "Aguardando...";
                     fecharModalColaboracao();
                     
-                    // Recarrega os pontos no mapa imediatamente
-                    carregarPontosColaborativos();
+                    // Atualiza os marcadores após 500ms
+                    setTimeout(() => {
+                        carregarPontosColaborativos();
+                    }, 500);
                 }
 
             } catch (err) {
@@ -1019,14 +1023,12 @@
 
                 if (!pontos || pontos.length === 0) return;
 
-                // Seleciona o iframe ativo do mapa
                 const iframes = document.querySelectorAll('.map-container iframe');
                 iframes.forEach(iframe => {
                     if (iframe.contentDocument && iframe.contentDocument.readyState === 'complete') {
                         plotaPontosNoIframe(iframe, pontos);
-                    } else {
-                        iframe.onload = () => plotaPontosNoIframe(iframe, pontos);
                     }
+                    iframe.onload = () => plotaPontosNoIframe(iframe, pontos);
                 });
 
             } catch (err) {
@@ -1088,11 +1090,10 @@
                 });
 
             } catch (e) {
-                console.warn('Mapa ainda carregando...', e);
+                console.warn('Mapa ainda a carregar...', e);
             }
         }
 
-        // Executa a busca ao carregar a página
         window.addEventListener('DOMContentLoaded', carregarPontosColaborativos);
     </script>
 </body>
