@@ -1,0 +1,183 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Painel de Moderação - Monitoramento de Alagamentos</title>
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <style>
+        :root {
+            --navy: #0f172a;
+            --slate: #1e293b;
+            --card-bg: #ffffff;
+            --green: #16a34a;
+            --red: #dc2626;
+            --yellow: #d97706;
+            --line: #e2e8f0;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
+        body { background-color: #f8fafc; color: var(--navy); padding: 20px; }
+        header { background: var(--navy); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
+        h1 { font-size: 1.4em; }
+
+        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { padding: 10px 18px; border: 1px solid var(--line); background: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: 0.2s; }
+        .filter-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
+        .card { background: var(--card-bg); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
+        .card-img { width: 100%; height: 200px; object-fit: cover; background: #e2e8f0; }
+        .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
+        
+        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
+        .badge-pendente { background: #fef3c7; color: var(--yellow); }
+        .badge-aprovado { background: #dcfce7; color: var(--green); }
+        .badge-rejeitado { background: #fee2e2; color: var(--red); }
+
+        .info { font-size: 0.88em; color: #475569; margin-bottom: 12px; line-height: 1.4; }
+        .actions { display: flex; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
+        .btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 0.85em; font-weight: bold; cursor: pointer; transition: 0.2s; }
+        .btn-approve { background: var(--green); color: white; }
+        .btn-reject { background: var(--yellow); color: white; }
+        .btn-delete { background: var(--red); color: white; flex: 0.4; }
+        .btn:hover { opacity: 0.9; }
+
+        .empty-state { text-align: center; padding: 40px; color: #64748b; grid-column: 1 / -1; }
+    </style>
+</head>
+<body>
+
+    <header>
+        <h1>🛡️ Painel de Moderação e Curadoria</h1>
+        <span id="total-pendentes" style="background: var(--yellow); padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold;">0 Pendentes</span>
+    </header>
+
+    <div class="filters">
+        <button class="filter-btn active" onclick="filtrar('pendente', this)">⏳ Pendentes</button>
+        <button class="filter-btn" onclick="filtrar('aprovado', this)">🟢 Aprovados</button>
+        <button class="filter-btn" onclick="filtrar('rejeitado', this)">🔴 Rejeitados</button>
+        <button class="filter-btn" onclick="filtrar('todos', this)">📋 Todos</button>
+    </div>
+
+    <div class="grid" id="container-cards">
+        <div class="empty-state">Carregando relatos... ⏳</div>
+    </div>
+
+    <script>
+        const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let statusFiltroAtual = 'pendente';
+
+        async function carregarRelatos() {
+            const container = document.getElementById('container-cards');
+            container.innerHTML = '<div class="empty-state">Buscando dados no Supabase... ⏳</div>';
+
+            let query = supabaseClient.from('confirmacoes_alagamento').select('*').order('created_at', { ascending: false });
+
+            if (statusFiltroAtual !== 'todos') {
+                query = query.eq('status_moderacao', statusFiltroAtual);
+            }
+
+            const { data: relatos, error } = await query;
+
+            if (error) {
+                container.innerHTML = `<div class="empty-state" style="color: var(--red)">Erro ao carregar: ${error.message}</div>`;
+                return;
+            }
+
+            atualizarContador();
+
+            if (!relatos || relatos.length === 0) {
+                container.innerHTML = `<div class="empty-state">Nenhum relato encontrado para o filtro selecionado.</div>`;
+                return;
+            }
+
+            container.innerHTML = '';
+            relatos.forEach(item => {
+                const status = item.status_moderacao || (item.aprovado ? 'aprovado' : 'pendente');
+                const dataFormatada = item.created_at 
+                    ? new Date(item.created_at).toLocaleString('pt-BR') 
+                    : 'Data não registrada';
+
+                const condicaoTexto = item.status === 'alagado' ? '🚨 Alagamento' : '🟢 Pista Liberada';
+                const fotoSrc = item.foto_url || 'https://via.placeholder.com/400x200?text=Sem+Foto+Anexada';
+
+                const cardHtml = `
+                    <div class="card">
+                        <a href="${fotoSrc}" target="_blank">
+                            <img src="${fotoSrc}" class="card-img" alt="Foto Ocorrência">
+                        </a>
+                        <div class="card-body">
+                            <div>
+                                <span class="badge badge-${status}">${status}</span>
+                                <h3 style="font-size: 1.05em; margin-bottom: 6px;">${condicaoTexto}</h3>
+                                <div class="info">
+                                    🕒 <strong>Data/Hora:</strong> ${dataFormatada}<br>
+                                    📍 <strong>GPS:</strong> ${item.latitude ? item.latitude.toFixed(5) : 'N/A'}, ${item.longitude ? item.longitude.toFixed(5) : 'N/A'}<br>
+                                    <a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" style="color: #2563eb; font-size: 0.9em;">Ver no Google Maps ↗</a>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-approve" onclick="alterarStatus('${item.id}', 'aprovado')">✓ Aprovar</button>
+                                <button class="btn btn-reject" onclick="alterarStatus('${item.id}', 'rejeitado')">✕ Rejeitar</button>
+                                <button class="btn btn-delete" onclick="excluirRelato('${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    </div>
+                `;
+                container.innerHTML += cardHtml;
+            });
+        }
+
+        async function alterarStatus(id, novoStatus) {
+            const eAprovado = novoStatus === 'aprovado';
+            const { error } = await supabaseClient
+                .from('confirmacoes_alagamento')
+                .update({ status_moderacao: novoStatus, aprovado: eAprovado })
+                .eq('id', id);
+
+            if (error) {
+                alert('Erro ao atualizar: ' + error.message);
+            } else {
+                carregarRelatos();
+            }
+        }
+
+        async function excluirRelato(id) {
+            if (!confirm('Deseja realmente excluir este registro permanentemente?')) return;
+
+            const { error } = await supabaseClient
+                .from('confirmacoes_alagamento')
+                .delete()
+                .eq('id', id);
+
+            if (error) {
+                alert('Erro ao excluir: ' + error.message);
+            } else {
+                carregarRelatos();
+            }
+        }
+
+        async function atualizarContador() {
+            const { count } = await supabaseClient
+                .from('confirmacoes_alagamento')
+                .select('*', { count: 'exact', head: true })
+                .eq('status_moderacao', 'pendente');
+            
+            document.getElementById('total-pendentes').innerText = `${count || 0} Pendentes`;
+        }
+
+        function filtrar(status, element) {
+            statusFiltroAtual = status;
+            document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
+            element.classList.add('active');
+            carregarRelatos();
+        }
+
+        window.addEventListener('DOMContentLoaded', carregarRelatos);
+    </script>
+</body>
+</html>
