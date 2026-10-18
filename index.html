@@ -736,17 +736,19 @@
             </div>
 
             <!-- ABA MAPA 9 -->
-            <div id="tab-mapa9" class="tab-content">
-                <h2>🗺️ Mapa 9: Matriz Integrada de Risco Socioambiental (IPVS x Bueiros x Alagamentos)</h2>
-                <p>Cruzamento analítico definitivo sobrepondo a média da Vulnerabilidade Social (IPVS em escala semafórica por Subprefeitura) aos chamados de manutenção e histórico de alagamentos.</p>
-                <div class="map-meta"><span class="map-chip">Fase 4</span><span class="map-chip">IPVS semafórico</span><span class="map-chip">Mapa integrado final</span></div>
-                <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs_2.html" title="Mapa 9" loading="lazy"></iframe></div>
-            </div>
-
             <!-- ABA MAPA INTERATIVO (VERSÃO AUTÔNOMA / INDEPENDENTE) -->
             <div id="tab-mapainterativo" class="tab-content">
-                <h2>🌐 Mapa Interativo (Versão Autônoma)</h2>
-                <p>Aplicação geoespacial estendida oferecida como alternativa independente com cartografia Esri Topo de alta performance.</p>
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="margin: 0; border-bottom: none; padding-bottom: 0;">🌐 Mapa Interativo (Versão Autônoma)</h2>
+                        <p style="margin: 4px 0 0; color: var(--muted); font-size: 0.9em;">Aplicação geoespacial estendida com cartografia Esri Topo e central colaborativa.</p>
+                    </div>
+                    <!-- BOTÃO DE COLABORAÇÃO LOCALIZADO EXCLUSIVAMENTE AQUI -->
+                    <button type="button" onclick="abrirModalColaboracao()" class="doc-btn" style="background-color: var(--cyan-deep); padding: 10px 20px; font-size: 0.85em;">
+                        📢 Colaborar (Foto ou Fórum)
+                    </button>
+                </div>
+                
                 <div class="map-meta">
                     <span class="map-chip">Versão Independente</span>
                     <span class="map-chip">Esri Topo</span>
@@ -948,9 +950,14 @@
             });
         }
 
-        // 6. ENVIO DE DADOS E FOTO PARA O SUPABASE
+        // 6. ENVIO DE DADOS E FOTO PARA O SUPABASE (COM MODERAÇÃO PENDENTE)
         async function enviarOcorrencia(e) {
             e.preventDefault();
+
+            if (!latAtual || !lonAtual) {
+                alert('⚠️ Por favor, clique em "Capturar GPS" para geolocalizar a ocorrência.');
+                return;
+            }
 
             const btnSubmit = document.getElementById("btn-submit-colaboracao");
             btnSubmit.disabled = true;
@@ -982,7 +989,7 @@
                     }
                 }
 
-                // Insere no banco (aprovado = false por padrão para moderação)
+                // Insere com moderação pendente por padrão
                 const { error: dbError } = await supabaseClient
                     .from('confirmacoes_alagamento')
                     .insert([
@@ -993,53 +1000,96 @@
                             longitude: lonAtual,
                             foto_url: fotoUrlPublica,
                             created_at: new Date().toISOString(),
-                            aprovado: true // Mudar para 'false' se quiser aprovação prévia obrigatória
+                            aprovado: false,
+                            status_moderacao: 'pendente'
                         }
                     ]);
 
                 if (dbError) {
                     alert('Erro ao registrar: ' + dbError.message);
                 } else {
-                    alert('✅ Ocorrência registrada com sucesso!');
-                    document.getElementById("form-colaborativo").reset();
+                    alert('✅ Ocorrência enviada com sucesso! Aguardando aprovação no painel de moderação.');
+                    document.getElementById("form-foto").reset();
                     document.getElementById("status-gps").innerText = "Aguardando...";
                     fecharModalColaboracao();
-                    
-                    setTimeout(() => carregarPontosColaborativos(), 500);
                 }
 
             } catch (err) {
                 alert('Erro no processamento: ' + err.message);
             } finally {
                 btnSubmit.disabled = false;
-                btnSubmit.innerText = "✅ Enviar Confirmação";
+                btnSubmit.innerText = "✅ Enviar Foto para Moderação";
             }
         }
 
-        // 7. EXIBIÇÃO EXCLUSIVA NO MAPA INTERATIVO (VERSÃO AUTÔNOMA)
-        async function carregarPontosColaborativos() {
-            try {
-                // Filtra apenas ocorrências aprovadas
-                const { data: pontos, error } = await supabaseClient
-                    .from('confirmacoes_alagamento')
-                    .select('*')
-                    .eq('aprovado', true);
+        // 7. ENVIO DA MICRO-PESQUISA DO FÓRUM ("CHOVEU? ALAGOU?")
+        async function enviarForum(e) {
+            e.preventDefault();
 
-                if (error) {
-                    console.error('Erro ao procurar ocorrências:', error.message);
-                    return;
+            if (!latAtual || !lonAtual) {
+                alert('⚠️ Por favor, clique em "Capturar GPS" para geolocalizar a sua resposta.');
+                return;
+            }
+
+            const btnSubmit = document.getElementById("btn-submit-forum");
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "Enviando resposta... ⏳";
+
+            const bairroInput = document.getElementById("forum-bairro").value;
+            const choveuValue = document.getElementById("forum-choveu").value === 'true';
+            const alagouValue = document.getElementById("forum-alagou").value === 'true';
+
+            try {
+                const { error: dbError } = await supabaseClient
+                    .from('forum_choveu_alagou')
+                    .insert([
+                        {
+                            bairro: bairroInput || 'São Paulo',
+                            latitude: latAtual,
+                            longitude: lonAtual,
+                            choveu: choveuValue,
+                            alagou: alagouValue,
+                            created_at: new Date().toISOString(),
+                            aprovado: false,
+                            status_moderacao: 'pendente'
+                        }
+                    ]);
+
+                if (dbError) {
+                    alert('Erro ao enviar para o fórum: ' + dbError.message);
+                } else {
+                    alert('✅ Resposta enviada com sucesso! Aguardando aprovação no painel de moderação.');
+                    document.getElementById("form-forum").reset();
+                    document.getElementById("status-gps").innerText = "Aguardando...";
+                    fecharModalColaboracao();
                 }
 
-                if (!pontos || pontos.length === 0) return;
+            } catch (err) {
+                alert('Erro no processamento: ' + err.message);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "✅ Enviar para Fórum Comunitário";
+            }
+        }
 
-                // RESTRITO APENAS AO IFRAME DA ABA "MAPA INTERATIVO AUTÔNOMO"
+        // 8. EXIBIÇÃO EXCLUSIVA DOS PONTOS APROVADOS NO MAPA AUTÔNOMO
+        async function carregarPontosColaborativos() {
+            try {
+                // Busca relatos com foto aprovados
+                const { data: pontosFoto } = await supabaseClient
+                    .from('confirmacoes_alagamento')
+                    .select('*')
+                    .eq('status_moderacao', 'aprovado');
+
                 const iframeAutonomo = document.querySelector('#tab-mapainterativo iframe');
                 if (!iframeAutonomo) return;
 
-                if (iframeAutonomo.contentDocument && iframeAutonomo.contentDocument.readyState === 'complete') {
-                    plotaPontosNoIframe(iframeAutonomo, pontos);
+                if (pontosFoto && pontosFoto.length > 0) {
+                    if (iframeAutonomo.contentDocument && iframeAutonomo.contentDocument.readyState === 'complete') {
+                        plotaPontosNoIframe(iframeAutonomo, pontosFoto);
+                    }
+                    iframeAutonomo.onload = () => plotaPontosNoIframe(iframeAutonomo, pontosFoto);
                 }
-                iframeAutonomo.onload = () => plotaPontosNoIframe(iframeAutonomo, pontos);
 
             } catch (err) {
                 console.error('Erro ao carregar pontos:', err);
