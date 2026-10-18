@@ -766,56 +766,70 @@
         </footer>
     </div>
 
-    <!-- ========================================================= -->
-    <!-- MODAL DE FORMULÁRIO DE COLABORAÇÃO POPUP -->
-    <!-- ========================================================= -->
-    <div id="modal-colaboracao" style="display:none; position:fixed; inset:0; background:rgba(18,20,31,0.75); backdrop-filter:blur(4px); z-index:9999; align-items:center; justify-content:center; padding:20px;">
-        <div style="background:#ffffff; border-radius:14px; max-width:500px; width:100%; padding:28px; box-shadow:0 12px 36px rgba(0,0,0,0.3); position:relative; border:1px solid var(--line);">
-            <button onclick="fecharModalColaboracao()" style="position:absolute; top:16px; right:16px; border:none; background:#f1f4f9; border-radius:50%; width:32px; height:32px; font-weight:bold; cursor:pointer; color:var(--muted);">✕</button>
-            
-            <h3 style="margin-top:0; color:var(--navy); font-size:1.25em;">📸 Registrar Ocorrência em Tempo Real</h3>
-            <p style="font-size:0.85em; color:var(--muted); margin-bottom:18px;">
-                Sua colaboração ajuda a manter a comunidade e os serviços públicos informados sobre a situação das vias.
-            </p>
+<!-- ========================================================= -->
+<!-- MODAL DE COLABORAÇÃO COMUNITÁRIA UNIFICADO -->
+<!-- ========================================================= -->
+<div id="modal-colaboracao" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
+    <div class="modal-content" style="background: white; border-radius: 12px; padding: 24px; max-width: 480px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative;">
+        <span class="close-btn" onclick="fecharModalColaboracao()" style="position: absolute; right: 16px; top: 12px; font-size: 24px; cursor: pointer; color: #64748b;">&times;</span>
+        
+        <h2 style="font-size: 1.25em; color: #0f172a; margin-bottom: 16px;">📢 Central de Colaboração Comunitária</h2>
 
-            <form id="form-colaborativo" onsubmit="enviarOcorrencia(event)">
-                <!-- 1. CAPTURA DE GPS -->
-                <div style="margin-bottom:16px;">
-                    <label style="font-weight:600; font-size:0.85em; display:block; margin-bottom:6px; color:var(--navy);">1. Posição Atual (GPS):</label>
-                    <button type="button" onclick="obterGPS()" style="padding:9px 14px; font-size:0.85em; font-weight:600; border:1px solid var(--line); border-radius:8px; cursor:pointer; background:#f4f7fb; color:var(--ink); width:100%; text-align:left; display:flex; align-items:center; justify-content:space-between;">
-                        <span>📍 Capturar Minhas Coordenadas</span>
-                        <span id="status-gps" style="font-weight:normal; font-size:0.82em; color:var(--muted);">Aguardando...</span>
-                    </button>
-                </div>
-
-                <!-- 2. STATUS DO LOCAL -->
-                <div style="margin-bottom:16px;">
-                    <label style="font-weight:600; font-size:0.85em; display:block; margin-bottom:6px; color:var(--navy);">2. Condição da Via:</label>
-                    <select id="status-local" required style="width:100%; padding:10px; border:1px solid var(--line); border-radius:8px; font-size:0.9em; background:#ffffff; color:var(--ink);">
-                        <option value="">Selecione o estado do local...</option>
-                        <option value="alagado">🚨 Local Alagado / Trânsito Interrompido</option>
-                        <option value="seco">🟢 Pista Seca / Pista Liberada</option>
-                    </select>
-                </div>
-
-                <!-- 3. CAPTURA DE FOTO -->
-                <div style="margin-bottom:20px;">
-                    <label style="font-weight:600; font-size:0.85em; display:block; margin-bottom:6px; color:var(--navy);">3. Foto da Ocorrência (Câmera ou Galeria):</label>
-                    <input type="file" id="foto-local" accept="image/*" capture="environment" style="width:100%; font-size:0.85em; padding:8px; border:1px solid var(--line); border-radius:8px; background:#f9fafc;">
-                </div>
-
-                <!-- NOTA PRIVACIDADE -->
-                <p style="font-size:0.75em; color:var(--muted); margin-bottom:16px;">
-                    🔒 Registro anônimo e utilizado exclusivamente para monitoramento de risco ambiental.
-                </p>
-
-                <!-- BOTÃO SUBMIT -->
-                <button type="submit" id="btn-submit-colaboracao" class="doc-btn" style="width:100%; background-color:var(--green); border-radius:8px; padding:12px; font-size:0.9em;">
-                    ✅ Enviar Confirmação
-                </button>
-            </form>
+        <!-- ABAS INTERNAS DO MODAL -->
+        <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+            <button id="modal-tab-btn-foto" class="modal-tab-btn active" onclick="alternarAbaModal('foto')" style="flex: 1; padding: 8px; border: none; background: #0f172a; color: white; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer;">📸 Com Foto</button>
+            <button id="modal-tab-btn-forum" class="modal-tab-btn" onclick="alternarAbaModal('forum')" style="flex: 1; padding: 8px; border: none; background: #e2e8f0; color: #334155; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer;">💬 Fórum Rápido</button>
         </div>
+
+        <!-- BOX GPS (PARTILHADO) -->
+        <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+            <div>
+                <strong style="font-size: 0.85em; display: block; color: #1e293b;">📍 Posição GPS</strong>
+                <small id="status-gps" style="color: #64748b; font-size: 0.8em;">Aguardando captura...</small>
+            </div>
+            <button type="button" onclick="obterGPS()" style="padding: 6px 12px; background: #0284c7; color: white; border: none; border-radius: 6px; font-size: 0.8em; font-weight: bold; cursor: pointer;">Capturar GPS</button>
+        </div>
+
+        <!-- FORMULÁRIO 1: RELATO COM FOTO -->
+        <form id="form-foto" onsubmit="enviarOcorrencia(event)">
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Estado do Local:</label>
+                <select id="status-local" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9em;" required>
+                    <option value="alagado">🚨 Ponto Alagado</option>
+                    <option value="liberado">🟢 Pista Liberada</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Foto do Local:</label>
+                <input type="file" id="foto-local" accept="image/*" style="width: 100%; font-size: 0.85em;" required>
+            </div>
+            <button type="submit" id="btn-submit-colaboracao" style="width: 100%; padding: 10px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">✅ Enviar Foto para Moderação</button>
+        </form>
+
+        <!-- FORMULÁRIO 2: FÓRUM "CHOVEU? ALAGOU?" -->
+        <form id="form-forum" onsubmit="enviarForum(event)" style="display: none;">
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Bairro ou Ponto de Referência (Opcional):</label>
+                <input type="text" id="forum-bairro" placeholder="Ex: Tatuapé, Av. Aricanduva..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9em;">
+            </div>
+            <div style="margin-bottom: 12px;">
+                <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Está a chover no local agora?</label>
+                <select id="forum-choveu" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9em;" required>
+                    <option value="true">🌧️ Sim, está a chover</option>
+                    <option value="false">☀️ Não está a chover</option>
+                </select>
+            </div>
+            <div style="margin-bottom: 16px;">
+                <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Há alagamento / pista bloqueada?</label>
+                <select id="forum-alagou" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9em;" required>
+                    <option value="true">🌊 Sim, há alagamento</option>
+                    <option value="false">🟢 Não há alagamento</option>
+                </select>
+            </div>
+            <button type="submit" id="btn-submit-forum" style="width: 100%; padding: 10px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">✅ Enviar para Fórum Comunitário</button>
+        </form>
     </div>
+</div>
 
     <!-- ========================================================= -->
     <!-- SCRIPTS DE CONTROLE DO SITE E CONEXÃO SUPABASE -->
@@ -1097,6 +1111,78 @@
         }
 
         window.addEventListener('DOMContentLoaded', carregarPontosColaborativos);
+        // A. ALTERNÂNCIA DE ABAS NO MODAL
+function alternarAbaModal(aba) {
+    const btnFoto = document.getElementById('modal-tab-btn-foto');
+    const btnForum = document.getElementById('modal-tab-btn-forum');
+    const formFoto = document.getElementById('form-foto');
+    const formForum = document.getElementById('form-forum');
+
+    if (aba === 'foto') {
+        btnFoto.style.background = '#0f172a';
+        btnFoto.style.color = 'white';
+        btnForum.style.background = '#e2e8f0';
+        btnForum.style.color = '#334155';
+        formFoto.style.display = 'block';
+        formForum.style.display = 'none';
+    } else {
+        btnForum.style.background = '#0f172a';
+        btnForum.style.color = 'white';
+        btnFoto.style.background = '#e2e8f0';
+        btnFoto.style.color = '#334155';
+        formForum.style.display = 'block';
+        formFoto.style.display = 'none';
+    }
+}
+
+// B. ENVIO DA MICRO-PESQUISA DO FÓRUM ("CHOVEU? ALAGOU?")
+async function enviarForum(e) {
+    e.preventDefault();
+
+    if (!latAtual || !lonAtual) {
+        alert('⚠️ Por favor, clique em "Capturar GPS" para geolocalizar a sua resposta antes de enviar.');
+        return;
+    }
+
+    const btnSubmit = document.getElementById("btn-submit-forum");
+    btnSubmit.disabled = true;
+    btnSubmit.innerText = "Enviando resposta... ⏳";
+
+    const bairroInput = document.getElementById("forum-bairro").value;
+    const choveuValue = document.getElementById("forum-choveu").value === 'true';
+    const alagouValue = document.getElementById("forum-alagou").value === 'true';
+
+    try {
+        const { error: dbError } = await supabaseClient
+            .from('forum_choveu_alagou')
+            .insert([
+                {
+                    bairro: bairroInput || 'São Paulo',
+                    latitude: latAtual,
+                    longitude: lonAtual,
+                    choveu: choveuValue,
+                    alagou: alagouValue,
+                    created_at: new Date().toISOString(),
+                    aprovado: false,
+                    status_moderacao: 'pendente'
+                }
+            ]);
+
+        if (dbError) {
+            alert('Erro ao enviar para o fórum: ' + dbError.message);
+        } else {
+            alert('✅ Resposta enviada com sucesso! Aguardando aprovação no painel de moderação.');
+            document.getElementById("form-forum").reset();
+            fecharModalColaboracao();
+        }
+
+    } catch (err) {
+        alert('Erro no processamento: ' + err.message);
+    } finally {
+        btnSubmit.disabled = false;
+        btnSubmit.innerText = "✅ Enviar para Fórum Comunitário";
+    }
+}
     </script>
 </body>
 </html>
