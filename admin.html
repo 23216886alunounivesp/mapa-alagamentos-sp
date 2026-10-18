@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Painel de Moderação - Monitoramento de Alagamentos</title>
+    <title>Painel de Moderação Unificado - SP Alagamentos</title>
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
     <style>
         :root {
@@ -13,55 +13,104 @@
             --green: #16a34a;
             --red: #dc2626;
             --yellow: #d97706;
+            --blue: #2563eb;
             --line: #e2e8f0;
         }
 
         * { box-sizing: border-box; margin: 0; padding: 0; font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif; }
         body { background-color: #f8fafc; color: var(--navy); padding: 20px; }
-        header { background: var(--navy); color: white; padding: 20px; border-radius: 12px; margin-bottom: 20px; display: flex; justify-content: space-between; align-items: center; }
-        h1 { font-size: 1.4em; }
+        
+        header { 
+            background: var(--navy); 
+            color: white; 
+            padding: 20px; 
+            border-radius: 12px; 
+            margin-bottom: 20px; 
+            display: flex; 
+            justify-content: space-between; 
+            align-items: center; 
+            flex-wrap: wrap;
+            gap: 10px;
+        }
+        h1 { font-size: 1.3em; display: flex; align-items: center; gap: 8px; }
 
-        .filters { display: flex; gap: 10px; margin-bottom: 20px; flex-wrap: wrap; }
-        .filter-btn { padding: 10px 18px; border: 1px solid var(--line); background: white; border-radius: 8px; cursor: pointer; font-weight: 600; font-size: 0.9em; transition: 0.2s; }
-        .filter-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+        /* NAVEGAÇÃO DE MÓDULOS (ABAS SUPERIORES) */
+        .module-nav { display: flex; gap: 10px; margin-bottom: 15px; border-bottom: 2px solid var(--line); padding-bottom: 10px; flex-wrap: wrap; }
+        .module-btn { 
+            padding: 10px 18px; 
+            border: none; 
+            background: #e2e8f0; 
+            color: var(--slate); 
+            border-radius: 8px; 
+            cursor: pointer; 
+            font-weight: bold; 
+            font-size: 0.9em; 
+            display: flex; 
+            align-items: center; 
+            gap: 8px; 
+            transition: 0.2s;
+        }
+        .module-btn.active { background: var(--navy); color: white; }
+        .badge-count { background: var(--yellow); color: white; border-radius: 12px; padding: 2px 8px; font-size: 0.75em; }
 
+        /* FILTROS DE STATUS */
+        .filters { display: flex; gap: 8px; margin-bottom: 20px; flex-wrap: wrap; }
+        .filter-btn { padding: 8px 14px; border: 1px solid var(--line); background: white; border-radius: 6px; cursor: pointer; font-weight: 600; font-size: 0.85em; transition: 0.2s; }
+        .filter-btn.active { background: var(--blue); color: white; border-color: var(--blue); }
+
+        /* GRID DE CARDS */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 20px; }
         .card { background: var(--card-bg); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; box-shadow: 0 4px 6px -1px rgba(0,0,0,0.05); }
-        .card-img { width: 100%; height: 200px; object-fit: cover; background: #e2e8f0; }
+        .card-img { width: 100%; height: 180px; object-fit: cover; background: #cbd5e1; }
         .card-body { padding: 15px; flex: 1; display: flex; flex-direction: column; justify-content: space-between; }
         
-        .badge { display: inline-block; padding: 4px 10px; border-radius: 20px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
+        .badge-status { display: inline-block; padding: 3px 8px; border-radius: 12px; font-size: 0.75em; font-weight: bold; text-transform: uppercase; margin-bottom: 8px; }
         .badge-pendente { background: #fef3c7; color: var(--yellow); }
         .badge-aprovado { background: #dcfce7; color: var(--green); }
         .badge-rejeitado { background: #fee2e2; color: var(--red); }
 
-        .info { font-size: 0.88em; color: #475569; margin-bottom: 12px; line-height: 1.4; }
+        .info-list { font-size: 0.88em; color: #475569; margin-bottom: 12px; line-height: 1.5; }
         .actions { display: flex; gap: 8px; border-top: 1px solid var(--line); padding-top: 12px; }
         .btn { flex: 1; padding: 8px; border: none; border-radius: 6px; font-size: 0.85em; font-weight: bold; cursor: pointer; transition: 0.2s; }
         .btn-approve { background: var(--green); color: white; }
         .btn-reject { background: var(--yellow); color: white; }
-        .btn-delete { background: var(--red); color: white; flex: 0.4; }
+        .btn-delete { background: var(--red); color: white; flex: 0.35; }
         .btn:hover { opacity: 0.9; }
 
-        .empty-state { text-align: center; padding: 40px; color: #64748b; grid-column: 1 / -1; }
+        .empty-state { text-align: center; padding: 50px 20px; color: #64748b; grid-column: 1 / -1; font-weight: 500; }
     </style>
 </head>
 <body>
 
     <header>
-        <h1>🛡️ Painel de Moderação e Curadoria</h1>
-        <span id="total-pendentes" style="background: var(--yellow); padding: 4px 12px; border-radius: 20px; font-size: 0.85em; font-weight: bold;">0 Pendentes</span>
+        <h1>🛡️ Painel de Moderação e Curadoria Unificado</h1>
+        <span style="font-size: 0.85em; opacity: 0.8;">Projeto Integrador UNIVESP</span>
     </header>
 
-    <div class="filters">
-        <button class="filter-btn active" onclick="filtrar('pendente', this)">⏳ Pendentes</button>
-        <button class="filter-btn" onclick="filtrar('aprovado', this)">🟢 Aprovados</button>
-        <button class="filter-btn" onclick="filtrar('rejeitado', this)">🔴 Rejeitados</button>
-        <button class="filter-btn" onclick="filtrar('todos', this)">📋 Todos</button>
+    <!-- NAVEGAÇÃO DE MÓDULOS -->
+    <div class="module-nav">
+        <button class="module-btn active" id="tab-confirmacoes" onclick="mudarModulo('confirmacoes_alagamento')">
+            📸 Relatos com Foto <span class="badge-count" id="count-confirmacoes">0</span>
+        </button>
+        <button class="module-btn" id="tab-forum" onclick="mudarModulo('forum_choveu_alagou')">
+            💬 Fórum: Choveu? Alagou? <span class="badge-count" id="count-forum">0</span>
+        </button>
+        <button class="module-btn" id="tab-noticias" onclick="mudarModulo('noticias_rss')">
+            📰 Notícias RSS <span class="badge-count" id="count-noticias">0</span>
+        </button>
     </div>
 
+    <!-- FILTROS DE STATUS -->
+    <div class="filters">
+        <button class="filter-btn active" onclick="filtrarStatus('pendente', this)">⏳ Pendentes</button>
+        <button class="filter-btn" onclick="filtrarStatus('aprovado', this)">🟢 Aprovados</button>
+        <button class="filter-btn" onclick="filtrarStatus('rejeitado', this)">🔴 Rejeitados</button>
+        <button class="filter-btn" onclick="filtrarStatus('todos', this)">📋 Todos</button>
+    </div>
+
+    <!-- CONTAINER DE CARDS -->
     <div class="grid" id="container-cards">
-        <div class="empty-state">Carregando relatos... ⏳</div>
+        <div class="empty-state">A carregar registos... ⏳</div>
     </div>
 
     <script>
@@ -69,115 +118,192 @@
         const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
         const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
+        let moduloAtual = 'confirmacoes_alagamento';
         let statusFiltroAtual = 'pendente';
 
-        async function carregarRelatos() {
+        async function carregarDados() {
             const container = document.getElementById('container-cards');
-            container.innerHTML = '<div class="empty-state">Buscando dados no Supabase... ⏳</div>';
+            container.innerHTML = '<div class="empty-state">A procurar registos no Supabase... ⏳</div>';
 
-            let query = supabaseClient.from('confirmacoes_alagamento').select('*').order('created_at', { ascending: false });
+            let query = supabaseClient.from(moduloAtual).select('*').order('created_at', { ascending: false });
 
             if (statusFiltroAtual !== 'todos') {
                 query = query.eq('status_moderacao', statusFiltroAtual);
             }
 
-            const { data: relatos, error } = await query;
+            const { data: registros, error } = await query;
 
             if (error) {
-                container.innerHTML = `<div class="empty-state" style="color: var(--red)">Erro ao carregar: ${error.message}</div>`;
+                container.innerHTML = `<div class="empty-state" style="color: var(--red)">Erro ao carregar registos: ${error.message}</div>`;
                 return;
             }
 
-            atualizarContador();
+            atualizarContadores();
 
-            if (!relatos || relatos.length === 0) {
-                container.innerHTML = `<div class="empty-state">Nenhum relato encontrado para o filtro selecionado.</div>`;
+            if (!registros || registros.length === 0) {
+                container.innerHTML = `<div class="empty-state">Nenhum registo encontrado para os filtros selecionados.</div>`;
                 return;
             }
 
             container.innerHTML = '';
-            relatos.forEach(item => {
+            registros.forEach(item => {
                 const status = item.status_moderacao || (item.aprovado ? 'aprovado' : 'pendente');
-                const dataFormatada = item.created_at 
-                    ? new Date(item.created_at).toLocaleString('pt-BR') 
-                    : 'Data não registrada';
+                const dataFormatada = item.created_at || item.data_publicacao
+                    ? new Date(item.created_at || item.data_publicacao).toLocaleString('pt-BR') 
+                    : 'Data não informada';
 
-                const condicaoTexto = item.status === 'alagado' ? '🚨 Alagamento' : '🟢 Pista Liberada';
-                const fotoSrc = item.foto_url || 'https://via.placeholder.com/400x200?text=Sem+Foto+Anexada';
+                let cardBodyHtml = '';
 
-                const cardHtml = `
-                    <div class="card">
+                // RENDERIZAÇÃO ESPECÍFICA POR MÓDULO
+                if (moduloAtual === 'confirmacoes_alagamento') {
+                    const fotoSrc = item.foto_url || 'https://via.placeholder.com/400x200?text=Sem+Foto+Anexada';
+                    const condicao = item.status === 'alagado' ? '🚨 Ponto Alagado' : '🟢 Pista Liberada';
+                    
+                    cardBodyHtml = `
                         <a href="${fotoSrc}" target="_blank">
-                            <img src="${fotoSrc}" class="card-img" alt="Foto Ocorrência">
+                            <img src="${fotoSrc}" class="card-img" alt="Foto da ocorrência">
                         </a>
                         <div class="card-body">
                             <div>
-                                <span class="badge badge-${status}">${status}</span>
-                                <h3 style="font-size: 1.05em; margin-bottom: 6px;">${condicaoTexto}</h3>
-                                <div class="info">
+                                <span class="badge-status badge-${status}">${status}</span>
+                                <h3 style="font-size: 1em; margin-bottom: 6px;">${condicao}</h3>
+                                <div class="info-list">
                                     🕒 <strong>Data/Hora:</strong> ${dataFormatada}<br>
                                     📍 <strong>GPS:</strong> ${item.latitude ? item.latitude.toFixed(5) : 'N/A'}, ${item.longitude ? item.longitude.toFixed(5) : 'N/A'}<br>
-                                    <a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" style="color: #2563eb; font-size: 0.9em;">Ver no Google Maps ↗</a>
+                                    <a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" style="color: var(--blue);">Ver no Google Maps ↗</a>
                                 </div>
                             </div>
                             <div class="actions">
                                 <button class="btn btn-approve" onclick="alterarStatus('${item.id}', 'aprovado')">✓ Aprovar</button>
                                 <button class="btn btn-reject" onclick="alterarStatus('${item.id}', 'rejeitado')">✕ Rejeitar</button>
-                                <button class="btn btn-delete" onclick="excluirRelato('${item.id}')">🗑️</button>
+                                <button class="btn btn-delete" onclick="excluirRegistro('${item.id}')">🗑️</button>
                             </div>
                         </div>
-                    </div>
-                `;
-                container.innerHTML += cardHtml;
+                    `;
+                } 
+                else if (moduloAtual === 'forum_choveu_alagou') {
+                    const txtChoveu = item.choveu ? '🌧️ SIM' : '☀️ NÃO';
+                    const txtAlagou = item.alagou ? '🌊 SIM' : '🟢 NÃO';
+
+                    cardBodyHtml = `
+                        <div class="card-body">
+                            <div>
+                                <span class="badge-status badge-${status}">${status}</span>
+                                <h3 style="font-size: 1.05em; margin-bottom: 8px;">💬 Fórum Comunitário</h3>
+                                <div class="info-list">
+                                    🏠 <strong>Bairro/Local:</strong> ${item.bairro || 'Não informado'}<br>
+                                    🌧️ <strong>Está a chover?</strong> ${txtChoveu}<br>
+                                    🌊 <strong>Há alagamento?</strong> ${txtAlagou}<br>
+                                    🕒 <strong>Data/Hora:</strong> ${dataFormatada}<br>
+                                    📍 <strong>GPS:</strong> ${item.latitude ? item.latitude.toFixed(5) : 'N/A'}, ${item.longitude ? item.longitude.toFixed(5) : 'N/A'}<br>
+                                    <a href="https://www.google.com/maps?q=${item.latitude},${item.longitude}" target="_blank" style="color: var(--blue);">Ver no Google Maps ↗</a>
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-approve" onclick="alterarStatus('${item.id}', 'aprovado')">✓ Aprovar</button>
+                                <button class="btn btn-reject" onclick="alterarStatus('${item.id}', 'rejeitado')">✕ Rejeitar</button>
+                                <button class="btn btn-delete" onclick="excluirRegistro('${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                } 
+                else if (moduloAtual === 'noticias_rss') {
+                    cardBodyHtml = `
+                        <div class="card-body">
+                            <div>
+                                <span class="badge-status badge-${status}">${status}</span>
+                                <h3 style="font-size: 0.98em; margin-bottom: 6px;">📰 ${item.titulo || 'Sem título'}</h3>
+                                <div class="info-list">
+                                    🏢 <strong>Veículo:</strong> ${item.veiculo_imprensa || 'Imprensa'}<br>
+                                    🏠 <strong>Bairro Extraído:</strong> ${item.bairro || 'São Paulo'}<br>
+                                    🕒 <strong>Publicação:</strong> ${dataFormatada}<br>
+                                    🔗 <a href="${item.link_noticia}" target="_blank" style="color: var(--blue);">Ler Notícia Completa ↗</a><br>
+                                    📍 <strong>GPS Geocodificado:</strong> ${item.latitude ? item.latitude.toFixed(5) : 'N/A'}, ${item.longitude ? item.longitude.toFixed(5) : 'N/A'}
+                                </div>
+                            </div>
+                            <div class="actions">
+                                <button class="btn btn-approve" onclick="alterarStatus('${item.id}', 'aprovado')">✓ Aprovar</button>
+                                <button class="btn btn-reject" onclick="alterarStatus('${item.id}', 'rejeitado')">✕ Rejeitar</button>
+                                <button class="btn btn-delete" onclick="excluirRegistro('${item.id}')">🗑️</button>
+                            </div>
+                        </div>
+                    `;
+                }
+
+                const cardElement = document.createElement('div');
+                cardElement.className = 'card';
+                cardElement.innerHTML = cardBodyHtml;
+                container.appendChild(cardElement);
             });
         }
 
         async function alterarStatus(id, novoStatus) {
-            const eAprovado = novoStatus === 'aprovado';
+            const eAprovado = (novoStatus === 'aprovado');
             const { error } = await supabaseClient
-                .from('confirmacoes_alagamento')
+                .from(moduloAtual)
                 .update({ status_moderacao: novoStatus, aprovado: eAprovado })
                 .eq('id', id);
 
             if (error) {
-                alert('Erro ao atualizar: ' + error.message);
+                alert('Erro ao atualizar estado: ' + error.message);
             } else {
-                carregarRelatos();
+                carregarDados();
             }
         }
 
-        async function excluirRelato(id) {
-            if (!confirm('Deseja realmente excluir este registro permanentemente?')) return;
+        async function excluirRegistro(id) {
+            if (!confirm('Tem certeza de que deseja eliminar permanentemente este registo?')) return;
 
             const { error } = await supabaseClient
-                .from('confirmacoes_alagamento')
+                .from(moduloAtual)
                 .delete()
                 .eq('id', id);
 
             if (error) {
-                alert('Erro ao excluir: ' + error.message);
+                alert('Erro ao eliminar: ' + error.message);
             } else {
-                carregarRelatos();
+                carregarDados();
             }
         }
 
-        async function atualizarContador() {
-            const { count } = await supabaseClient
-                .from('confirmacoes_alagamento')
-                .select('*', { count: 'exact', head: true })
-                .eq('status_moderacao', 'pendente');
-            
-            document.getElementById('total-pendentes').innerText = `${count || 0} Pendentes`;
+        async function atualizarContadores() {
+            const modulos = ['confirmacoes_alagamento', 'forum_choveu_alagou', 'noticias_rss'];
+            const idsContadores = {
+                'confirmacoes_alagamento': 'count-confirmacoes',
+                'forum_choveu_alagou': 'count-forum',
+                'noticias_rss': 'count-noticias'
+            };
+
+            for (const mod of modulos) {
+                const { count } = await supabaseClient
+                    .from(mod)
+                    .select('*', { count: 'exact', head: true })
+                    .eq('status_moderacao', 'pendente');
+
+                const el = document.getElementById(idsContadores[mod]);
+                if (el) el.innerText = count || 0;
+            }
         }
 
-        function filtrar(status, element) {
+        function mudarModulo(novoModulo) {
+            moduloAtual = novoModulo;
+            document.querySelectorAll('.module-btn').forEach(btn => btn.classList.remove('active'));
+            
+            if (novoModulo === 'confirmacoes_alagamento') document.getElementById('tab-confirmacoes').classList.add('active');
+            if (novoModulo === 'forum_choveu_alagou') document.getElementById('tab-forum').classList.add('active');
+            if (novoModulo === 'noticias_rss') document.getElementById('tab-noticias').classList.add('active');
+
+            carregarDados();
+        }
+
+        function filtrarStatus(status, element) {
             statusFiltroAtual = status;
             document.querySelectorAll('.filter-btn').forEach(btn => btn.classList.remove('active'));
             element.classList.add('active');
-            carregarRelatos();
+            carregarDados();
         }
 
-        window.addEventListener('DOMContentLoaded', carregarRelatos);
+        window.addEventListener('DOMContentLoaded', carregarDados);
     </script>
 </body>
 </html>
