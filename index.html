@@ -42,7 +42,7 @@
             line-height: 1.6;
         }
 
-        /* HEADER GLOBAL DE APLICAÇÃO */
+        /* HEADER GLOBAL */
         .app-header {
             position: sticky;
             top: 0;
@@ -62,7 +62,6 @@
             gap: 10px;
             font-weight: 800;
             font-size: 1.05em;
-            letter-spacing: -0.01em;
         }
         .app-brand span { color: var(--cyan); }
         .app-badge-univesp {
@@ -138,9 +137,31 @@
         }
         .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
 
-        /* PAINEL PRINCIPAL & STEPPER DE FASES */
+        /* PAINEL PRINCIPAL & STEPPER 100% MAPAS */
         .wrapper { max-width: 1180px; margin: 20px auto 40px; padding: 0 20px; }
         
+        .stepper-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+        }
+        .stepper-title {
+            font-size: 0.85em;
+            font-weight: 700;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .about-link {
+            font-size: 0.82em;
+            color: var(--cyan-deep);
+            font-weight: 600;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .about-link:hover { text-decoration: underline; }
+
         .stepper-nav {
             display: flex;
             gap: 8px;
@@ -206,6 +227,30 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* CARDS DO PAINEL "SOBRE A FERRAMENTA" */
+        .about-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 16px;
+            margin-top: 20px;
+        }
+        .about-card {
+            background: #f8fafc;
+            border: 1px solid var(--line);
+            border-radius: 8px;
+            padding: 16px;
+        }
+        .about-card h4 {
+            margin: 0 0 8px;
+            color: var(--navy);
+            font-size: 0.95em;
+        }
+        .about-card p {
+            margin: 0;
+            font-size: 0.85em;
+            color: var(--muted);
+        }
+
         /* MODAL E FEEDBACK INLINE */
         .modal-overlay {
             position: fixed; inset: 0;
@@ -255,7 +300,7 @@
 </head>
 <body>
 
-    <!-- HEADER PERMANENTE DA APLICAÇÃO -->
+    <!-- HEADER PERMANENTE -->
     <header class="app-header">
         <div class="app-brand">
             🌊 GeoAlagamentos <span>SP</span>
@@ -280,13 +325,18 @@
 
             <div class="cta-group">
                 <button class="btn-primary" onclick="scrollParaTrilha()">🗺️ Explorar Trilha de Mapas</button>
-                <button class="btn-secondary" onclick="openTab(null, 'tab-documentacao')">📖 Ver Metodologia &amp; Pipeline</button>
+                <button class="btn-secondary" onclick="scrollParaSobre()">ℹ️ Ver Origem dos Dados &amp; Metodologia</button>
             </div>
         </div>
     </section>
 
-    <!-- NAVEGAÇÃO POR FASES / STEPPER -->
+    <!-- NAVEGAÇÃO EXCLUSIVA DE MAPAS -->
     <div class="wrapper" id="secao-trilha">
+        <div class="stepper-header">
+            <span class="stepper-title">Trilha de Análise Territorial</span>
+            <a onclick="scrollParaSobre()" class="about-link">ℹ️ Como esta ferramenta foi feita?</a>
+        </div>
+
         <nav class="stepper-nav">
             <button class="stepper-item active" onclick="openTab(event, 'tab-mapa0')">📍 1. Calor Histórico</button>
             <button class="stepper-item" onclick="openTab(event, 'tab-mapa1')">🏙️ 2. Macro-Zonas</button>
@@ -296,7 +346,6 @@
             <button class="stepper-item" onclick="openTab(event, 'tab-mapa8')">🔧 6. Bueiros AMLURB</button>
             <button class="stepper-item" onclick="openTab(event, 'tab-mapa9')">📊 7. Matriz Integrada Final</button>
             <button class="stepper-item" onclick="openTab(event, 'tab-mapainterativo')">🌐 8. Mapa ao Vivo (24h)</button>
-            <button class="stepper-item" onclick="openTab(event, 'tab-documentacao')">📖 Documentação</button>
         </nav>
 
         <!-- MAPA 0 (PADRÃO DE ENTRADA) -->
@@ -403,27 +452,33 @@
             </div>
         </div>
 
-        <!-- ABA DE DOCUMENTAÇÃO DE APOIO -->
-        <div id="tab-documentacao" class="tab-content">
-            <div class="map-card">
-                <h2>📖 Documentação do Projeto e Pipeline de Dados</h2>
-                <p>Plataforma concebida como Projeto Integrador Extensionista para prevenção de riscos ambientais com arquitetura 100% Open Source.</p>
+        <!-- SEÇÃO "SOBRE A FERRAMENTA & DADOS" (FORA DO STEPPER) -->
+        <div id="secao-sobre" class="map-card" style="margin-top: 32px;">
+            <h3 style="margin-top: 0; color: var(--navy); font-size: 1.2em;">ℹ️ Sobre a Ferramenta &amp; Origem dos Dados</h3>
+            <p style="color: var(--muted); font-size: 0.9em; margin-bottom: 16px;">Entenda o processo de extração, auditoria e cruzamento de dados públicos que sustentam esta plataforma.</p>
 
-                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 16px; margin: 20px 0;">
-                    <div style="background: #f8fafc; border-left: 4px solid var(--cyan-deep); padding: 16px; border-radius: 6px;">
-                        <strong>57,85% (7.224)</strong><br>
-                        <small>Falha na Microdrenagem (bueiros e galerias obstruídas)</small>
-                    </div>
-                    <div style="background: #f8fafc; border-left: 4px solid var(--red); padding: 16px; border-radius: 6px;">
-                        <strong>42,15% (5.263)</strong><br>
-                        <small>Gargalo na Macrodrenagem (transbordamento de córregos e rios)</small>
-                    </div>
+            <div class="about-grid">
+                <div class="about-card">
+                    <h4>1. O que é</h4>
+                    <p>Ferramenta geoespacial cidadã para leitura analítica de alagamentos, vulnerabilidade social e infraestrutura hídrica em São Paulo.</p>
                 </div>
+                <div class="about-card">
+                    <h4>2. Fontes Abertas</h4>
+                    <p>Dados oficiais extraídos do GeoSampa, Defesa Civil, Portal SP156, Fundação SEADE (IPVS) e AMLURB (2013–2026).</p>
+                </div>
+                <div class="about-card">
+                    <h4>3. Recorte Hídrico</h4>
+                    <p>Filtragem estrita de 12.487 ocorrências hídricas auditadas a partir de um volume bruto inicial de 68.310 chamados.</p>
+                </div>
+                <div class="about-card">
+                    <h4>4. Limitações</h4>
+                    <p>O histórico de dados reflete registros oficiais acumulados e não substitui os alertas em tempo real da Defesa Civil.</p>
+                </div>
+            </div>
 
-                <h3>⚙️ Diagrama da Arquitetura Geoespacial</h3>
-                <div class="map-container" style="height: 500px; margin-top: 12px;">
-                    <iframe src="diagrama_pipeline.html" title="Diagrama do Pipeline"></iframe>
-                </div>
+            <h4 style="margin: 24px 0 12px; color: var(--navy);">⚙️ Diagrama da Arquitetura Geoespacial</h4>
+            <div class="map-container" style="height: 420px;">
+                <iframe src="diagrama_pipeline.html" title="Diagrama do Pipeline"></iframe>
             </div>
         </div>
     </div>
@@ -436,7 +491,7 @@
 
             <div id="feedback-status"></div>
 
-            <div style="background: #f8fafc; border: 1px solid var(--line); padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-align: center;">
+            <div style="background: #f8fafc; border: 1px solid var(--line); padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
                     <strong style="font-size: 0.85em; display: block; color: var(--navy);">📍 Posição GPS</strong>
                     <small id="status-gps" style="color: var(--muted); font-size: 0.8em;">Aguardando captura...</small>
@@ -477,7 +532,7 @@
         </div>
     </footer>
 
-    <!-- LOGICA JS DE ESTADO E SUPABASE -->
+    <!-- LÓGICA JS -->
     <script>
         const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
@@ -489,6 +544,10 @@
 
         function scrollParaTrilha() {
             document.getElementById('secao-trilha').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function scrollParaSobre() {
+            document.getElementById('secao-sobre').scrollIntoView({ behavior: 'smooth' });
         }
 
         function openTab(evt, tabName) {
@@ -547,7 +606,7 @@
         }
 
         function compressImage(file, maxWidth = 1200, quality = 0.8) {
-            return new Promise((resolve, reject) => {
+            return new Promise((resolve) => {
                 const reader = new FileReader();
                 reader.readAsDataURL(file);
                 reader.onload = (event) => {
@@ -573,7 +632,7 @@
         async function enviarOcorrencia(e) {
             e.preventDefault();
             if (!latAtual || !lonAtual) {
-                exhibirFeedbackModal('⚠️ Clique em "Capturar GPS" para geolocalizar.');
+                exibirFeedbackModal('⚠️ Clique em "Capturar GPS" para geolocalizar.');
                 return;
             }
 
