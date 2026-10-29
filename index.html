@@ -1,519 +1,1240 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Mapa de Alagamentos SP - PI UNIVESP</title>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🌊 Mapeamento Interativo de Alagamentos, Vulnerabilidade e Macro-Zonas de São Paulo</title>
+    
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
+    
+    <!-- SDK DO SUPABASE -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
-  <!-- Leaflet CSS -->
-  <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
-  
-  <!-- Supabase JS SDK -->
-  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-
-  <style>
-    * {
-      box-sizing: border-box;
-      margin: 0;
-      padding: 0;
-      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
-    body {
-      display: flex;
-      flex-direction: column;
-      height: 100vh;
-      background-color: #f4f6f8;
-    }
-
-    header {
-      background-color: #1e293b;
-      color: #ffffff;
-      padding: 0.8rem 1rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      box-shadow: 0 2px 4px rgba(0,0,0,0.1);
-      z-index: 1000;
-    }
-
-    header h1 {
-      font-size: 1.1rem;
-      font-weight: 600;
-    }
-
-    .btn-modal {
-      background-color: #2563eb;
-      color: white;
-      border: none;
-      padding: 0.5rem 0.9rem;
-      border-radius: 6px;
-      cursor: pointer;
-      font-weight: 600;
-      font-size: 0.85rem;
-      transition: background 0.2s;
-    }
-
-    .btn-modal:hover {
-      background-color: #1d4ed8;
-    }
-
-    #map-container {
-      flex: 1;
-      width: 100%;
-      height: 100%;
-      z-index: 1;
-    }
-
-    #map {
-      width: 100%;
-      height: 100%;
-    }
-
-    /* Modal de Colaboração Comunitária */
-    .modal-overlay {
-      position: fixed;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: 100%;
-      background: rgba(0, 0, 0, 0.6);
-      display: none;
-      justify-content: center;
-      align-items: center;
-      z-index: 9999;
-      padding: 1rem;
-    }
-
-    .modal-overlay.active {
-      display: flex;
-    }
-
-    .modal-card {
-      background: #ffffff;
-      width: 100%;
-      max-width: 480px;
-      max-height: 90vh;
-      overflow-y: auto;
-      border-radius: 12px;
-      padding: 1.25rem;
-      position: relative;
-      box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    }
-
-    .modal-close {
-      position: absolute;
-      top: 0.8rem;
-      right: 1rem;
-      background: transparent;
-      border: none;
-      font-size: 1.5rem;
-      cursor: pointer;
-      color: #64748b;
-    }
-
-    .tabs {
-      display: flex;
-      border-bottom: 2px solid #e2e8f0;
-      margin-bottom: 1rem;
-      margin-top: 0.8rem;
-    }
-
-    .tab-btn {
-      flex: 1;
-      padding: 0.6rem;
-      border: none;
-      background: none;
-      font-weight: 600;
-      font-size: 0.85rem;
-      color: #64748b;
-      cursor: pointer;
-      border-bottom: 2px solid transparent;
-      margin-bottom: -2px;
-    }
-
-    .tab-btn.active {
-      color: #2563eb;
-      border-color: #2563eb;
-    }
-
-    .tab-content {
-      display: none;
-    }
-
-    .tab-content.active {
-      display: block;
-    }
-
-    .form-group {
-      margin-bottom: 0.9rem;
-    }
-
-    .form-group label {
-      display: block;
-      font-size: 0.85rem;
-      font-weight: 600;
-      margin-bottom: 0.3rem;
-      color: #334155;
-    }
-
-    .form-group input, 
-    .form-group select, 
-    .form-group textarea {
-      width: 100%;
-      padding: 0.55rem;
-      border: 1px solid #cbd5e1;
-      border-radius: 6px;
-      font-size: 0.9rem;
-    }
-
-    .btn-submit {
-      width: 100%;
-      padding: 0.7rem;
-      background-color: #059669;
-      color: white;
-      border: none;
-      border-radius: 6px;
-      font-weight: 600;
-      cursor: pointer;
-      transition: background 0.2s;
-    }
-
-    .btn-submit:hover {
-      background-color: #047857;
-    }
-
-    .btn-submit:disabled {
-      background-color: #9ca3af;
-      cursor: not-allowed;
-    }
-
-    .popup-content img {
-      width: 100%;
-      max-height: 160px;
-      object-fit: cover;
-      border-radius: 6px;
-      margin-top: 0.5rem;
-    }
-
-    .popup-badge {
-      display: inline-block;
-      padding: 2px 8px;
-      border-radius: 12px;
-      font-size: 0.7rem;
-      font-weight: bold;
-      color: white;
-      margin-bottom: 4px;
-    }
-
-    .badge-foto { background-color: #8b5cf6; }
-    .badge-forum { background-color: #f59e0b; }
-    .badge-rss { background-color: #2563eb; }
-  </style>
+    <style>
+        :root {
+            --navy: #12141f;
+            --navy-2: #1b2340;
+            --ink: #1f2430;
+            --muted: #57606a;
+            --bg: #eef1f6;
+            --surface: #ffffff;
+            --line: #dfe4ec;
+            --cyan: #22d3ee;
+            --cyan-deep: #0891b2;
+            --blue: #1f6feb;
+            --purple: #8250df;
+            --green: #1a7f37;
+            --red: #cf222e;
+            --mono: 'JetBrains Mono', ui-monospace, monospace;
+            --sans: 'Inter', -apple-system, BlinkMacSystemFont, "Segoe UI", Helvetica, Arial, sans-serif;
+        }
+        * { box-sizing: border-box; }
+        html { scroll-behavior: smooth; }
+        body {
+            min-width: 280px;
+            margin: 0;
+            padding: 0 0 60px;
+            font-family: var(--sans);
+            color: var(--ink);
+            background-color: var(--bg);
+            line-height: 1.7;
+        }
+        /* ============ HERO ============ */
+        .hero {
+            position: relative;
+            background:
+                radial-gradient(900px 500px at 85% -10%, rgba(34, 211, 238, 0.18), transparent 60%),
+                radial-gradient(700px 420px at 8% 110%, rgba(31, 111, 235, 0.22), transparent 60%),
+                linear-gradient(160deg, var(--navy) 0%, var(--navy-2) 100%);
+            color: #f0f4fa;
+            padding: 64px 20px 56px;
+            overflow: hidden;
+        }
+        .hero::after {
+            content: "";
+            position: absolute; inset: 0;
+            background: repeating-linear-gradient(0deg, rgba(255,255,255,0.025) 0 1px, transparent 1px 3px);
+            pointer-events: none;
+        }
+        .hero-inner { max-width: 1180px; margin: 0 auto; position: relative; z-index: 1; }
+        .hero-badge {
+            display: inline-flex; align-items: center; gap: 8px;
+            font-family: var(--mono); font-size: 11px; font-weight: 600;
+            letter-spacing: 0.18em; text-transform: uppercase;
+            color: var(--cyan);
+            border: 1px solid rgba(34, 211, 238, 0.35);
+            border-radius: 100px;
+            padding: 6px 16px;
+            margin-bottom: 22px;
+            background: rgba(34, 211, 238, 0.06);
+        }
+        .hero-badge .dot {
+            width: 7px; height: 7px; border-radius: 50%;
+            background: var(--cyan);
+            box-shadow: 0 0 8px var(--cyan);
+            animation: pulse 1.6s ease-in-out infinite;
+        }
+        @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.35; } }
+        .hero h1 {
+            margin: 0 0 14px;
+            font-size: clamp(1.7em, 4.2vw, 2.9em);
+            font-weight: 900;
+            letter-spacing: -0.02em;
+            line-height: 1.15;
+            max-width: 900px;
+        }
+        .hero h1 .accent { color: var(--cyan); }
+        .hero .subtitle {
+            color: #aab4c8;
+            font-size: 1.08em;
+            max-width: 720px;
+            margin: 0 0 36px;
+        }
+        .hero-stats {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(170px, 1fr));
+            gap: 1px;
+            background: rgba(255,255,255,0.12);
+            border: 1px solid rgba(255,255,255,0.12);
+            border-radius: 12px;
+            overflow: hidden;
+            max-width: 860px;
+        }
+        .hero-stat {
+            background: rgba(12, 16, 28, 0.55);
+            backdrop-filter: blur(6px);
+            padding: 18px 20px;
+        }
+        .hero-stat .num {
+            font-family: var(--mono);
+            font-size: 1.7em; font-weight: 700;
+            color: var(--cyan);
+            line-height: 1.1;
+            letter-spacing: -0.02em;
+        }
+        .hero-stat .lbl {
+            font-family: var(--mono);
+            font-size: 0.62em; font-weight: 600;
+            text-transform: uppercase; letter-spacing: 0.14em;
+            color: #8b96ab;
+            margin-top: 6px;
+        }
+        /* ============ WRAPPER ============ */
+        .wrapper {
+            max-width: 1180px;
+            margin: -28px auto 0;
+            padding: 0 20px;
+            position: relative;
+            z-index: 2;
+        }
+        .panel {
+            background-color: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 14px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(18, 20, 31, 0.08);
+        }
+        h2 {
+            font-size: 1.45em; font-weight: 800;
+            letter-spacing: -0.01em;
+            color: var(--navy);
+            border-bottom: 2px solid var(--line);
+            padding-bottom: 10px;
+            margin: 34px 0 16px;
+        }
+        h2:first-child { margin-top: 0; }
+        code {
+            font-family: var(--mono); font-size: 0.85em;
+            background: #f1f4f9; border: 1px solid var(--line);
+            border-radius: 5px; padding: 1px 6px;
+            color: var(--navy);
+        }
+        /* CABEÇALHO ACADÊMICO UNIVESP */
+        .academic-header {
+            background: linear-gradient(180deg, #f7f9fc, #eef2f8);
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 24px;
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .academic-title {
+            font-family: var(--mono);
+            font-weight: 700;
+            color: var(--navy);
+            font-size: 0.82em;
+            letter-spacing: 0.12em;
+            margin-bottom: 8px;
+        }
+        .academic-authors {
+            font-size: 0.88em;
+            color: var(--muted);
+            margin-top: 8px;
+        }
+        /* BOTÃO DE DOCUMENTAÇÃO */
+        .doc-bar { text-align: center; margin-bottom: 34px; }
+        .doc-btn {
+            background-color: var(--navy);
+            color: #ffffff;
+            border: none;
+            border-radius: 100px;
+            padding: 14px 32px;
+            font-family: var(--mono);
+            font-size: 0.82em;
+            font-weight: 600;
+            letter-spacing: 0.06em;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 6px 18px rgba(18, 20, 31, 0.25);
+        }
+        .doc-btn:hover, .doc-btn.active {
+            background-color: var(--cyan-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 8px 22px rgba(8, 145, 178, 0.35);
+        }
+        /* ROADMAP / TRILHA DE FASES */
+        .roadmap-container {
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            margin-bottom: 34px;
+        }
+        .roadmap-phase {
+            border-left: 4px solid var(--phase, var(--blue));
+            background-color: var(--surface);
+            border: 1px solid var(--line);
+            border-left: 4px solid var(--phase, var(--blue));
+            padding: 16px 20px;
+            border-radius: 0 10px 10px 0;
+            box-shadow: 0 2px 6px rgba(18,20,31,0.04);
+        }
+        .phase-title {
+            font-family: var(--mono);
+            font-size: 0.72em;
+            font-weight: 700;
+            color: var(--phase, var(--blue));
+            text-transform: uppercase;
+            margin-bottom: 12px;
+            letter-spacing: 0.14em;
+        }
+        .phase-steps {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 8px;
+        }
+        .roadmap-btn {
+            background-color: #f4f7fb;
+            border: 1px solid var(--line);
+            border-radius: 100px;
+            padding: 9px 18px;
+            font-size: 0.84em;
+            font-weight: 600;
+            cursor: pointer;
+            color: var(--ink);
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 7px;
+        }
+        .roadmap-btn:hover {
+            border-color: var(--phase, var(--blue));
+            color: var(--phase, var(--blue));
+            transform: translateY(-1px);
+        }
+        .roadmap-btn.active {
+            background-color: var(--phase, var(--blue));
+            color: #ffffff;
+            border-color: var(--phase, var(--blue));
+            box-shadow: 0 3px 10px rgba(18, 20, 31, 0.22);
+        }
+        .roadmap-btn.active:hover { color: #ffffff; }
+        
+        /* ABAS E CONTAINERS */
+        .tab-content { display: none; }
+        .tab-content.active {
+            display: block;
+            animation: fadeIn 0.4s ease-in-out;
+        }
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(6px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .map-container {
+            position: relative;
+            width: 100%;
+            height: 720px;
+            min-height: 720px;
+            margin: 20px 0 10px;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            overflow: hidden;
+            background-color: #f4f7fb;
+            box-shadow: 0 4px 16px rgba(18, 20, 31, 0.08);
+        }
+        iframe {
+            width: 100%;
+            height: 100%;
+            min-height: 720px;
+            border: none;
+            display: block;
+        }
+        .map-meta {
+            display: flex; flex-wrap: wrap; gap: 8px;
+            margin: 12px 0 4px;
+        }
+        .map-chip {
+            font-family: var(--mono);
+            font-size: 0.66em; font-weight: 600;
+            letter-spacing: 0.08em; text-transform: uppercase;
+            color: var(--muted);
+            background: #f1f4f9;
+            border: 1px solid var(--line);
+            border-radius: 100px;
+            padding: 4px 12px;
+        }
+        /* CAIXAS DE DESTAQUE */
+        .info-box {
+            background-color: #ecfeff;
+            border-left: 4px solid var(--cyan-deep);
+            padding: 18px 20px;
+            margin: 22px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        .audit-box {
+            background-color: #fff5f5;
+            border-left: 4px solid var(--red);
+            padding: 20px 22px;
+            margin: 22px 0;
+            border-radius: 0 10px 10px 0;
+        }
+        .audit-box h3 { margin-top: 0; color: var(--red); }
+        
+        /* INFOGRÁFICO DE PIPELINE */
+        .infographic-img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px;
+            border: 1px solid var(--line);
+            margin: 20px 0;
+            box-shadow: 0 4px 16px rgba(18,20,31,0.08);
+        }
+        .pipeline-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+            gap: 14px;
+            margin: 26px 0;
+        }
+        .pipeline-card {
+            background-color: var(--surface);
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 18px;
+            box-shadow: 0 2px 6px rgba(18,20,31,0.04);
+            position: relative;
+            transition: transform 0.2s ease, box-shadow 0.2s ease;
+        }
+        .pipeline-card:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(18,20,31,0.09);
+        }
+        .pipeline-card .step-num {
+            font-family: var(--mono);
+            font-size: 0.66em; font-weight: 700;
+            letter-spacing: 0.14em;
+            color: var(--cyan-deep);
+            text-transform: uppercase;
+            display: block;
+            margin-bottom: 6px;
+        }
+        .pipeline-card h4 {
+            margin: 0 0 8px;
+            color: var(--navy);
+            font-size: 1em;
+            font-weight: 700;
+        }
+        /* SEÇÕES AUXILIARES */
+        .howto-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+            gap: 14px;
+            margin: 22px 0;
+        }
+        .howto-item {
+            border: 1px dashed var(--line);
+            border-radius: 10px;
+            padding: 16px 18px;
+            background: #fafbfe;
+        }
+        .howto-item .k {
+            font-family: var(--mono); font-size: 0.66em; font-weight: 700;
+            letter-spacing: 0.14em; text-transform: uppercase;
+            color: var(--cyan-deep); display: block; margin-bottom: 5px;
+        }
+        .source-list { list-style: none; padding-left: 0; }
+        .source-list li {
+            padding: 10px 0 10px 30px;
+            position: relative;
+            border-bottom: 1px dashed var(--line);
+            margin-bottom: 0;
+        }
+        .source-list li::before {
+            content: "▸";
+            position: absolute; left: 6px;
+            color: var(--cyan-deep); font-weight: 700;
+        }
+        .faq-item {
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            margin-bottom: 10px;
+            overflow: hidden;
+            background: var(--surface);
+        }
+        .faq-item summary {
+            cursor: pointer;
+            padding: 14px 18px;
+            font-weight: 600;
+            color: var(--navy);
+            list-style: none;
+            display: flex; align-items: center; gap: 10px;
+        }
+        .faq-item summary::before { content: "+"; font-family: var(--mono); color: var(--cyan-deep); font-weight: 700; }
+        .faq-item[open] summary::before { content: "−"; }
+        .faq-item .faq-body { padding: 0 18px 16px 40px; color: var(--muted); font-size: 0.94em; }
+        hr {
+            border: 0; height: 1px;
+            background: var(--line);
+            margin: 40px 0;
+        }
+        ul { padding-left: 20px; }
+        li { margin-bottom: 8px; }
+        /* RODAPÉ */
+        .footer {
+            max-width: 1180px;
+            margin: 40px auto 0;
+            padding: 28px 20px 0;
+            border-top: 1px solid var(--line);
+            text-align: center;
+            color: var(--muted);
+            font-size: 0.85em;
+        }
+        .footer .f-mono {
+            font-family: var(--mono); font-size: 0.78em;
+            letter-spacing: 0.1em; text-transform: uppercase;
+            color: var(--navy); font-weight: 600;
+        }
+        /* RESPONSIVO */
+        @media (max-width: 720px) {
+            .panel { padding: 24px 18px; }
+            .map-container, iframe { height: 480px; min-height: 480px; }
+            .hero { padding: 44px 16px 44px; }
+        }
+    </style>
 </head>
 <body>
+    <!-- ============ HERO ============ -->
+    <header class="hero">
+        <div class="hero-inner">
+            <span class="hero-badge"><span class="dot"></span> Plataforma Geoespacial · Dados 2013–2026</span>
+            <h1>🌊 Mapeamento Interativo de <span class="accent">Alagamentos</span> e Vulnerabilidade Social de São Paulo</h1>
+            <p class="subtitle">Plataforma analítica geoespacial baseada em dados abertos (GeoSampa, Defesa Civil &amp; SEADE) — do calor histórico à matriz integrada de risco socioambiental.</p>
+            <div class="hero-stats">
+                <div class="hero-stat"><div class="num">12.487</div><div class="lbl">Ocorrências hídricas</div></div>
+                <div class="hero-stat"><div class="num">68.310</div><div class="lbl">Eventos auditados</div></div>
+                <div class="hero-stat"><div class="num">32</div><div class="lbl">Subprefeituras</div></div>
+                <div class="hero-stat"><div class="num">27.301</div><div class="lbl">Setores IPVS</div></div>
+                <div class="hero-stat"><div class="num">11</div><div class="lbl">Camadas de mapas</div></div>
+            </div>
+        </div>
+    </header>
 
-  <header>
-    <h1>🌐 Mapa de Alagamentos SP</h1>
-    <button class="btn-modal" onclick="abrirModal()">📢 Central de Colaboração</button>
-  </header>
+    <div class="wrapper">
+        <div class="panel">
+            <!-- CABEÇALHO ACADÊMICO UNIVESP -->
+            <div class="academic-header">
+                <div class="academic-title">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO — UNIVESP</div>
+                <div><strong>Projeto Integrador Extensionista IV (DRP14 - Turma 003)</strong> — Polo Carrão</div>
+                <div class="academic-authors">
+                    <strong>Pesquisadores:</strong> Daniel Martins Queiroz, Leonardo Tomaz de Souza Neto, Livia Maria Roncoleta, Mateus Fujita Silveira, Nailah Carolina Silva, Roberto Joaquim dos Santos, Rodrigo Jose de Melo, William Yang Chen Fan.<br>
+                    <strong>Orientadora:</strong> Prof.ª Millena de Araujo Rodrigues
+                </div>
+            </div>
 
-  <div id="map-container">
-    <div id="map"></div>
-  </div>
+            <!-- BOTÃO DE DOCUMENTAÇÃO EM DESTAQUE -->
+            <div class="doc-bar">
+                <button class="doc-btn active" onclick="openTab(event, 'tab-documentacao')">📖 Acessar Documentação Completa &amp; Engenharia de Dados</button>
+            </div>
 
-  <!-- Modal Pop-up para Formulários -->
-  <div class="modal-overlay" id="modalColaboracao">
-    <div class="modal-card">
-      <button class="modal-close" onclick="fecharModal()">&times;</button>
-      <h3 style="color: #1e293b; font-size: 1.1rem;">📢 Central de Colaboração Comunitária</h3>
+            <!-- ROADMAP / TRILHA INTERATIVA DE MAPAS -->
+            <div class="roadmap-container">
+                <!-- FASE 1 -->
+                <div class="roadmap-phase" style="--phase: #1f6feb;">
+                    <div class="phase-title">🚀 Fase 1: Fundamentos &amp; Macro-Contexto Territorial</div>
+                    <div class="phase-steps">
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa0')">📍 Mapa 0: Calor Puro</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa1')">🏙️ Mapa 1: Macro-Zonas</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa2')">🏛️ Mapa 2: Subprefeituras Geral</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa3')">🔍 Mapa 3: Individual</button>
+                    </div>
+                </div>
+                <!-- FASE 2 -->
+                <div class="roadmap-phase" style="--phase: #8250df;">
+                    <div class="phase-title">📈 Fase 2: Variação Temporal, Altimétrica &amp; Estrutural</div>
+                    <div class="phase-steps">
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa4')">📅 Mapa 4: Seletor Anual</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa5')">⛰️ Mapa 5: Altitude</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-piramide')">📊 Pirâmide Altitudinal</button>
+                    </div>
+                </div>
+                <!-- FASE 3 -->
+                <div class="roadmap-phase" style="--phase: #1a7f37;">
+                    <div class="phase-title">⚡ Fase 3: Infraestrutura, Drenagem &amp; Modelagem Preditiva</div>
+                    <div class="phase-steps">
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa6')">🌊 Mapa 6: Drenagem + Anos</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa7')">⚠️ Mapa 7: Mancha Preditiva (5 Anos)</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa8')">🔧 Mapa 8: Bueiros &amp; Alagamentos</button>
+                    </div>
+                </div>
+                <!-- FASE 4 -->
+                <div class="roadmap-phase" style="--phase: #cf222e;">
+                    <div class="phase-title">🎯 Fase 4: Matriz de Risco Socioambiental &amp; Utilidade Pública</div>
+                    <div class="phase-steps">
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapa9')">📊 Mapa 9: Matriz IPVS x Bueiros x Alagamentos (Mapa Integrado Final)</button>
+                        <button class="roadmap-btn" onclick="openTab(event, 'tab-mapainterativo')">🌐 Mapa Interativo (Versão Autônoma)</button>
+                    </div>
+                </div>
+            </div>
 
-      <div class="tabs">
-        <button class="tab-btn active" onclick="alternarAba('aba-foto')">📸 Relato com Foto</button>
-        <button class="tab-btn" onclick="alternarAba('aba-forum')">💬 Fórum: Choveu? Alagou?</button>
-      </div>
+            <!-- CONTEÚDO DAS ABAS -->
 
-      <!-- Form 1: Relato com Foto -->
-      <div id="aba-foto" class="tab-content active">
-        <form id="form-relato-foto" onsubmit="enviarRelatoFoto(event)">
-          <div class="form-group">
-            <label for="foto-bairro">Bairro / Localidade em SP:</label>
-            <input type="text" id="foto-bairro" placeholder="Ex: Mooca, Radial Leste, Tatuapé" required>
-          </div>
+            <!-- ABA 1: DOCUMENTAÇÃO -->
+            <div id="tab-documentacao" class="tab-content active">
+                <h2>📌 Visão Geral do Projeto</h2>
+                <p>Esta plataforma interativa foi concebida para apoiar os cidadãos paulistanos e a gestão pública na prevenção e mitigação de riscos de enchentes. Através da ingestão, tratamento e cruzamento espacial de bases de dados abertas da cidade de São Paulo, o projeto relaciona a infraestrutura de drenagem urbana com o histórico de ocorrências hídricas e os níveis de vulnerabilidade social.</p>
 
-          <div class="form-group">
-            <label for="foto-status-via">Estado da Via:</label>
-            <select id="foto-status-via" required>
-              <option value="Pista Transitável">🟢 Pista Transitável com Chuva</option>
-              <option value="Bolsão de Água">🟡 Bolsão de Água / Ponto Parcial</option>
-              <option value="Intransitável / Alagado">🔴 Via Intransitável / Alagamento Total</option>
-            </select>
-          </div>
+                <!-- BLOCO DE DESTAQUE PARADIGMA DA PREVENÇÃO -->
+                <div class="info-box">
+                    <h3>💡 O Paradigma da Prevenção: De Dados Fragmentados à Inteligência Proativa</h3>
+                    <p>A abordagem convencional lida com a zeladoria de forma reativa ("Onde alagou ontem?"). Este piloto consolida dados abertos para permitir uma atuação proativa ("Quais áreas de risco crônico exigem intervenção e zeladoria hoje?"). Toda a solução foi projetada com <strong>arquitetura 100% Open Source e custo zero de infraestrutura</strong>.</p>
+                </div>
 
-          <div class="form-group">
-            <label for="foto-descricao">Descrição da Ocorrência:</label>
-            <textarea id="foto-descricao" rows="3" placeholder="Descreva os detalhes do local..." required></textarea>
-          </div>
+                <!-- BLOCO DE AUDITORIA DE DADOS -->
+                <div class="audit-box">
+                    <h3>📊 Anatomia e Auditoria do Dataset Hídrico (2013–2026)</h3>
+                    <p>A partir do volume bruto de <strong>68.310 registros</strong> extraídos da Defesa Civil / COMDEC via Canal SP156, aplicou-se um pipeline rigoroso em Python para expurgar eventos não hídricos (52.464 quedas de árvores e 3.359 deslizamentos), resultando em <strong>12.487 ocorrências hídricas auditadas</strong>:</p>
+                    
+                    <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px; margin-top: 15px;">
+                        <div style="background: #ffffff; border: 1px solid var(--line); border-left: 4px solid var(--cyan-deep); padding: 12px; border-radius: 6px;">
+                            <strong style="color: var(--cyan-deep); font-size: 1.1em;">57,85% (7.224)</strong><br>
+                            <span style="font-size: 0.85em; color: var(--muted);"><strong>Falha na Microdrenagem:</strong> Alagamentos por obstrução de galerias, bueiros e bocas de lobo.</span>
+                        </div>
+                        <div style="background: #ffffff; border: 1px solid var(--line); border-left: 4px solid var(--red); padding: 12px; border-radius: 6px;">
+                            <strong style="color: var(--red); font-size: 1.1em;">42,15% (5.263)</strong><br>
+                            <span style="font-size: 0.85em; color: var(--muted);"><strong>Gargalo na Macrodrenagem:</strong> Inundações por transbordamento de rios, córregos e piscinões.</span>
+                        </div>
+                    </div>
+                </div>
 
-          <div class="form-group">
-            <label for="foto-arquivo">Foto do Local:</label>
-            <input type="file" id="foto-arquivo" accept="image/*" required>
-          </div>
+                <h2>⚙️ Pipeline de Engenharia de Dados Espaciais</h2>
+                <p>Abaixo está representado o fluxo de transformação dos dados geoespaciais desde a coleta de fontes primárias públicas até a geração da Matriz de Risco Socioambiental:</p>
+                
+                <img src="Pipeline_de_Engenharia_de_Dados_Espaciais.png" alt="Infográfico do Pipeline de Engenharia de Dados Espaciais (2013-2026)" class="infographic-img">
 
-          <button type="submit" id="btn-submit-foto" class="btn-submit">Enviar Registro 📸</button>
-        </form>
-      </div>
+                <h3>📐 Diagrama Técnico da Arquitetura (Mermaid / ByteByteGo)</h3>
+                <div class="map-container" style="height: 600px; margin-bottom: 25px;">
+                    <iframe src="diagrama_pipeline.html" title="Diagrama do Pipeline de Engenharia de Dados" loading="lazy"></iframe>
+                </div>
 
-      <!-- Form 2: Fórum Rápido -->
-      <div id="aba-forum" class="tab-content">
-        <form id="form-forum" onsubmit="enviarForum(event)">
-          <div class="form-group">
-            <label for="forum-bairro">Bairro / Região:</label>
-            <input type="text" id="forum-bairro" placeholder="Ex: Pinheiros, Santana, Itaquera" required>
-          </div>
+                <div class="pipeline-grid">
+                    <div class="pipeline-card">
+                        <span class="step-num">Etapa 01</span>
+                        <h4>Ingestão e Fontes</h4>
+                        <p style="font-size: 0.85em;">Coleta automática de GeoJSONs do GeoSampa (subprefeituras, drenagem, bueiros AMLURB), histórico da Defesa Civil e setores do IPVS (SEADE).</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <span class="step-num">Etapa 02</span>
+                        <h4>ETL &amp; Reprojeção</h4>
+                        <p style="font-size: 0.85em;">Expurgo de ruídos em Python, conversão cartográfica de UTM SIRGAS 2000 (EPSG:31983) para WGS84 (EPSG:4326) e sanitização de objetos para JSON.</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <span class="step-num">Etapa 03</span>
+                        <h4>Spatial Join</h4>
+                        <p style="font-size: 0.85em;">Agregação topológica de 27.301 setores do IPVS em 32 Subprefeituras e cálculo de densidade de alagamentos por km².</p>
+                    </div>
+                    <div class="pipeline-card">
+                        <span class="step-num">Etapa 04</span>
+                        <h4>Visualização Web</h4>
+                        <p style="font-size: 0.85em;">Renderização interativa leve em HTML5/Leaflet.js via Folium com Tiles Esri, sem limites de zoom e hospedada no GitHub Pages.</p>
+                    </div>
+                </div>
 
-          <div class="form-group">
-            <label for="forum-chovendo">Está a chover no local agora?</label>
-            <select id="forum-chovendo" required>
-              <option value="Sim, chuva fraca">🌧️ Sim, chuva fraca / garoa</option>
-              <option value="Sim, chuva forte">⛈️ Sim, chuva forte / torrencial</option>
-              <option value="Não está chovendo">☀️ Não está a chover</option>
-            </select>
-          </div>
+                <h2>🧭 Como Navegar na Plataforma</h2>
+                <div class="howto-grid">
+                    <div class="howto-item">
+                        <span class="k">Passo 01</span>
+                        <strong>Escolha uma fase.</strong> A trilha acima organiza os mapas em 4 fases analíticas — do contexto territorial à matriz de risco final.
+                    </div>
+                    <div class="howto-item">
+                        <span class="k">Passo 02</span>
+                        <strong>Abra um mapa.</strong> Cada botão carrega uma camada interativa (zoom, filtros e painéis laterais) renderizada via Leaflet/Folium.
+                    </div>
+                    <div class="howto-item">
+                        <span class="k">Passo 03</span>
+                        <strong>Compare as camadas.</strong> Alterne entre temporal, altimétrico, drenagem e IPVS para identificar padrões e prioridades de ação.
+                    </div>
+                </div>
 
-          <div class="form-group">
-            <label for="forum-alagamento">Há alagamento / pista bloqueada?</label>
-            <select id="forum-alagamento" required>
-              <option value="Não há alagamento">🟢 Não há alagamento</option>
-              <option value="Atenção - Risco de alagamento">🟡 Ponto de atenção / Água a subir</option>
-              <option value="Alagamento Confirmado">🔴 Alagamento confirmado / Pista paralisada</option>
-            </select>
-          </div>
+                <h2>🗺️ Trilha Analítica e Descrição das Camadas</h2>
+                <ul>
+                    <li><strong>Fase 1 - Mapa 0 (Calor Histórico Puro):</strong> Concentração espacial dos registros históricos de alagamentos na capital.</li>
+                    <li><strong>Fase 1 - Mapa 1 (Macro-Zonas):</strong> Agrupamento das 32 subprefeituras em 5 regiões (Centro, Norte, Leste, Oeste e Sul).</li>
+                    <li><strong>Fase 1 - Mapa 2 (Subprefeituras Geral):</strong> Malha territorial detalhada das 32 subprefeituras sobreposta ao calor.</li>
+                    <li><strong>Fase 1 - Mapa 3 (Individualização):</strong> Ferramenta para isolar subprefeituras específicas via painel lateral.</li>
+                    <li><strong>Fase 2 - Mapa 4 (Seletor Histórico por Ano):</strong> Painel cronológico para filtrar eventos de alagamento ano a ano (2013-2026).</li>
+                    <li><strong>Fase 2 - Mapa 5 (Altitude):</strong> Cruzamento entre ocorrências e o Modelo Digital de Elevação municipal.</li>
+                    <li><strong>Fase 2 - Pirâmide Altitudinal:</strong> Correlação gráfica entre frequência de alagamentos e cotas altimétricas.</li>
+                    <li><strong>Fase 3 - Mapa 6 (Drenagem + Anos):</strong> Hidrografia oficial (rios, canais e córregos) integrada ao filtro temporal.</li>
+                    <li><strong>Fase 3 - Mapa 7 (Mancha Preditiva de 5 Anos):</strong> Modelo hidrológico cruzando drenagem com a lâmina d'água estimada (<code>m5_profu</code>).</li>
+                    <li><strong>Fase 3 - Mapa 8 (Bueiros &amp; Alagamentos):</strong> Consolidação cruzando chamados de desentupimento da AMLURB com alagamentos.</li>
+                    <li><strong>Fase 4 - Mapa 9 (Matriz IPVS x Bueiros x Alagamentos):</strong> Ocorrência espacial completa sobrepondo o Índice Paulista de Vulnerabilidade Social (IPVS) em escala semafórica por Subprefeitura aos pontos de manutenção urbana e alagamentos.</li>
+                    <li><strong>Mapa Interativo Autônomo:</strong> Aplicação geoespacial estendida oferecida como alternativa independente com cartografia Esri Topo.</li>
+                </ul>
 
-          <button type="submit" id="btn-submit-forum" class="btn-submit">Enviar Resposta 💬</button>
-        </form>
-      </div>
+                <hr>
 
+                <h2>🗃️ Fontes de Dados</h2>
+                <ul class="source-list">
+                    <li><strong>Portal GeoSampa (PMSP):</strong> malha de subprefeituras, rede de drenagem (rios, canais e córregos), modelo digital de elevação e mancha de inundação de retorno de 5 anos.</li>
+                    <li><strong>Defesa Civil / CGE:</strong> histórico oficial de ocorrências de alagamentos e inundações (2013–2026), auditado e deduplicado.</li>
+                    <li><strong>AMLURB:</strong> chamados de limpeza e desentupimento de bueiros, usados como proxy de manutenção da microdrenagem.</li>
+                    <li><strong>Fundação SEADE:</strong> Índice Paulista de Vulnerabilidade Social (IPVS) por setor censitário, agregado às 32 subprefeituras.</li>
+                </ul>
+
+                <h2>🧰 Tecnologias Utilizadas</h2>
+                <ul>
+                    <li><strong>Linguagem:</strong> Python 3.13</li>
+                    <li><strong>GIS &amp; Engenharia de Dados:</strong> <code>pandas</code>, <code>geopandas</code>, <code>shapely</code>, <code>pyproj</code></li>
+                    <li><strong>Visualização:</strong> <code>folium</code> (TileLayer Esri, GeoJson, LayerControl, MarkerCluster, Choropleth)</li>
+                    <li><strong>Hospedagem &amp; Deploy:</strong> GitHub Pages</li>
+                </ul>
+
+                <h2>❓ Perguntas Frequentes</h2>
+                <details class="faq-item">
+                    <summary>Os mapas não carregaram. O que fazer?</summary>
+                    <div class="faq-body">Cada camada é um arquivo HTML hospedado no GitHub Pages e carregado dentro da página. Verifique sua conexão e aguarde alguns segundos; se o problema persistir, recarregue a página.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>Por que eventos de queda de árvore e deslizamento foram removidos?</summary>
+                    <div class="faq-body">A auditoria identificou 68.310 eventos brutos na base da Defesa Civil. Como o escopo do projeto é hídrico, apenas <em>ALAGAMENTO</em> e <em>INUNDACAO</em> foram integrados, totalizando 12.487 ocorrências consolidadas.</div>
+                </details>
+                <details class="faq-item">
+                    <summary>O que significa a escala semafórica do Mapa 9?</summary>
+                    <div class="faq-body">As subprefeituras são coloridas conforme a média do IPVS: quanto mais alta a vulnerabilidade social do território, mais crítica a cor — permitindo cruzar risco social, manutenção de bueiros e histórico de alagamentos em uma única leitura.</div>
+                </details>
+            </div>
+
+            <!-- ABA MAPA 0 -->
+            <div id="tab-mapa0" class="tab-content">
+                <h2>🗺️ Mapa 0: Densidade de Calor Histórico</h2>
+                <p>Visualização pura da mancha de calor concentrando os registros históricos de alagamentos.</p>
+                <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">Heatmap</span><span class="map-chip">Fonte: Defesa Civil</span></div>
+                <div class="map-container"><iframe src="mapa_calor_puro.html" title="Mapa 0" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 1 -->
+            <div id="tab-mapa1" class="tab-content">
+                <h2>🗺️ Mapa 1: Densidade por Macro-Zonas</h2>
+                <p>Foco na análise regional através das 5 Macro-Zonas de São Paulo.</p>
+                <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">5 Macro-Zonas</span><span class="map-chip">Fonte: GeoSampa</span></div>
+                <div class="map-container"><iframe src="mapa_zonas_interativo.html" title="Mapa 1" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 2 -->
+            <div id="tab-mapa2" class="tab-content">
+                <h2>🗺️ Mapa 2: Subprefeituras (Geral)</h2>
+                <p>Malha territorial geral das 32 subprefeituras paulistanas.</p>
+                <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">32 Subprefeituras</span><span class="map-chip">Fonte: GeoSampa</span></div>
+                <div class="map-container"><iframe src="mapa.html" title="Mapa 2" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 3 -->
+            <div id="tab-mapa3" class="tab-content">
+                <h2>🗺️ Mapa 3: Individualização por Subprefeitura</h2>
+                <p>Isolamento seletivo de subprefeituras específicas para análise pontual.</p>
+                <div class="map-meta"><span class="map-chip">Fase 1</span><span class="map-chip">Painel lateral</span><span class="map-chip">Análise pontual</span></div>
+                <div class="map-container"><iframe src="mapa_por_subprefeitura.html" title="Mapa 3" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 4 -->
+            <div id="tab-mapa4" class="tab-content">
+                <h2>🗺️ Mapa 4: Seletor Histórico por Ano</h2>
+                <p>Painel cronológico interativo contendo os pontos de alagamento por ano (2013 a 2026), com limites do Município, Subprefeituras e Macro-Zonas.</p>
+                
+                <div class="map-meta">
+                    <span class="map-chip">Fase 2</span>
+                    <span class="map-chip">Série temporal</span>
+                    <span class="map-chip">2013–2026</span>
+                </div>
+
+                <div class="map-container">
+                    <iframe src="mapa_alagamentos_seletor_por_ano.html" title="Mapa 4: Seletor Histórico por Ano" loading="lazy"></iframe>
+                </div>
+            </div>
+
+            <!-- ABA MAPA 5 -->
+            <div id="tab-mapa5" class="tab-content">
+                <h2>🗺️ Mapa 5: Ocorrências Cruzadas por Altitude</h2>
+                <p>Correlação topográfica entre as cotas altimétricas urbanas e os alagamentos.</p>
+                <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">MDE municipal</span><span class="map-chip">Topografia</span></div>
+                <div class="map-container"><iframe src="mapa_pontos_por_altitude.html" title="Mapa 5" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA PIRÂMIDE -->
+            <div id="tab-piramide" class="tab-content">
+                <h2>📊 Análise Estrutural: Pirâmide de Altitudes e Risco</h2>
+                <p>Gráfico analítico correlacionando frequência de alagamentos e faixas de altitude.</p>
+                <div class="map-meta"><span class="map-chip">Fase 2</span><span class="map-chip">Gráfico analítico</span><span class="map-chip">Faixas altimétricas</span></div>
+                <div class="map-container"><iframe src="figura_piramide_altitudes.html" title="Pirâmide" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 6 -->
+            <div id="tab-mapa6" class="tab-content">
+                <h2>🗺️ Mapa 6: Rede de Drenagem, Subprefeituras e Seletor Histórico por Anos</h2>
+                <p>Hidrografia oficial associada à malha territorial e filtro temporal.</p>
+                <div class="map-meta"><span class="map-chip">Fase 3</span><span class="map-chip">Hidrografia</span><span class="map-chip">Filtro temporal</span></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_com_drenagem_e_anos.html" title="Mapa 6" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 7 -->
+            <div id="tab-mapa7" class="tab-content">
+                <h2>🗺️ Mapa 7: Análise Preditiva de Risco (Mancha de Inundação - Retorno de 5 Anos)</h2>
+                <p>Modelo hidrológico preditivo cruzando drenagem com lâmina d'água estimada.</p>
+                <div class="map-meta"><span class="map-chip">Fase 3</span><span class="map-chip">Modelo hidrológico</span><span class="map-chip">Retorno: 5 anos</span></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_drenagem_mancha5_anos.html" title="Mapa 7" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 8 -->
+            <div id="tab-mapa8" class="tab-content">
+                <h2>🗺️ Mapa 8: Chamados de Limpeza de Bueiros (AMLURB) &amp; Ocorrências Anuais</h2>
+                <p>Integração operacional cruzando manutenção de bueiros com alagamentos.</p>
+                <div class="map-meta"><span class="map-chip">Fase 3</span><span class="map-chip">AMLURB</span><span class="map-chip">Microdrenagem</span></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_e_bueiros.html" title="Mapa 8" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA 9 -->
+            <div id="tab-mapa9" class="tab-content">
+                <h2>🗺️ Mapa 9: Matriz Integrada de Risco Socioambiental (IPVS x Bueiros x Alagamentos)</h2>
+                <p>Cruzamento analítico definitivo sobrepondo a média da Vulnerabilidade Social (IPVS em escala semafórica por Subprefeitura) aos chamados de manutenção e histórico de alagamentos.</p>
+                <div class="map-meta"><span class="map-chip">Fase 4</span><span class="map-chip">IPVS semafórico</span><span class="map-chip">Mapa integrado final</span></div>
+                <div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs_2.html" title="Mapa 9" loading="lazy"></iframe></div>
+            </div>
+
+            <!-- ABA MAPA INTERATIVO (VERSÃO AUTÔNOMA / INDEPENDENTE) -->
+            <div id="tab-mapainterativo" class="tab-content">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; flex-wrap: wrap; gap: 10px;">
+                    <div>
+                        <h2 style="margin: 0; border-bottom: none; padding-bottom: 0;">🌐 Mapa Interativo (Versão Autônoma)</h2>
+                        <p style="margin: 4px 0 0; color: var(--muted); font-size: 0.9em;">Aplicação geoespacial estendida com cartografia Esri Topo e central colaborativa.</p>
+                    </div>
+                    <!-- BOTÃO DE COLABORAÇÃO LOCALIZADO EXCLUSIVAMENTE AQUI -->
+                    <button type="button" onclick="abrirModalColaboracao()" class="doc-btn" style="background-color: var(--cyan-deep); padding: 10px 20px; font-size: 0.85em;">
+                        📢 Colaborar (Foto ou Fórum)
+                    </button>
+                </div>
+                
+                <div class="map-meta">
+                    <span class="map-chip">Versão Independente</span>
+                    <span class="map-chip">Esri Topo</span>
+                    <span class="map-chip">Navegação Livre</span>
+                </div>
+                <div class="map-container">
+                    <iframe src="mapa_alagamentos_independente.html" title="Mapa Interativo Autônomo" loading="lazy"></iframe>
+                </div>
+            </div>
+
+        </div>
+
+        <!-- RODAPÉ -->
+        <footer class="footer">
+            <p class="f-mono">UNIVESP · Projeto Integrador Extensionista IV · DRP14 — Turma 003 · Polo Carrão</p>
+            <p>Dados abertos: GeoSampa (Decreto nº 57.770/2017) · Defesa Civil · AMLURB · Fundação SEADE — sob a Lei de Acesso à Informação (Lei 12.527/2011).</p>
+        </footer>
     </div>
-  </div>
 
-  <!-- Leaflet JS -->
-  <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- ========================================================= -->
+    <!-- MODAL DE COLABORAÇÃO COMUNITÁRIA UNIFICADO -->
+    <!-- ========================================================= -->
+    <div id="modal-colaboracao" class="modal-overlay" style="display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.6); z-index: 9999; justify-content: center; align-items: center;">
+        <div class="modal-content" style="background: white; border-radius: 12px; padding: 24px; max-width: 480px; width: 90%; box-shadow: 0 10px 25px rgba(0,0,0,0.2); position: relative;">
+            <span class="close-btn" onclick="fecharModalColaboracao()" style="position: absolute; right: 16px; top: 12px; font-size: 24px; cursor: pointer; color: #64748b;">&times;</span>
+            
+            <h2 style="font-size: 1.25em; color: #0f172a; margin-bottom: 16px;">📢 Central de Colaboração Comunitária</h2>
 
-  <script>
-    // Inicialização do Supabase
-    const SUPABASE_URL = "https://ebknsiiirqpfsrjewpou.supabase.co";
-    const SUPABASE_KEY = "sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO";
-    const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+            <!-- ABAS INTERNAS DO MODAL -->
+            <div style="display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid #e2e8f0; padding-bottom: 8px;">
+                <button id="modal-tab-btn-foto" class="modal-tab-btn active" onclick="alternarAbaModal('foto')" style="flex: 1; padding: 8px; border: none; background: #0f172a; color: white; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer;">📸 Com Foto</button>
+                <button id="modal-tab-btn-forum" class="modal-tab-btn" onclick="alternarAbaModal('forum')" style="flex: 1; padding: 8px; border: none; background: #e2e8f0; color: #334155; border-radius: 6px; font-weight: bold; font-size: 0.85em; cursor: pointer;">💬 Fórum Rápido</button>
+            </div>
 
-    // Tratamento de mensagens de erro para evitar 'undefined' no celular
-    function extrairMensagemErro(error) {
-      if (!error) return "Erro desconhecido de comunicação com o servidor.";
-      if (typeof error === "string") return error;
-      if (error.message) return error.message;
-      if (error.error_description) return error.error_description;
-      if (error.details) return error.details;
-      try {
-        return JSON.stringify(error);
-      } catch (e) {
-        return "Falha ao processar a requisição.";
-      }
-    }
-
-    // Configuração do Mapa Leaflet
-    const map = L.map('map').setView([-23.55052, -46.63330], 12);
-
-    L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-      maxZoom: 19,
-      attribution: '© OpenStreetMap contributors | PI UNIVESP'
-    }).addTo(map);
-
-    const camadaFotos = L.layerGroup().addTo(map);
-    const camadaForum = L.layerGroup().addTo(map);
-    const camadaRSS = L.layerGroup().addTo(map);
-
-    L.control.layers(null, {
-      "📸 Relatos com Foto": camadaFotos,
-      "💬 Fórum Comunitário": camadaForum,
-      "📰 Notícias RSS": camadaRSS
-    }).addTo(map);
-
-    // Carregar Registros Aprovados
-    async function carregarRegistosMapa() {
-      try {
-        // Relatos com Foto
-        const { data: fotos, error: errFotos } = await supabaseClient
-          .from('relatos_fotos')
-          .select('*')
-          .eq('aprovado', true);
-
-        if (!errFotos && fotos) {
-          fotos.forEach(item => {
-            if (item.latitude && item.longitude) {
-              const marker = L.circleMarker([item.latitude, item.longitude], {
-                radius: 8,
-                fillColor: "#8b5cf6",
-                color: "#fff",
-                weight: 2,
-                fillOpacity: 0.9
-              });
-              marker.bindPopup(`
-                <div class="popup-content">
-                  <span class="popup-badge badge-foto">Relato com Foto</span>
-                  <h4>${item.bairro}</h4>
-                  <p><strong>Estado:</strong> ${item.status_via}</p>
-                  <p>${item.descricao}</p>
-                  ${item.foto_url ? `<img src="${item.foto_url}" alt="Foto">` : ''}
+            <!-- BOX GPS (PARTILHADO) -->
+            <div style="background: #f8fafc; border: 1px solid #e2e8f0; padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
+                <div>
+                    <strong style="font-size: 0.85em; display: block; color: #1e293b;">📍 Posição GPS</strong>
+                    <small id="status-gps" style="color: #64748b; font-size: 0.8em;">Aguardando captura...</small>
                 </div>
-              `);
-              camadaFotos.addLayer(marker);
+                <button type="button" onclick="obterGPS()" style="padding: 6px 12px; background: #0284c7; color: white; border: none; border-radius: 6px; font-size: 0.8em; font-weight: bold; cursor: pointer;">Capturar GPS</button>
+            </div>
+
+            <!-- FORMULÁRIO 1: RELATO COM FOTO -->
+            <form id="form-foto" onsubmit="enviarOcorrencia(event)">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Estado do Local:</label>
+                    <select id="status-local" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9em;" required>
+                        <option value="alagado">🚨 Ponto Alagado</option>
+                        <option value="liberado">🟢 Pista Liberada</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Foto do Local:</label>
+                    <input type="file" id="foto-local" accept="image/*" style="width: 100%; font-size: 0.85em;" required>
+                </div>
+                <button type="submit" id="btn-submit-colaboracao" style="width: 100%; padding: 10px; background: #16a34a; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">✅ Enviar Foto para Moderação</button>
+            </form>
+
+            <!-- FORMULÁRIO 2: FÓRUM "CHOVEU? ALAGOU?" -->
+            <form id="form-forum" onsubmit="enviarForum(event)" style="display: none;">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Bairro ou Ponto de Referência (Opcional):</label>
+                    <input type="text" id="forum-bairro" placeholder="Ex: Tatuapé, Av. Aricanduva..." style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9em;">
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Está a chover no local agora?</label>
+                    <select id="forum-choveu" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9em;" required>
+                        <option value="true">🌧️ Sim, está a chover</option>
+                        <option value="false">☀️ Não está a chover</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px; color: #334155;">Há alagamento / pista bloqueada?</label>
+                    <select id="forum-alagou" style="width: 100%; padding: 8px; border: 1px solid #cbd5e1; border-radius: 6px; font-size: 0.9em;" required>
+                        <option value="true">🌊 Sim, há alagamento</option>
+                        <option value="false">🟢 Não há alagamento</option>
+                    </select>
+                </div>
+                <button type="submit" id="btn-submit-forum" style="width: 100%; padding: 10px; background: #0284c7; color: white; border: none; border-radius: 6px; font-weight: bold; cursor: pointer;">✅ Enviar para Fórum Comunitário</button>
+            </form>
+        </div>
+    </div>
+
+    <!-- ========================================================= -->
+    <!-- SCRIPTS DE CONTROLE DO SITE E CONEXÃO SUPABASE -->
+    <!-- ========================================================= -->
+    <script>
+        // 1. INICIALIZAÇÃO DO CLIENTE SUPABASE
+        const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
+        const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
+        const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
+
+        let latAtual = null;
+        let lonAtual = null;
+
+        // 2. CONTROLE DE ABAS E ROADMAP
+        function openTab(evt, tabName) {
+            const contents = document.getElementsByClassName("tab-content");
+            for (let i = 0; i < contents.length; i++) {
+                contents[i].classList.remove("active");
             }
-          });
+            const roadmapBtns = document.getElementsByClassName("roadmap-btn");
+            for (let i = 0; i < roadmapBtns.length; i++) {
+                roadmapBtns[i].classList.remove("active");
+            }
+            const docBtns = document.getElementsByClassName("doc-btn");
+            for (let i = 0; i < docBtns.length; i++) {
+                docBtns[i].classList.remove("active");
+            }
+            
+            const targetTab = document.getElementById(tabName);
+            if (targetTab) {
+                targetTab.classList.add("active");
+                if (evt && evt.currentTarget) {
+                    evt.currentTarget.classList.add("active");
+                }
+                document.querySelector('.panel').scrollIntoView({ behavior: 'smooth', block: 'start' });
+
+                // Se abrir a aba do Mapa Interativo Autônomo, recarrega os pontos
+                if (tabName === 'tab-mapainterativo') {
+                    setTimeout(() => {
+                        carregarPontosColaborativos();
+                    }, 400);
+                }
+            }
         }
 
-        // Fórum
-        const { data: forum, error: errForum } = await supabaseClient
-          .from('forum_alagamentos')
-          .select('*')
-          .eq('aprovado', true);
-
-        if (!errForum && forum) {
-          forum.forEach(item => {
-            if (item.latitude && item.longitude) {
-              const cor = item.alagamento.includes('Confirmado') ? '#ef4444' : '#f59e0b';
-              const marker = L.circleMarker([item.latitude, item.longitude], {
-                radius: 7,
-                fillColor: cor,
-                color: "#fff",
-                weight: 2,
-                fillOpacity: 0.9
-              });
-              marker.bindPopup(`
-                <div class="popup-content">
-                  <span class="popup-badge badge-forum">Fórum</span>
-                  <h4>${item.bairro}</h4>
-                  <p><strong>Chuva:</strong> ${item.chovendo}</p>
-                  <p><strong>Situação:</strong> ${item.alagamento}</p>
-                </div>
-              `);
-              camadaForum.addLayer(marker);
-            }
-          });
+        // 3. CONTROLE DO MODAL COLABORATIVO
+        function abrirModalColaboracao() {
+            document.getElementById("modal-colaboracao").style.display = "flex";
         }
 
-        // RSS
-        const { data: rss, error: errRss } = await supabaseClient
-          .from('noticias_rss')
-          .select('*')
-          .eq('aprovado', true);
-
-        if (!errRss && rss) {
-          rss.forEach(item => {
-            if (item.latitude && item.longitude) {
-              const marker = L.circleMarker([item.latitude, item.longitude], {
-                radius: 7,
-                fillColor: "#2563eb",
-                color: "#fff",
-                weight: 2,
-                fillOpacity: 0.9
-              });
-              marker.bindPopup(`
-                <div class="popup-content">
-                  <span class="popup-badge badge-rss">${item.veiculo_imprensa}</span>
-                  <h4>${item.bairro}</h4>
-                  <p><strong>${item.titulo}</strong></p>
-                  <a href="${item.link_noticia}" target="_blank" rel="noopener">Ler matéria completa 🔗</a>
-                </div>
-              `);
-              camadaRSS.addLayer(marker);
-            }
-          });
+        function fecharModalColaboracao() {
+            document.getElementById("modal-colaboracao").style.display = "none";
         }
-      } catch (err) {
-        console.error("Erro ao carregar mapa:", err);
-      }
-    }
 
-    carregarRegistosMapa();
+        function alternarAbaModal(aba) {
+            const btnFoto = document.getElementById('modal-tab-btn-foto');
+            const btnForum = document.getElementById('modal-tab-btn-forum');
+            const formFoto = document.getElementById('form-foto');
+            const formForum = document.getElementById('form-forum');
 
-    // Envio Relato com Foto
-    async function enviarRelatoFoto(event) {
-      event.preventDefault();
-      const btn = document.getElementById("btn-submit-foto");
+            if (aba === 'foto') {
+                btnFoto.style.background = '#0f172a';
+                btnFoto.style.color = 'white';
+                btnForum.style.background = '#e2e8f0';
+                btnForum.style.color = '#334155';
+                formFoto.style.display = 'block';
+                formForum.style.display = 'none';
+            } else {
+                btnForum.style.background = '#0f172a';
+                btnForum.style.color = 'white';
+                btnFoto.style.background = '#e2e8f0';
+                btnFoto.style.color = '#334155';
+                formForum.style.display = 'block';
+                formFoto.style.display = 'none';
+            }
+        }
 
-      try {
-        btn.disabled = true;
-        btn.innerText = "Enviando imagem...";
+        // 4. CAPTURA DE GPS COM VALIDAÇÃO DE SP
+        function obterGPS() {
+            const statusTxt = document.getElementById("status-gps");
+            if ("geolocation" in navigator) {
+                statusTxt.innerText = "Capturando... ⏳";
+                statusTxt.style.color = "var(--cyan-deep)";
 
-        const bairro = document.getElementById("foto-bairro").value;
-        const statusVia = document.getElementById("foto-status-via").value;
-        const descricao = document.getElementById("foto-descricao").value;
-        const fileInput = document.getElementById("foto-arquivo");
-        const file = fileInput.files[0];
+                navigator.geolocation.getCurrentPosition(
+                    (pos) => {
+                        latAtual = pos.coords.latitude;
+                        lonAtual = pos.coords.longitude;
 
-        if (!file) throw new Error("Selecione uma imagem para enviar.");
+                        if (latAtual >= -24.1 && latAtual <= -23.3 && lonAtual >= -46.9 && lonAtual <= -46.3) {
+                            statusTxt.innerText = "✅ GPS OK";
+                            statusTxt.style.color = "var(--green)";
+                        } else {
+                            statusTxt.innerText = "⚠️ Fora de SP";
+                            statusTxt.style.color = "#d97706";
+                        }
+                    },
+                    (err) => {
+                        statusTxt.innerText = "❌ Sem GPS";
+                        statusTxt.style.color = "var(--red)";
+                    },
+                    { enableHighAccuracy: true, timeout: 10000 }
+                );
+            } else {
+                statusTxt.innerText = "❌ Não suportado";
+                statusTxt.style.color = "var(--red)";
+            }
+        }
 
-        const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
-        const { error: uploadError } = await supabaseClient.storage
-          .from('fotos_alagamentos')
-          .upload(fileName, file);
+        // 5. COMPRESSÃO DE IMAGEM
+        function compressImage(file, maxWidth = 1200, quality = 0.8) {
+            return new Promise((resolve, reject) => {
+                const reader = new FileReader();
+                reader.readAsDataURL(file);
+                reader.onload = (event) => {
+                    const img = new Image();
+                    img.src = event.target.result;
+                    img.onload = () => {
+                        const canvas = document.createElement('canvas');
+                        let width = img.width;
+                        let height = img.height;
 
-        if (uploadError) throw uploadError;
+                        if (width > maxWidth) {
+                            height = Math.round((height * maxWidth) / width);
+                            width = maxWidth;
+                        }
 
-        const { data: publicUrlData } = supabaseClient.storage
-          .from('fotos_alagamentos')
-          .getPublicUrl(fileName);
+                        canvas.width = width;
+                        canvas.height = height;
 
-        const fotoUrl = publicUrlData.publicUrl;
-        btn.innerText = "Gravando registro...";
+                        const ctx = canvas.getContext('2d');
+                        ctx.drawImage(img, 0, 0, width, height);
 
-        const lat = -23.55052 + (Math.random() - 0.5) * 0.1;
-        const lon = -46.63330 + (Math.random() - 0.5) * 0.1;
+                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
+                    };
+                    img.onerror = (err) => reject(err);
+                };
+                reader.onerror = (err) => reject(err);
+            });
+        }
 
-        const { error: dbError } = await supabaseClient
-          .from('relatos_fotos')
-          .insert([{
-            bairro: bairro,
-            status_via: statusVia,
-            descricao: descricao,
-            foto_url: fotoUrl,
-            latitude: lat,
-            longitude: lon,
-            aprovado: false,
-            status_moderacao: 'pendente'
-          }]);
+        // 6. ENVIO DE DADOS E FOTO PARA O SUPABASE (MODERAÇÃO PENDENTE)
+        async function enviarOcorrencia(e) {
+            e.preventDefault();
 
-        if (dbError) throw dbError;
+            if (!latAtual || !lonAtual) {
+                alert('⚠️ Por favor, clique em "Capturar GPS" para geolocalizar a ocorrência.');
+                return;
+            }
 
-        alert("✅ Relato enviado com sucesso! O registro aguarda aprovação na moderação.");
-        document.getElementById("form-relato-foto").reset();
-        fecharModal();
+            const btnSubmit = document.getElementById("btn-submit-colaboracao");
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "Enviando registro... ⏳";
 
-      } catch (error) {
-        console.error("Erro no envio do relato com foto:", error);
-        alert("Não foi possível enviar: " + extrairMensagemErro(error));
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Enviar Registro 📸";
-      }
-    }
+            const statusLocal = document.getElementById("status-local").value;
+            const inputFoto = document.getElementById("foto-local");
+            let fotoUrlPublica = null;
 
-    // Envio Fórum
-    async function enviarForum(event) {
-      event.preventDefault();
-      const btn = document.getElementById("btn-submit-forum");
+            try {
+                if (inputFoto.files && inputFoto.files[0]) {
+                    const fileOriginal = inputFoto.files[0];
+                    const blobComprimido = await compressImage(fileOriginal, 1200, 0.8);
 
-      try {
-        btn.disabled = true;
-        btn.innerText = "Gravando resposta...";
+                    const nomeArquivo = `foto_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
 
-        const bairro = document.getElementById("forum-bairro").value;
-        const chovendo = document.getElementById("forum-chovendo").value;
-        const alagamento = document.getElementById("forum-alagamento").value;
+                    const { data: storageData, error: storageError } = await supabaseClient.storage
+                        .from('fotos-alagamentos')
+                        .upload(nomeArquivo, blobComprimido, { contentType: 'image/jpeg' });
 
-        const lat = -23.55052 + (Math.random() - 0.5) * 0.1;
-        const lon = -46.63330 + (Math.random() - 0.5) * 0.1;
+                    if (storageError) {
+                        console.warn('Erro ao enviar foto:', storageError.message);
+                    } else {
+                        const { data: urlData } = supabaseClient.storage
+                            .from('fotos-alagamentos')
+                            .getPublicUrl(nomeArquivo);
+                        
+                        fotoUrlPublica = urlData.publicUrl;
+                    }
+                }
 
-        const { error } = await supabaseClient
-          .from('forum_alagamentos')
-          .
+                // Insere com moderação pendente por padrão
+                const { error: dbError } = await supabaseClient
+                    .from('confirmacoes_alagamento')
+                    .insert([
+                        {
+                            ponto_id: 'report_usuario',
+                            status: statusLocal,
+                            latitude: latAtual,
+                            longitude: lonAtual,
+                            foto_url: fotoUrlPublica,
+                            created_at: new Date().toISOString(),
+                            aprovado: false,
+                            status_moderacao: 'pendente'
+                        }
+                    ]);
+
+                if (dbError) {
+                    alert('Erro ao registrar: ' + dbError.message);
+                } else {
+                    alert('✅ Ocorrência enviada com sucesso! Aguardando aprovação no painel de moderação.');
+                    document.getElementById("form-foto").reset();
+                    document.getElementById("status-gps").innerText = "Aguardando...";
+                    fecharModalColaboracao();
+                }
+
+            } catch (err) {
+                alert('Erro no processamento: ' + err.message);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "✅ Enviar Foto para Moderação";
+            }
+        }
+
+        // 7. ENVIO DA MICRO-PESQUISA DO FÓRUM ("CHOVEU? ALAGOU?")
+        async function enviarForum(e) {
+            e.preventDefault();
+
+            if (!latAtual || !lonAtual) {
+                alert('⚠️ Por favor, clique em "Capturar GPS" para geolocalizar a sua resposta.');
+                return;
+            }
+
+            const btnSubmit = document.getElementById("btn-submit-forum");
+            btnSubmit.disabled = true;
+            btnSubmit.innerText = "Enviando resposta... ⏳";
+
+            const bairroInput = document.getElementById("forum-bairro").value;
+            const choveuValue = document.getElementById("forum-choveu").value === 'true';
+            const alagouValue = document.getElementById("forum-alagou").value === 'true';
+
+            try {
+                const { error: dbError } = await supabaseClient
+                    .from('forum_choveu_alagou')
+                    .insert([
+                        {
+                            bairro: bairroInput || 'São Paulo',
+                            latitude: latAtual,
+                            longitude: lonAtual,
+                            choveu: choveuValue,
+                            alagou: alagouValue,
+                            created_at: new Date().toISOString(),
+                            aprovado: false,
+                            status_moderacao: 'pendente'
+                        }
+                    ]);
+
+                if (dbError) {
+                    alert('Erro ao enviar para o fórum: ' + dbError.message);
+                } else {
+                    alert('✅ Resposta enviada com sucesso! Aguardando aprovação no painel de moderação.');
+                    document.getElementById("form-forum").reset();
+                    document.getElementById("status-gps").innerText = "Aguardando...";
+                    fecharModalColaboracao();
+                }
+
+            } catch (err) {
+                alert('Erro no processamento: ' + err.message);
+            } finally {
+                btnSubmit.disabled = false;
+                btnSubmit.innerText = "✅ Enviar para Fórum Comunitário";
+            }
+        }
+
+        // 8. EXIBIÇÃO UNIFICADA NO MAPA AUTÔNOMO (FOTOS + FÓRUM + RSS)
+        async function carregarPontosColaborativos() {
+            try {
+                // A. Procura relatos com foto aprovados
+                const { data: pontosFoto } = await supabaseClient
+                    .from('confirmacoes_alagamento')
+                    .select('*')
+                    .eq('status_moderacao', 'aprovado');
+
+                // B. Procura enquetes do fórum aprovadas
+                const { data: pontosForum } = await supabaseClient
+                    .from('forum_choveu_alagou')
+                    .select('*')
+                    .eq('status_moderacao', 'aprovado');
+
+                // C. Procura notícias RSS aprovadas
+                const { data: pontosRSS } = await supabaseClient
+                    .from('noticias_rss')
+                    .select('*')
+                    .eq('status_moderacao', 'aprovado');
+
+                const iframeAutonomo = document.querySelector('#tab-mapainterativo iframe');
+                if (!iframeAutonomo) return;
+
+                const renderizarTodos = () => {
+                    if (pontosFoto && pontosFoto.length > 0) plotaPontosNoIframe(iframeAutonomo, pontosFoto, 'foto');
+                    if (pontosForum && pontosForum.length > 0) plotaPontosNoIframe(iframeAutonomo, pontosForum, 'forum');
+                    if (pontosRSS && pontosRSS.length > 0) plotaPontosNoIframe(iframeAutonomo, pontosRSS, 'rss');
+                };
+
+                if (iframeAutonomo.contentDocument && iframeAutonomo.contentDocument.readyState === 'complete') {
+                    renderizarTodos();
+                }
+                iframeAutonomo.onload = renderizarTodos;
+
+            } catch (err) {
+                console.error('Erro ao carregar pontos no mapa:', err);
+            }
+        }
+
+        function plotaPontosNoIframe(iframeElement, listaPontos, tipo) {
+            try {
+                const win = iframeElement.contentWindow;
+                if (!win || !win.L) return;
+
+                let mapObj = null;
+                for (let key in win) {
+                    if (key.startsWith('map_') || key === 'mapa_anos') {
+                        mapObj = win[key];
+                        break;
+                    }
+                }
+
+                if (!mapObj) return;
+
+                listaPontos.forEach(ponto => {
+                    if (!ponto.latitude || !ponto.longitude) return;
+
+                    let corIcone = '#2563eb';
+                    let popupHtml = '';
+
+                    const d = ponto.created_at || ponto.data_publicacao ? new Date(ponto.created_at || ponto.data_publicacao) : null;
+                    const dataFormatada = d ? d.toLocaleDateString('pt-BR') + ' às ' + d.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' }) : 'Data não informada';
+
+                    // 1. RELATOS COM FOTO
+                    if (tipo === 'foto') {
+                        corIcone = ponto.status === 'alagado' ? '#cf222e' : '#1a7f37';
+                        const statusTexto = ponto.status === 'alagado' ? '🚨 Ponto Alagado (Foto)' : '🟢 Pista Liberada (Foto)';
+
+                        popupHtml = `
+                            <div style="font-family: sans-serif; min-width: 220px; max-width: 270px; padding: 4px;">
+                                <strong style="color: ${corIcone}; font-size: 1.05em;">${statusTexto}</strong><br>
+                                <span style="color: #475569; font-size: 0.8em;">🕒 ${dataFormatada}</span>
+                                <hr style="margin: 8px 0; border: 0; border-top: 1px solid #e2e8f0;">
+                        `;
+
+                        if (ponto.foto_url) {
+                            popupHtml += `
+                                <div style="margin: 6px 0;">
+                                    <a href="${ponto.foto_url}" target="_blank" title="Clique para ver em tamanho real">
+                                        <img src="${ponto.foto_url}" alt="Foto do local" style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
+                                    </a>
+                                </div>
+                            `;
+                        } else {
+                            popupHtml += `<p style="font-size: 0.8em; color: #94a3b8; margin: 4px 0;">Sem foto anexada.</p>`;
+                        }
+                        popupHtml += `</div>`;
+                    } 
+                    // 2. ENQUETES DO FÓRUM
+                    else if (tipo === 'forum') {
+                        if (ponto.alagou) {
+                            corIcone = '#dc2626';
+                        } else if (ponto.choveu) {
+                            corIcone = '#d97706';
+                        } else {
+                            corIcone = '#16a34a';
+                        }
+
+                        const txtChoveu = ponto.choveu ? '🌧️ Sim' : '☀️ Não';
+                        const txtAlagou = ponto.alagou ? '🚨 Sim (Alagado)' : '🟢 Não (Liberado)';
+
+                        popupHtml = `
+                            <div style="font-family: sans-serif; min-width: 210px; padding: 4px;">
+                                <strong style="color: ${corIcone}; font-size: 1.05em;">💬 Fórum Comunitário</strong><br>
+                                <span style="color: #475569; font-size: 0.8em;">🏠 <b>Bairro:</b> ${ponto.bairro || 'São Paulo'}</span><br>
+                                <span style="color: #475569; font-size: 0.8em;">🕒 ${dataFormatada}</span>
+                                <hr style="margin: 8px 0; border: 0; border-top: 1px solid #e2e8f0;">
+                                <div style="font-size: 0.85em; line-height: 1.5;">
+                                    🌧️ <b>Choveu?</b> ${txtChoveu}<br>
+                                    🌊 <b>Alagou?</b> ${txtAlagou}
+                                </div>
+                            </div>
+                        `;
+                    }
+                    // 3. NOTÍCIAS RSS
+                    else if (tipo === 'rss') {
+                        corIcone = '#2563eb';
+                        popupHtml = `
+                            <div style="font-family: sans-serif; min-width: 220px; padding: 4px;">
+                                <strong style="color: #2563eb; font-size: 1em;">📰 ${ponto.titulo || 'Notícia RSS'}</strong><br>
+                                <span style="color: #475569; font-size: 0.8em;">🏢 ${ponto.veiculo_imprensa || 'Imprensa'}</span><br>
+                                <span style="color: #475569; font-size: 0.8em;">🕒 ${dataFormatada}</span>
+                                <hr style="margin: 8px 0; border: 0; border-top: 1px solid #e2e8f0;">
+                                <a href="${ponto.link_noticia}" target="_blank" style="color: #2563eb; font-size: 0.85em; font-weight: bold;">Ler notícia completa ↗</a>
+                            </div>
+                        `;
+                    }
+
+                    win.L.circleMarker([ponto.latitude, ponto.longitude], {
+                        radius: 8,
+                        fillColor: corIcone,
+                        color: '#ffffff',
+                        weight: 2,
+                        opacity: 1,
+                        fillOpacity: 0.9
+                    }).bindPopup(popupHtml).addTo(mapObj);
+                });
+
+            } catch (e) {
+                console.warn('Aguardando carregamento do iframe do mapa...', e);
+            }
+        }
+
+        window.addEventListener('DOMContentLoaded', carregarPontosColaborativos);
+    </script>
+</body>
+</html>
