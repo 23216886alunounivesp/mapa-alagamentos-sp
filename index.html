@@ -1167,20 +1167,26 @@
                                 <span style="color: #475569; font-size: 0.8em;">🕒 ${dataFormatada}</span>
                                 <hr style="margin: 8px 0; border: 0; border-top: 1px solid #e2e8f0;">
                         `;
-
+                        
+                         // === TRECHO COM TRATAMENTO DE ERRO 'onerror' AQUI ===
                         if (ponto.foto_url) {
                             popupHtml += `
                                 <div style="margin: 6px 0;">
                                     <a href="${ponto.foto_url}" target="_blank" title="Clique para ver em tamanho real">
-                                        <img src="${ponto.foto_url}" alt="Foto do local" style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
+                                        <img src="${ponto.foto_url}" 
+                                             alt="Foto do local" 
+                                             onerror="this.onerror=null; this.parentElement.innerHTML='<span style=\'font-size:0.8em; color:#94a3b8;\'>⚠️ Imagem indisponível no Storage</span>';"
+                                             style="width: 100%; height: 140px; object-fit: cover; border-radius: 8px; border: 1px solid #cbd5e1;">
                                     </a>
                                 </div>
                             `;
                         } else {
                             popupHtml += `<p style="font-size: 0.8em; color: #94a3b8; margin: 4px 0;">Sem foto anexada.</p>`;
                         }
+                        // ===================================================
+
                         popupHtml += `</div>`;
-                    } 
+                    }
                     // 2. ENQUETES DO FÓRUM
                     else if (tipo === 'forum') {
                         if (ponto.alagou) {
