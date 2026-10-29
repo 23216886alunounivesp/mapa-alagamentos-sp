@@ -967,8 +967,7 @@
                 reader.onerror = (err) => reject(err);
             });
         }
-
-        // 6. ENVIO DE DADOS E FOTO PARA O SUPABASE (MODERAÇÃO PENDENTE)
+ // 6. ENVIO DE DADOS E FOTO PARA O SUPABASE (MODERAÇÃO PENDENTE)
         async function enviarOcorrencia(e) {
             e.preventDefault();
 
@@ -992,19 +991,22 @@
 
                     const nomeArquivo = `foto_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
 
+                    // === TRECHO ATUALIZADO AQUI ===
                     const { data: storageData, error: storageError } = await supabaseClient.storage
                         .from('fotos-alagamentos')
                         .upload(nomeArquivo, blobComprimido, { contentType: 'image/jpeg' });
 
                     if (storageError) {
-                        console.warn('Erro ao enviar foto:', storageError.message);
-                    } else {
-                        const { data: urlData } = supabaseClient.storage
-                            .from('fotos-alagamentos')
-                            .getPublicUrl(nomeArquivo);
-                        
-                        fotoUrlPublica = urlData.publicUrl;
+                        // Interrompe o fluxo e lança a mensagem para ser capturada pelo catch
+                        throw new Error('Falha ao salvar a imagem no Storage: ' + storageError.message);
                     }
+
+                    const { data: urlData } = supabaseClient.storage
+                        .from('fotos-alagamentos')
+                        .getPublicUrl(nomeArquivo);
+
+                    fotoUrlPublica = urlData.publicUrl;
+                    // ==============================
                 }
 
                 // Insere com moderação pendente por padrão
@@ -1039,7 +1041,7 @@
                 btnSubmit.innerText = "✅ Enviar Foto para Moderação";
             }
         }
-
+        
         // 7. ENVIO DA MICRO-PESQUISA DO FÓRUM ("CHOVEU? ALAGOU?")
         async function enviarForum(e) {
             e.preventDefault();
