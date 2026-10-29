@@ -227,6 +227,67 @@
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
+        /* COMPONENTE: ESTRADA DA JORNADA DO USUÁRIO */
+        .user-road-wrapper {
+            background: #ffffff;
+            border: 1px solid var(--line);
+            border-radius: 12px;
+            padding: 24px;
+            margin: 20px 0;
+        }
+        .user-road-header h4 { margin: 0 0 4px; color: var(--navy); font-size: 1.1em; }
+        .user-road-header p { margin: 0 0 20px; color: var(--muted); font-size: 0.88em; }
+
+        .user-road-timeline {
+            display: flex;
+            gap: 12px;
+            overflow-x: auto;
+            padding-bottom: 12px;
+            position: relative;
+        }
+        .road-node {
+            min-width: 160px;
+            flex: 1;
+            background: #f8fafc;
+            border: 1px solid var(--line);
+            border-radius: 10px;
+            padding: 14px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            position: relative;
+        }
+        .road-node:hover {
+            border-color: var(--cyan-deep);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
+        }
+        .road-node.highlight {
+            background: #f0fdf4;
+            border-color: #86efac;
+        }
+        .node-badge {
+            position: absolute; top: 10px; right: 10px;
+            width: 20px; height: 20px; border-radius: 50%;
+            background: var(--navy); color: white;
+            font-family: var(--mono); font-size: 0.7em; font-weight: bold;
+            display: flex; align-items: center; justify-content: center;
+        }
+        .road-node.highlight .node-badge { background: var(--green); }
+        .node-icon { font-size: 1.4em; display: block; margin-bottom: 6px; }
+        .node-body strong { display: block; font-size: 0.85em; color: var(--navy); margin-bottom: 4px; }
+        .node-body p { margin: 0; font-size: 0.76em; color: var(--muted); line-height: 1.3; }
+
+        .road-expansion {
+            background: #f1f5f9;
+            border-left: 4px solid var(--cyan-deep);
+            padding: 16px;
+            border-radius: 0 8px 8px 0;
+            margin-top: 16px;
+            font-size: 0.88em;
+        }
+        .road-expansion h5 { margin: 0 0 8px; color: var(--navy); font-size: 1em; }
+        .road-expansion ul { margin: 0; padding-left: 20px; }
+
         /* CARDS DO PAINEL "SOBRE A FERRAMENTA" */
         .about-grid {
             display: grid;
@@ -295,6 +356,11 @@
         @media (max-width: 720px) {
             .map-container { height: 480px; }
             .hero { padding: 24px 16px; }
+            .user-road-timeline {
+                flex-direction: column;
+                overflow-x: visible;
+            }
+            .road-node { min-width: 100%; }
         }
     </style>
 </head>
@@ -457,6 +523,111 @@
             <h3 style="margin-top: 0; color: var(--navy); font-size: 1.2em;">ℹ️ Sobre a Ferramenta &amp; Origem dos Dados</h3>
             <p style="color: var(--muted); font-size: 0.9em; margin-bottom: 16px;">Entenda o processo de extração, auditoria e cruzamento de dados públicos que sustentam esta plataforma.</p>
 
+            <!-- COMPONENTE: ESTRADA DA JORNADA DO USUÁRIO -->
+            <div class="user-road-wrapper">
+                <div class="user-road-header">
+                    <h4>🛣️ Trilha da Jornada: Do Dado Aberto ao Alerta na Rua</h4>
+                    <p>Clique em cada etapa para explorar a metodologia ou ir diretamente para o mapa correspondente.</p>
+                </div>
+
+                <div class="user-road-timeline">
+                    <!-- Parada 1: Expansível -->
+                    <div class="road-node" onclick="toggleRoadDetail('detalhe-fontes')">
+                        <div class="node-badge">1</div>
+                        <div class="node-body">
+                            <span class="node-icon">📂</span>
+                            <strong>Dados Abertos</strong>
+                            <p>Defesa Civil, GeoSampa, SEADE e AMLURB.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parada 2: Expansível -->
+                    <div class="road-node" onclick="toggleRoadDetail('detalhe-auditoria')">
+                        <div class="node-badge">2</div>
+                        <div class="node-body">
+                            <span class="node-icon">🧹</span>
+                            <strong>Auditoria</strong>
+                            <p>Filtragem de 68k para 12.4k eventos auditados.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parada 3: Navega para Mapa 0 -->
+                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa0')">
+                        <div class="node-badge">3</div>
+                        <div class="node-body">
+                            <span class="node-icon">🔥</span>
+                            <strong>Calor Histórico</strong>
+                            <p>Densidade acumulada de ocorrências.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parada 4: Navega para Mapa 1 -->
+                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa1')">
+                        <div class="node-badge">4</div>
+                        <div class="node-body">
+                            <span class="node-icon">🏙️</span>
+                            <strong>Território</strong>
+                            <p>Macrozonas e 32 subprefeituras.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parada 5: Navega para Mapa 4 -->
+                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa4')">
+                        <div class="node-badge">5</div>
+                        <div class="node-body">
+                            <span class="node-icon">⛰️</span>
+                            <strong>Tempo &amp; Relevo</strong>
+                            <p>Seletor anual e cota altimétrica.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parada 6: Navega para Mapa 8 -->
+                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa8')">
+                        <div class="node-badge">6</div>
+                        <div class="node-body">
+                            <span class="node-icon">🔧</span>
+                            <strong>Infraestrutura</strong>
+                            <p>Drenagem e bueiros AMLURB.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parada 7: Navega para Mapa 9 -->
+                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa9')">
+                        <div class="node-badge">7</div>
+                        <div class="node-body">
+                            <span class="node-icon">🎯</span>
+                            <strong>Matriz Social</strong>
+                            <p>Índice IPVS × Alagamentos.</p>
+                        </div>
+                    </div>
+
+                    <!-- Parada 8: Navega para Mapa Ao Vivo -->
+                    <div class="road-node road-action highlight" onclick="irParaMapa('tab-mapainterativo')">
+                        <div class="node-badge">8</div>
+                        <div class="node-body">
+                            <span class="node-icon">📢</span>
+                            <strong>Na Rua Agora</strong>
+                            <p>Relatos comunitários moderados.</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- PAINÉIS EXPANSÍVEIS (ETAPAS 1 E 2) -->
+                <div id="detalhe-fontes" class="road-expansion" style="display: none;">
+                    <h5>📂 1. Fontes de Dados Abertos Utilizadas</h5>
+                    <ul>
+                        <li><strong>GeoSampa:</strong> Camadas vetoriais de limites administrativos, hidrografia e bueiros.</li>
+                        <li><strong>Defesa Civil / SP156:</strong> Registros históricos de chamados e pontos recorrentes.</li>
+                        <li><strong>Fundação SEADE:</strong> Setores censitários do Índice Paulista de Vulnerabilidade Social (IPVS).</li>
+                    </ul>
+                </div>
+
+                <div id="detalhe-auditoria" class="road-expansion" style="display: none;">
+                    <h5>🧹 2. Processo de Limpeza e Auditoria Hídrica</h5>
+                    <p>A base bruta contava com 68.310 apontamentos genéricos. Após deduplicação geográfica, sanitização de coordenadas e filtro estrito de tipologia de enchente/alagamento, obteve-se a base consolidada de <strong>12.487 registros auditados</strong>.</p>
+                </div>
+            </div>
+
             <div class="about-grid">
                 <div class="about-card">
                     <h4>1. O que é</h4>
@@ -550,6 +721,18 @@
             document.getElementById('secao-sobre').scrollIntoView({ behavior: 'smooth' });
         }
 
+        function toggleRoadDetail(id) {
+            const target = document.getElementById(id);
+            const isOpen = target.style.display === 'block';
+            document.querySelectorAll('.road-expansion').forEach(el => el.style.display = 'none');
+            if (!isOpen) target.style.display = 'block';
+        }
+
+        function irParaMapa(tabId) {
+            openTab(null, tabId);
+            document.getElementById('secao-trilha').scrollIntoView({ behavior: 'smooth' });
+        }
+
         function openTab(evt, tabName) {
             const contents = document.getElementsByClassName("tab-content");
             for (let i = 0; i < contents.length; i++) contents[i].classList.remove("active");
@@ -560,7 +743,14 @@
             const targetTab = document.getElementById(tabName);
             if (targetTab) {
                 targetTab.classList.add("active");
-                if (evt && evt.currentTarget) evt.currentTarget.classList.add("active");
+                
+                // Ativa o botão correto no stepper nav
+                const stepperBtns = document.querySelectorAll('.stepper-item');
+                stepperBtns.forEach(btn => {
+                    if (btn.getAttribute('onclick').includes(tabName)) {
+                        btn.classList.add('active');
+                    }
+                });
 
                 if (tabName === 'tab-mapainterativo') {
                     setTimeout(() => { carregarPontosColaborativos(); }, 300);
