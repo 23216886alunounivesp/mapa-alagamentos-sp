@@ -29,15 +29,16 @@
     header {
       background-color: #1e293b;
       color: #ffffff;
-      padding: 1rem;
+      padding: 0.8rem 1rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
       box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      z-index: 1000;
     }
 
     header h1 {
-      font-size: 1.25rem;
+      font-size: 1.1rem;
       font-weight: 600;
     }
 
@@ -45,10 +46,11 @@
       background-color: #2563eb;
       color: white;
       border: none;
-      padding: 0.5rem 1rem;
+      padding: 0.5rem 0.9rem;
       border-radius: 6px;
       cursor: pointer;
-      font-weight: 500;
+      font-weight: 600;
+      font-size: 0.85rem;
       transition: background 0.2s;
     }
 
@@ -90,18 +92,18 @@
     .modal-card {
       background: #ffffff;
       width: 100%;
-      max-width: 500px;
+      max-width: 480px;
       max-height: 90vh;
       overflow-y: auto;
       border-radius: 12px;
-      padding: 1.5rem;
+      padding: 1.25rem;
       position: relative;
       box-shadow: 0 10px 25px rgba(0,0,0,0.2);
     }
 
     .modal-close {
       position: absolute;
-      top: 1rem;
+      top: 0.8rem;
       right: 1rem;
       background: transparent;
       border: none;
@@ -114,15 +116,16 @@
       display: flex;
       border-bottom: 2px solid #e2e8f0;
       margin-bottom: 1rem;
-      margin-top: 1rem;
+      margin-top: 0.8rem;
     }
 
     .tab-btn {
       flex: 1;
-      padding: 0.75rem;
+      padding: 0.6rem;
       border: none;
       background: none;
       font-weight: 600;
+      font-size: 0.85rem;
       color: #64748b;
       cursor: pointer;
       border-bottom: 2px solid transparent;
@@ -143,14 +146,14 @@
     }
 
     .form-group {
-      margin-bottom: 1rem;
+      margin-bottom: 0.9rem;
     }
 
     .form-group label {
       display: block;
-      font-size: 0.875rem;
+      font-size: 0.85rem;
       font-weight: 600;
-      margin-bottom: 0.35rem;
+      margin-bottom: 0.3rem;
       color: #334155;
     }
 
@@ -158,7 +161,7 @@
     .form-group select, 
     .form-group textarea {
       width: 100%;
-      padding: 0.6rem;
+      padding: 0.55rem;
       border: 1px solid #cbd5e1;
       border-radius: 6px;
       font-size: 0.9rem;
@@ -166,7 +169,7 @@
 
     .btn-submit {
       width: 100%;
-      padding: 0.75rem;
+      padding: 0.7rem;
       background-color: #059669;
       color: white;
       border: none;
@@ -185,10 +188,9 @@
       cursor: not-allowed;
     }
 
-    /* Estilos do Popup no Mapa */
     .popup-content img {
       width: 100%;
-      max-height: 180px;
+      max-height: 160px;
       object-fit: cover;
       border-radius: 6px;
       margin-top: 0.5rem;
@@ -198,7 +200,7 @@
       display: inline-block;
       padding: 2px 8px;
       border-radius: 12px;
-      font-size: 0.75rem;
+      font-size: 0.7rem;
       font-weight: bold;
       color: white;
       margin-bottom: 4px;
@@ -220,11 +222,11 @@
     <div id="map"></div>
   </div>
 
-  <!-- Modal de Colaboração Comunitária -->
+  <!-- Modal Pop-up para Formulários -->
   <div class="modal-overlay" id="modalColaboracao">
     <div class="modal-card">
       <button class="modal-close" onclick="fecharModal()">&times;</button>
-      <h2>📢 Central de Colaboração Comunitária</h2>
+      <h3 style="color: #1e293b; font-size: 1.1rem;">📢 Central de Colaboração Comunitária</h3>
 
       <div class="tabs">
         <button class="tab-btn active" onclick="alternarAba('aba-foto')">📸 Relato com Foto</button>
@@ -262,7 +264,7 @@
         </form>
       </div>
 
-      <!-- Form 2: Fórum Rapido -->
+      <!-- Form 2: Fórum Rápido -->
       <div id="aba-forum" class="tab-content">
         <form id="form-forum" onsubmit="enviarForum(event)">
           <div class="form-group">
@@ -299,18 +301,14 @@
   <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
 
   <script>
-    // ==============================================================================
-    // 1. INICIALIZAÇÃO DO SUPABASE CLIENT
-    // ==============================================================================
+    // Inicialização do Supabase
     const SUPABASE_URL = "https://ebknsiiirqpfsrjewpou.supabase.co";
     const SUPABASE_KEY = "sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO";
     const supabaseClient = supabase.createClient(SUPABASE_URL, SUPABASE_KEY);
 
-    // ==============================================================================
-    // 2. EXTRAÇÃO DEFENSIVA DE ERROS (PREVINE ALERTAS UNDEFINED EM DISPOSITIVOS MÓVEIS)
-    // ==============================================================================
+    // Tratamento de mensagens de erro para evitar 'undefined' no celular
     function extrairMensagemErro(error) {
-      if (!error) return "Erro desconhecido de ligação com o servidor.";
+      if (!error) return "Erro desconhecido de comunicação com o servidor.";
       if (typeof error === "string") return error;
       if (error.message) return error.message;
       if (error.error_description) return error.error_description;
@@ -322,17 +320,14 @@
       }
     }
 
-    // ==============================================================================
-    // 3. INICIALIZAÇÃO DO MAPA LEAFLET
-    // ==============================================================================
-    const map = L.map('map').setView([-23.55052, -46.63330], 12); // Centro de SP
+    // Configuração do Mapa Leaflet
+    const map = L.map('map').setView([-23.55052, -46.63330], 12);
 
     L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
       maxZoom: 19,
       attribution: '© OpenStreetMap contributors | PI UNIVESP'
     }).addTo(map);
 
-    // Grupos de Camadas
     const camadaFotos = L.layerGroup().addTo(map);
     const camadaForum = L.layerGroup().addTo(map);
     const camadaRSS = L.layerGroup().addTo(map);
@@ -343,12 +338,10 @@
       "📰 Notícias RSS": camadaRSS
     }).addTo(map);
 
-    // ==============================================================================
-    // 4. CARREGAMENTO DOS REGISTOS APROVADOS NO MAPA
-    // ==============================================================================
+    // Carregar Registros Aprovados
     async function carregarRegistosMapa() {
       try {
-        // A. Relatos com Foto Aprovados
+        // Relatos com Foto
         const { data: fotos, error: errFotos } = await supabaseClient
           .from('relatos_fotos')
           .select('*')
@@ -364,14 +357,13 @@
                 weight: 2,
                 fillOpacity: 0.9
               });
-              
               marker.bindPopup(`
                 <div class="popup-content">
                   <span class="popup-badge badge-foto">Relato com Foto</span>
                   <h4>${item.bairro}</h4>
                   <p><strong>Estado:</strong> ${item.status_via}</p>
                   <p>${item.descricao}</p>
-                  ${item.foto_url ? `<img src="${item.foto_url}" alt="Foto do local">` : ''}
+                  ${item.foto_url ? `<img src="${item.foto_url}" alt="Foto">` : ''}
                 </div>
               `);
               camadaFotos.addLayer(marker);
@@ -379,7 +371,7 @@
           });
         }
 
-        // B. Fórum Comunitário Aprovado
+        // Fórum
         const { data: forum, error: errForum } = await supabaseClient
           .from('forum_alagamentos')
           .select('*')
@@ -396,10 +388,9 @@
                 weight: 2,
                 fillOpacity: 0.9
               });
-
               marker.bindPopup(`
                 <div class="popup-content">
-                  <span class="popup-badge badge-forum">Fórum Comunitário</span>
+                  <span class="popup-badge badge-forum">Fórum</span>
                   <h4>${item.bairro}</h4>
                   <p><strong>Chuva:</strong> ${item.chovendo}</p>
                   <p><strong>Situação:</strong> ${item.alagamento}</p>
@@ -410,7 +401,7 @@
           });
         }
 
-        // C. Notícias RSS Aprovadas
+        // RSS
         const { data: rss, error: errRss } = await supabaseClient
           .from('noticias_rss')
           .select('*')
@@ -426,7 +417,6 @@
                 weight: 2,
                 fillOpacity: 0.9
               });
-
               marker.bindPopup(`
                 <div class="popup-content">
                   <span class="popup-badge badge-rss">${item.veiculo_imprensa}</span>
@@ -439,20 +429,14 @@
             }
           });
         }
-
       } catch (err) {
-        console.error("Erro ao carregar dados do mapa:", err);
+        console.error("Erro ao carregar mapa:", err);
       }
     }
 
-    // Inicializa os pontos ao carregar a página
     carregarRegistosMapa();
 
-    // ==============================================================================
-    // 5. ENVIO DE FORMULÁRIOS COM SUPABASE E TRATAMENTO SEGURO DE ERROS
-    // ==============================================================================
-
-    // A. Envio do Relato com Foto (Upload para o Storage)
+    // Envio Relato com Foto
     async function enviarRelatoFoto(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-foto");
@@ -469,28 +453,23 @@
 
         if (!file) throw new Error("Selecione uma imagem para enviar.");
 
-        // 1. Upload da Foto para o Bucket do Supabase Storage
         const fileName = `${Date.now()}_${file.name.replace(/[^a-zA-Z0-9.]/g, "_")}`;
-        const { data: uploadData, error: uploadError } = await supabaseClient.storage
+        const { error: uploadError } = await supabaseClient.storage
           .from('fotos_alagamentos')
           .upload(fileName, file);
 
         if (uploadError) throw uploadError;
 
-        // 2. Obter URL Pública da Imagem
         const { data: publicUrlData } = supabaseClient.storage
           .from('fotos_alagamentos')
           .getPublicUrl(fileName);
 
         const fotoUrl = publicUrlData.publicUrl;
+        btn.innerText = "Gravando registro...";
 
-        btn.innerText = "Gravando registo...";
-
-        // 3. Geocodificação aproximada baseada no centro de SP
         const lat = -23.55052 + (Math.random() - 0.5) * 0.1;
         const lon = -46.63330 + (Math.random() - 0.5) * 0.1;
 
-        // 4. Inserir na tabela relatos_fotos
         const { error: dbError } = await supabaseClient
           .from('relatos_fotos')
           .insert([{
@@ -506,7 +485,7 @@
 
         if (dbError) throw dbError;
 
-        alert("✅ Relato enviado com sucesso! O seu registo aguarda aprovação da moderação.");
+        alert("✅ Relato enviado com sucesso! O registro aguarda aprovação na moderação.");
         document.getElementById("form-relato-foto").reset();
         fecharModal();
 
@@ -519,7 +498,7 @@
       }
     }
 
-    // B. Envio do Fórum
+    // Envio Fórum
     async function enviarForum(event) {
       event.preventDefault();
       const btn = document.getElementById("btn-submit-forum");
@@ -532,60 +511,9 @@
         const chovendo = document.getElementById("forum-chovendo").value;
         const alagamento = document.getElementById("forum-alagamento").value;
 
-        // Geocodificação aproximada para o fórum
         const lat = -23.55052 + (Math.random() - 0.5) * 0.1;
         const lon = -46.63330 + (Math.random() - 0.5) * 0.1;
 
         const { error } = await supabaseClient
           .from('forum_alagamentos')
-          .insert([{
-            bairro: bairro,
-            chovendo: chovendo,
-            alagamento: alagamento,
-            latitude: lat,
-            longitude: lon,
-            aprovado: false,
-            status_moderacao: 'pendente'
-          }]);
-
-        if (error) throw error;
-
-        alert("✅ Resposta enviada para o fórum! Aguarda validação da equipa de moderação.");
-        document.getElementById("form-forum").reset();
-        fecharModal();
-
-      } catch (error) {
-        console.error("Erro no envio do fórum:", error);
-        alert("Erro ao enviar para o fórum: " + extrairMensagemErro(error));
-      } finally {
-        btn.disabled = false;
-        btn.innerText = "Enviar Resposta 💬";
-      }
-    }
-
-    // ==============================================================================
-    // 6. CONTROLO DO MODAL E DAS ABAS
-    // ==============================================================================
-    function abrirModal() {
-      document.getElementById("modalColaboracao").classList.add("active");
-    }
-
-    function fecharModal() {
-      document.getElementById("modalColaboracao").classList.remove("active");
-    }
-
-    function alternarAba(abaId) {
-      document.querySelectorAll(".tab-btn").forEach(btn => btn.classList.remove("active"));
-      document.querySelectorAll(".tab-content").forEach(content => content.classList.remove("active"));
-
-      if (abaId === 'aba-foto') {
-        document.querySelectorAll(".tab-btn")[0].classList.add("active");
-      } else {
-        document.querySelectorAll(".tab-btn")[1].classList.add("active");
-      }
-
-      document.getElementById(abaId).classList.add("active");
-    }
-  </script>
-</body>
-</html>
+          .
