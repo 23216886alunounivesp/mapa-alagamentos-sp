@@ -162,6 +162,24 @@
         }
         .about-link:hover { text-decoration: underline; }
 
+        /* RECOLHÍVEL NO MOBILE */
+        .stepper-header-mobile { display: none; }
+        .btn-toggle-stepper {
+            width: 100%;
+            padding: 12px 16px;
+            background: var(--navy);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            font-weight: 700;
+            font-size: 0.88em;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            cursor: pointer;
+            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+        }
+
         .stepper-nav {
             display: flex;
             gap: 8px;
@@ -341,6 +359,18 @@
             display: none; padding: 10px; border-radius: 6px;
             font-size: 0.85em; font-weight: 600; margin-bottom: 12px;
         }
+        #alerta-proximidade {
+            display: none;
+            background: #fffbebf8;
+            border: 1px solid #fcd34d;
+            border-left: 4px solid #d97706;
+            color: #92400e;
+            padding: 10px 12px;
+            border-radius: 6px;
+            font-size: 0.82em;
+            margin-bottom: 14px;
+            line-height: 1.4;
+        }
 
         /* FOOTER ACADÊMICO */
         .footer-academic {
@@ -356,6 +386,19 @@
         @media (max-width: 720px) {
             .map-container { height: 480px; }
             .hero { padding: 24px 16px; }
+            
+            /* RECOLHER E APRESENTAR STEPPER NO MOBILE */
+            .stepper-header-mobile { display: block; margin-bottom: 8px; }
+            .stepper-nav {
+                display: none;
+                flex-direction: column;
+                gap: 6px;
+                border-bottom: none;
+                margin-bottom: 14px;
+            }
+            .stepper-nav.open { display: flex; }
+            .stepper-item { text-align: left; }
+
             .user-road-timeline {
                 flex-direction: column;
                 overflow-x: visible;
@@ -403,7 +446,14 @@
             <a onclick="scrollParaSobre()" class="about-link">ℹ️ Como esta ferramenta foi feita?</a>
         </div>
 
-        <nav class="stepper-nav">
+        <!-- BOTÃO ALTERNÂNCIA RECOLHÍVEL (MOBILE) -->
+        <div class="stepper-header-mobile">
+            <button type="button" class="btn-toggle-stepper" onclick="toggleStepperMobile()">
+                🗺️ Selecionar Mapa da Trilha <span id="stepper-arrow">▾</span>
+            </button>
+        </div>
+
+        <nav class="stepper-nav" id="stepper-menu">
             <button class="stepper-item active" onclick="openTab(event, 'tab-mapa0')">📍 1. Calor Histórico</button>
             <button class="stepper-item" onclick="openTab(event, 'tab-mapa1')">🏙️ 2. Macro-Zonas</button>
             <button class="stepper-item" onclick="openTab(event, 'tab-mapa4')">📅 3. Seletor Anual</button>
@@ -661,6 +711,7 @@
             <h3 style="margin-top: 0; color: var(--navy);">📢 Reportar Condição na Rua</h3>
 
             <div id="feedback-status"></div>
+            <div id="alerta-proximidade"></div>
 
             <div style="background: #f8fafc; border: 1px solid var(--line); padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
@@ -703,7 +754,7 @@
         </div>
     </footer>
 
-    <!-- LÓGICA JS -->
+    <!-- LÓGICA JS DA APLICAÇÃO -->
     <script>
         const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
@@ -713,12 +764,42 @@
         let lonAtual = null;
         let precisaoGPS = null;
 
+        // PONTOS CRÍTICOS HISTÓRICOS PARA CÁLCULO DE PROXIMIDADE (SP)
+        const ZONAS_RISCO_HISTORICO = [
+            { nome: 'Av. Aricanduva (Córrego Aricanduva)', lat: -23.5658, lon: -46.5134 },
+            { nome: 'Praça da Bandeira (Centro)', lat: -23.5492, lon: -46.6389 },
+            { nome: 'Marginal Tietê (Ponte das Banderas)', lat: -23.5186, lon: -46.6322 },
+            { nome: 'Marginal Pinheiros (Ponte Cidade Jardim)', lat: -23.5852, lon: -46.6978 },
+            { nome: 'Av. Professor Luiz Ignácio Anhaia Mello', lat: -23.5871, lon: -46.5642 },
+            { nome: 'Av. Santo Amaro (Córrego Água Espraiada)', lat: -23.6214, lon: -46.6853 },
+            { nome: 'Vale do Anhangabaú', lat: -23.5463, lon: -46.6361 }
+        ];
+
+        // FÓRMULA DE HAVERSINE PARA DISTÂNCIA EM METROS
+        function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
+            const R = 6371000;
+            const dLat = (lat2 - lat1) * Math.PI / 180;
+            const dLon = (lon2 - lon1) * Math.PI / 180;
+            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
+                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
+            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+            return R * c;
+        }
+
         function scrollParaTrilha() {
             document.getElementById('secao-trilha').scrollIntoView({ behavior: 'smooth' });
         }
 
         function scrollParaSobre() {
             document.getElementById('secao-sobre').scrollIntoView({ behavior: 'smooth' });
+        }
+
+        function toggleStepperMobile() {
+            const nav = document.getElementById('stepper-menu');
+            const arrow = document.getElementById('stepper-arrow');
+            nav.classList.toggle('open');
+            arrow.innerText = nav.classList.contains('open') ? '▴' : '▾';
         }
 
         function toggleRoadDetail(id) {
@@ -744,13 +825,18 @@
             if (targetTab) {
                 targetTab.classList.add("active");
                 
-                // Ativa o botão correto no stepper nav
                 const stepperBtns = document.querySelectorAll('.stepper-item');
                 stepperBtns.forEach(btn => {
                     if (btn.getAttribute('onclick').includes(tabName)) {
                         btn.classList.add('active');
                     }
                 });
+
+                // Se estiver no mobile, recolhe o menu após selecionar
+                const nav = document.getElementById('stepper-menu');
+                if (window.innerWidth <= 720 && nav.classList.contains('open')) {
+                    toggleStepperMobile();
+                }
 
                 if (tabName === 'tab-mapainterativo') {
                     setTimeout(() => { carregarPontosColaborativos(); }, 300);
@@ -774,6 +860,30 @@
             el.style.color = tipo === 'sucesso' ? '#15803d' : '#b91c1c';
         }
 
+        function verificarProximidadeHistorica(lat, lon) {
+            const alertaEl = document.getElementById('alerta-proximidade');
+            alertaEl.style.display = 'none';
+            alertaEl.innerHTML = '';
+
+            let menorDistancia = Infinity;
+            let zonaProxima = null;
+
+            ZONAS_RISCO_HISTORICO.forEach(zona => {
+                const dist = calcularDistanciaMetros(lat, lon, zona.lat, zona.lon);
+                if (dist < menorDistancia) {
+                    menorDistancia = dist;
+                    zonaProxima = zona;
+                }
+            });
+
+            // Alerta ativado se a pessoa estiver a menos de 800m de um ponto histórico
+            if (menorDistancia <= 800 && zonaProxima) {
+                const distKm = menorDistancia < 1000 ? `${Math.round(menorDistancia)}m` : `${(menorDistancia/1000).toFixed(1)}km`;
+                alertaEl.innerHTML = `⚠️ <b>Atenção Preventiva:</b> Você está a aproximadamente <b>${distKm}</b> de uma área com histórico crítico de alagamentos (<i>${zonaProxima.nome}</i>).`;
+                alertaEl.style.display = 'block';
+            }
+        }
+
         function obterGPS() {
             const statusTxt = document.getElementById("status-gps");
             if ("geolocation" in navigator) {
@@ -785,6 +895,9 @@
                         precisaoGPS = pos.coords.accuracy;
                         statusTxt.innerText = `✅ GPS OK (~${Math.round(precisaoGPS)}m)`;
                         statusTxt.style.color = "var(--green)";
+                        
+                        // Executa checagem de proximidade
+                        verificarProximidadeHistorica(latAtual, lonAtual);
                     },
                     (err) => {
                         statusTxt.innerText = "❌ Permissão negada ou GPS offline";
@@ -844,6 +957,7 @@
                     fotoUrlPublica = urlData.publicUrl;
                 }
 
+                // GARANTIA EXPLICITA DE MODERAÇÃO PENDENTE
                 const { error: errDb } = await supabaseClient.from('confirmacoes_alagamento').insert([{
                     ponto_id: 'report_usuario',
                     status: document.getElementById("status-local").value,
@@ -859,7 +973,7 @@
 
                 if (errDb) throw errDb;
 
-                exibirFeedbackModal('✅ Relato enviado! Aguardando aprovação.', 'sucesso');
+                exibirFeedbackModal('✅ Relato enviado! Aguardando aprovação na moderação.', 'sucesso');
                 setTimeout(() => fecharModalColaboracao(), 1800);
 
             } catch (err) {
