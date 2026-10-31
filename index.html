@@ -385,7 +385,7 @@
             </div>
         </div>
 
-        <!-- MAPA 8 AO VIVO: COMUNITÁRIO (24H) -->
+        <!-- MAPA AO VIVO: COMUNITÁRIO (24H) -->
         <div id="tab-mapainterativo" class="tab-content">
             <div class="map-card">
                 <div class="map-header-box">
@@ -612,7 +612,7 @@
         </div>
     </footer>
 
-    <!-- LÓGICA JS COMPLETA COM CORREÇÃO DA FOTO E PONTOS EXPANDIDOS -->
+    <!-- LÓGICA JS COMPLETA -->
     <script>
         const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
@@ -622,7 +622,7 @@
         let lonAtual = null;
         let precisaoGPS = null;
 
-        // EXPANDIDO: BASE DE PONTOS HISTÓRICOS CRÍTICOS INCLUINDO BELÉM, MOOCA E ZONA LESTE
+        // PONTOS CRÍTICOS HISTÓRICOS DA CAPITAL (INCLUINDO MOOCA, BELÉM E ZONA LESTE)
         const ZONAS_RISCO_HISTORICO = [
             { nome: 'Av. Salim Farah Maluf (Córrego Tatuapé)', lat: -23.5412, lon: -46.5750 },
             { nome: 'Radial Leste (Viaduto Alberto Badra / Aricanduva)', lat: -23.5350, lon: -46.5620 },
@@ -648,7 +648,7 @@
             return R * c;
         }
 
-        // CONSULTA INDEPENDENTE COM RAIO EXPANDIDO (10 KM PARA TESTES)
+        // CONSULTA INDEPENDENTE DISPARADA APENAS PELO BOTÃO DO USUÁRIO
         function consultarZonasRiscoPerto() {
             limparFeedbackModal();
             
@@ -657,7 +657,7 @@
                 return;
             }
 
-            // Raio de busca ampliado para 10 km (10.000 metros)
+            // Executa busca num raio de 10 km (10.000m)
             verificarProximidadeHistorica(latAtual, lonAtual, 10000);
         }
 
@@ -926,23 +926,39 @@
             }
         }
 
+        // BUSCA INTEGRADA: RECUPERA TANTO FOTOS QUANTO RESPOSTAS DO FÓRUM APROVADAS NAS ÚLTIMAS 24H
         async function carregarPontosColaborativos() {
             try {
                 const limite24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-                const { data: pontos } = await supabaseClient
-                    .from('confirmacoes_alagamento')
-                    .select('*')
-                    .eq('status_moderacao', 'aprovado')
-                    .gte('created_at', limite24h);
+
+                const [resFotos, resForum] = await Promise.all([
+                    supabaseClient
+                        .from('confirmacoes_alagamento')
+                        .select('*')
+                        .eq('status_moderacao', 'aprovado')
+                        .gte('created_at', limite24h),
+                    supabaseClient
+                        .from('forum_choveu_alagou')
+                        .select('*')
+                        .eq('status_moderacao', 'aprovado')
+                        .gte('created_at', limite24h)
+                ]);
+
+                const pontosFoto = (resFotos.data || []).map(p => ({ ...p, tipoOrigem: 'foto' }));
+                const pontosForum = (resForum.data || []).map(p => ({ ...p, tipoOrigem: 'forum' }));
+
+                const todosPontos = [...pontosFoto, ...pontosForum];
 
                 const iframe = document.querySelector('#tab-mapainterativo iframe');
-                if (iframe && pontos) plotaPontosNoIframe(iframe, pontos);
+                if (iframe && todosPontos.length > 0) {
+                    plotaPontosNoIframe(iframe, todosPontos);
+                }
             } catch (err) {
-                console.warn('Erro ao atualizar pontos:', err);
+                console.warn('Erro ao carregar relatos no mapa:', err);
             }
         }
 
-        // CORRIGIDO: RENDERIZA A IMAGEM NO POPUP DO LEAFLET SE EXISTIR FOTO_URL
+        // RENDERIZA OS POPUPS PERSONALIZADOS TANTO PARA RELATOS DE FOTO QUANTO RESPOSTAS DO FÓRUM
         function plotaPontosNoIframe(iframeElement, listaPontos) {
             try {
                 const win = iframeElement.contentWindow;
@@ -957,15 +973,22 @@
                 }
 
                 listaPontos.forEach(p => {
-                    const cor = p.status === 'alagado' ? '#dc2626' : '#16a34a';
-                    
-                    // MONTAGEM DO CONTEÚDO DO POPUP COM SUPORTE À FOTO
-                    let popupHtml = `<b>${p.status === 'alagado' ? '🚨 Ponto Alagado' : '🟢 Pista Liberada'}</b>`;
-                    if (p.observacao) {
-                        popupHtml += `<br><span style="font-size:0.85em;">${p.observacao}</span>`;
-                    }
-                    if (p.foto_url) {
-                        popupHtml += `<br><img src="${p.foto_url}" style="width:100%; max-width:220px; border-radius:6px; margin-top:6px; border:1px solid #cbd5e1;" onerror="this.onerror=null; this.outerHTML='<br><small style=\\'color:#94a3b8;\\'>⚠️ Imagem indisponível</small>';">`;
+                    let cor = '#dc2626';
+                    let popupHtml = '';
+
+                    if (p.tipoOrigem === 'foto') {
+                        cor = p.status === 'alagado' ? '#dc2626' : '#16a34a';
+                        popupHtml = `<b>${p.status === 'alagado' ? '🚨 Ponto Alagado' : '🟢 Pista Liberada'}</b>`;
+                        if (p.observacao) {
+                            popupHtml += `<br><span style="font-size:0.85em;">${p.observacao}</span>`;
+                        }
+                        if (p.foto_url) {
+                            popupHtml += `<br><img src="${p.foto_url}" style="width:100%; max-width:220px; border-radius:6px; margin-top:6px; border:1px solid #cbd5e1;" onerror="this.onerror=null; this.outerHTML='<br><small style=\\'color:#94a3b8;\\'>⚠️ Imagem indisponível</small>';">`;
+                        }
+                    } else if (p.tipoOrigem === 'forum') {
+                        cor = p.alagou ? '#dc2626' : '#16a34a';
+                        popupHtml = `<b>💬 Fórum Rápido (${p.bairro || 'São Paulo'})</b><br>`;
+                        popupHtml += `<span style="font-size:0.85em;">🌧️ Choveu: <b>${p.choveu ? 'Sim' : 'Não'}</b><br>🌊 Alagou: <b>${p.alagou ? 'Sim' : 'Não'}</b></span>`;
                     }
 
                     win.L.circleMarker([p.latitude, p.longitude], {
