@@ -385,7 +385,7 @@
             </div>
         </div>
 
-        <!-- MAPA AO VIVO: COMUNITÁRIO (24H) -->
+        <!-- MAPA 8 AO VIVO: COMUNITÁRIO (24H) -->
         <div id="tab-mapainterativo" class="tab-content">
             <div class="map-card">
                 <div class="map-header-box">
@@ -550,7 +550,6 @@
                     </button>
                 </div>
                 
-                <!-- BOTÃO DISPARADO SOB DEMANDA APENAS NA TELA DO USUÁRIO -->
                 <button type="button" onclick="consultarZonasRiscoPerto()" class="btn-secondary" style="width: 100%; padding: 8px; font-size: 0.82em; color: var(--navy); border-color: var(--navy); font-weight: 700;">
                     🔍 Consultar Histórico de Risco Próximo a Mim
                 </button>
@@ -613,7 +612,7 @@
         </div>
     </footer>
 
-    <!-- LÓGICA JS COMPLETA -->
+    <!-- LÓGICA JS COMPLETA COM CORREÇÃO DA FOTO E PONTOS EXPANDIDOS -->
     <script>
         const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
@@ -623,8 +622,11 @@
         let lonAtual = null;
         let precisaoGPS = null;
 
-        // PONTOS CRÍTICOS HISTÓRICOS DA CAPITAL (PARA CONSULTA DE PROXIMIDADE)
+        // EXPANDIDO: BASE DE PONTOS HISTÓRICOS CRÍTICOS INCLUINDO BELÉM, MOOCA E ZONA LESTE
         const ZONAS_RISCO_HISTORICO = [
+            { nome: 'Av. Salim Farah Maluf (Córrego Tatuapé)', lat: -23.5412, lon: -46.5750 },
+            { nome: 'Radial Leste (Viaduto Alberto Badra / Aricanduva)', lat: -23.5350, lon: -46.5620 },
+            { nome: 'Av. Alcântara Machado / Pacheco Chaves (Mooca)', lat: -23.5560, lon: -46.5980 },
             { nome: 'Av. Aricanduva (Córrego Aricanduva)', lat: -23.5658, lon: -46.5134 },
             { nome: 'Praça da Bandeira (Centro)', lat: -23.5492, lon: -46.6389 },
             { nome: 'Marginal Tietê (Ponte das Bandeiras)', lat: -23.5186, lon: -46.6322 },
@@ -646,7 +648,7 @@
             return R * c;
         }
 
-        // CONSULTA INDEPENDENTE DISPARADA APENAS PELO BOTÃO DO USUÁRIO
+        // CONSULTA INDEPENDENTE COM RAIO EXPANDIDO (10 KM PARA TESTES)
         function consultarZonasRiscoPerto() {
             limparFeedbackModal();
             
@@ -655,12 +657,11 @@
                 return;
             }
 
-            // Executa busca num raio de 3 km (3000m)
-            verificarProximidadeHistorica(latAtual, lonAtual, 3000);
+            // Raio de busca ampliado para 10 km (10.000 metros)
+            verificarProximidadeHistorica(latAtual, lonAtual, 10000);
         }
 
-        // MONTA O ALERTA DE PROXIMIDADE MULTI-PONTOS
-        function verificarProximidadeHistorica(lat, lon, raioMaximoMetros = 3000) {
+        function verificarProximidadeHistorica(lat, lon, raioMaximoMetros = 10000) {
             const alertaEl = document.getElementById('alerta-proximidade');
             alertaEl.style.display = 'none';
             alertaEl.innerHTML = '';
@@ -768,13 +769,8 @@
             }
         }
 
-        function abrirModalColaboracao() {
-            document.getElementById("modal-colaboracao").style.display = "flex";
-        }
-
-        function fecharModalColaboracao() {
-            document.getElementById("modal-colaboracao").style.display = "none";
-        }
+        function abrirModalColaboracao() { document.getElementById("modal-colaboracao").style.display = "flex"; }
+        function fecharModalColaboracao() { document.getElementById("modal-colaboracao").style.display = "none"; }
 
         function limparFeedbackModal() {
             const el = document.getElementById("feedback-status");
@@ -946,6 +942,7 @@
             }
         }
 
+        // CORRIGIDO: RENDERIZA A IMAGEM NO POPUP DO LEAFLET SE EXISTIR FOTO_URL
         function plotaPontosNoIframe(iframeElement, listaPontos) {
             try {
                 const win = iframeElement.contentWindow;
@@ -961,9 +958,19 @@
 
                 listaPontos.forEach(p => {
                     const cor = p.status === 'alagado' ? '#dc2626' : '#16a34a';
+                    
+                    // MONTAGEM DO CONTEÚDO DO POPUP COM SUPORTE À FOTO
+                    let popupHtml = `<b>${p.status === 'alagado' ? '🚨 Ponto Alagado' : '🟢 Pista Liberada'}</b>`;
+                    if (p.observacao) {
+                        popupHtml += `<br><span style="font-size:0.85em;">${p.observacao}</span>`;
+                    }
+                    if (p.foto_url) {
+                        popupHtml += `<br><img src="${p.foto_url}" style="width:100%; max-width:220px; border-radius:6px; margin-top:6px; border:1px solid #cbd5e1;" onerror="this.onerror=null; this.outerHTML='<br><small style=\\'color:#94a3b8;\\'>⚠️ Imagem indisponível</small>';">`;
+                    }
+
                     win.L.circleMarker([p.latitude, p.longitude], {
                         radius: 8, fillColor: cor, color: '#fff', weight: 2, fillOpacity: 0.9
-                    }).bindPopup(`<b>${p.status === 'alagado' ? '🚨 Alagado' : '🟢 Liberado'}</b><br>${p.observacao || ''}`).addTo(win.__camadaColaborativa);
+                    }).bindPopup(popupHtml).addTo(win.__camadaColaborativa);
                 });
             } catch (e) {
                 console.warn('Aguardando Leaflet no iframe...', e);
