@@ -57,7 +57,7 @@
             border-radius: 4px; color: #94a3b8;
         }
 
-        /* HERO ENXUTO */
+        /* HERO PRINCIPAL */
         .hero {
             background: linear-gradient(160deg, var(--navy) 0%, var(--navy-surface) 100%);
             color: #ffffff; padding: 36px 20px 28px;
@@ -116,7 +116,7 @@
         .stepper-item:hover { border-color: var(--cyan-deep); color: var(--cyan-deep); }
         .stepper-item.active { background: var(--navy); color: #ffffff; border-color: var(--navy); }
 
-        /* REGRAS RESPONSIVAS RECOLHÍVEIS (SANFONA MOBILE) */
+        /* SANFONA RECOLHÍVEL NO MOBILE */
         @media (max-width: 768px) {
             .stepper-header-mobile { display: block !important; margin-bottom: 10px; }
             .stepper-nav {
@@ -385,7 +385,7 @@
             </div>
         </div>
 
-        <!-- MAPA 8 AO VIVO: COMUNITÁRIO (24H) -->
+        <!-- MAPA AO VIVO: COMUNITÁRIO (24H) -->
         <div id="tab-mapainterativo" class="tab-content">
             <div class="map-card">
                 <div class="map-header-box">
@@ -411,7 +411,6 @@
                 </div>
 
                 <div class="user-road-timeline">
-                    <!-- Parada 1: Expansível -->
                     <div class="road-node" onclick="toggleRoadDetail('detalhe-fontes')">
                         <div class="node-badge">1</div>
                         <div class="node-body">
@@ -421,7 +420,6 @@
                         </div>
                     </div>
 
-                    <!-- Parada 2: Expansível -->
                     <div class="road-node" onclick="toggleRoadDetail('detalhe-auditoria')">
                         <div class="node-badge">2</div>
                         <div class="node-body">
@@ -431,7 +429,6 @@
                         </div>
                     </div>
 
-                    <!-- Parada 3: Navega para Mapa 0 -->
                     <div class="road-node road-action" onclick="irParaMapa('tab-mapa0')">
                         <div class="node-badge">3</div>
                         <div class="node-body">
@@ -441,7 +438,6 @@
                         </div>
                     </div>
 
-                    <!-- Parada 4: Navega para Mapa 1 -->
                     <div class="road-node road-action" onclick="irParaMapa('tab-mapa1')">
                         <div class="node-badge">4</div>
                         <div class="node-body">
@@ -451,7 +447,6 @@
                         </div>
                     </div>
 
-                    <!-- Parada 5: Navega para Mapa 4 -->
                     <div class="road-node road-action" onclick="irParaMapa('tab-mapa4')">
                         <div class="node-badge">5</div>
                         <div class="node-body">
@@ -461,7 +456,6 @@
                         </div>
                     </div>
 
-                    <!-- Parada 6: Navega para Mapa 8 -->
                     <div class="road-node road-action" onclick="irParaMapa('tab-mapa8')">
                         <div class="node-badge">6</div>
                         <div class="node-body">
@@ -471,7 +465,6 @@
                         </div>
                     </div>
 
-                    <!-- Parada 7: Navega para Mapa 9 -->
                     <div class="road-node road-action" onclick="irParaMapa('tab-mapa9')">
                         <div class="node-badge">7</div>
                         <div class="node-body">
@@ -481,7 +474,6 @@
                         </div>
                     </div>
 
-                    <!-- Parada 8: Navega para Mapa Ao Vivo -->
                     <div class="road-node road-action highlight" onclick="irParaMapa('tab-mapainterativo')">
                         <div class="node-badge">8</div>
                         <div class="node-body">
@@ -492,7 +484,6 @@
                     </div>
                 </div>
 
-                <!-- PAINÉIS EXPANSÍVEIS (ETAPAS 1 E 2) -->
                 <div id="detalhe-fontes" class="road-expansion" style="display: none;">
                     <h5>📂 1. Fontes de Dados Abertos Utilizadas</h5>
                     <ul>
@@ -508,7 +499,6 @@
                 </div>
             </div>
 
-            <!-- CARDS RESUMIDOS SOBRE O PROJETO -->
             <div class="about-grid">
                 <div class="about-card">
                     <h4>1. O que é</h4>
@@ -535,29 +525,35 @@
         </div>
     </div>
 
-    <!-- MODAL INTEGRADO COM TABS (REPORTAR + FÓRUM + ALERTA DE PROXIMIDADE) -->
+    <!-- MODAL INTEGRADO COM TABS E CONSULTA DE RISCO INDEPENDENTE -->
     <div id="modal-colaboracao" class="modal-overlay">
         <div class="modal-card">
             <button class="modal-close" onclick="fecharModalColaboracao()">&times;</button>
             
-            <!-- ABAS DO MODAL -->
             <div class="modal-tabs">
                 <button type="button" class="modal-tab-btn active" id="btn-tab-reportar" onclick="mudarAbaModal('reportar')">📢 Reportar com Foto</button>
                 <button type="button" class="modal-tab-btn" id="btn-tab-forum" onclick="mudarAbaModal('forum')">💬 Fórum Rápido</button>
             </div>
 
             <div id="feedback-status"></div>
-            
-            <!-- CAIXA DE ALERTA DE PROXIMIDADE HISTÓRICA -->
             <div id="alerta-proximidade"></div>
 
-            <!-- SERVIÇO DE LOCALIZAÇÃO GPS COMPARTILHADO -->
-            <div style="background: #f8fafc; border: 1px solid var(--line); padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
-                <div>
-                    <strong style="font-size: 0.85em; display: block; color: var(--navy);">📍 Serviço de Localização GPS</strong>
-                    <small id="status-gps" style="color: var(--muted); font-size: 0.8em;">Clique para obter coordenadas</small>
+            <!-- SERVIÇO DE LOCALIZAÇÃO GPS COM BOTÃO DE CHECAGEM INDEPENDENTE -->
+            <div style="background: #f8fafc; border: 1px solid var(--line); padding: 12px; border-radius: 8px; margin-bottom: 16px;">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px;">
+                    <div>
+                        <strong style="font-size: 0.85em; display: block; color: var(--navy);">📍 Posição GPS</strong>
+                        <small id="status-gps" style="color: var(--muted); font-size: 0.8em;">Aguardando captura...</small>
+                    </div>
+                    <button type="button" onclick="obterGPS()" class="btn-primary" style="padding: 6px 12px; font-size: 0.8em;">
+                        1. Capturar GPS
+                    </button>
                 </div>
-                <button type="button" onclick="obterGPS()" class="btn-primary" style="padding: 6px 12px; font-size: 0.8em;">Capturar GPS</button>
+                
+                <!-- BOTÃO DISPARADO SOB DEMANDA APENAS NA TELA DO USUÁRIO -->
+                <button type="button" onclick="consultarZonasRiscoPerto()" class="btn-secondary" style="width: 100%; padding: 8px; font-size: 0.82em; color: var(--navy); border-color: var(--navy); font-weight: 700;">
+                    🔍 Consultar Histórico de Risco Próximo a Mim
+                </button>
             </div>
 
             <!-- FORMULÁRIO 1: REPORTAR FOTO -->
@@ -617,7 +613,7 @@
         </div>
     </footer>
 
-    <!-- LÓGICA JS DA APLICAÇÃO -->
+    <!-- LÓGICA JS COMPLETA -->
     <script>
         const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
@@ -627,7 +623,7 @@
         let lonAtual = null;
         let precisaoGPS = null;
 
-        // BASE DE PONTOS CRÍTICOS HISTÓRICOS PARA ALERTAS DE PROXIMIDADE
+        // PONTOS CRÍTICOS HISTÓRICOS DA CAPITAL (PARA CONSULTA DE PROXIMIDADE)
         const ZONAS_RISCO_HISTORICO = [
             { nome: 'Av. Aricanduva (Córrego Aricanduva)', lat: -23.5658, lon: -46.5134 },
             { nome: 'Praça da Bandeira (Centro)', lat: -23.5492, lon: -46.6389 },
@@ -638,7 +634,7 @@
             { nome: 'Vale do Anhangabaú', lat: -23.5463, lon: -46.6361 }
         ];
 
-        // CÁLCULO DE DISTÂNCIA (FÓRUMULA DE HAVERSINE EM METROS)
+        // FÓRMULA DE HAVERSINE EM METROS
         function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
             const R = 6371000;
             const dLat = (lat2 - lat1) * Math.PI / 180;
@@ -650,29 +646,51 @@
             return R * c;
         }
 
-        // VERIFICAÇÃO DE PROXIMIDADE DE ÁREA HISTÓRICA
-        function verificarProximidadeHistorica(lat, lon) {
+        // CONSULTA INDEPENDENTE DISPARADA APENAS PELO BOTÃO DO USUÁRIO
+        function consultarZonasRiscoPerto() {
+            limparFeedbackModal();
+            
+            if (!latAtual || !lonAtual) {
+                exibirFeedbackModal('⚠️ Por favor, clique em "1. Capturar GPS" antes de consultar o histórico de risco.');
+                return;
+            }
+
+            // Executa busca num raio de 3 km (3000m)
+            verificarProximidadeHistorica(latAtual, lonAtual, 3000);
+        }
+
+        // MONTA O ALERTA DE PROXIMIDADE MULTI-PONTOS
+        function verificarProximidadeHistorica(lat, lon, raioMaximoMetros = 3000) {
             const alertaEl = document.getElementById('alerta-proximidade');
             alertaEl.style.display = 'none';
             alertaEl.innerHTML = '';
 
-            let menorDistancia = Infinity;
-            let zonaProxima = null;
-
-            ZONAS_RISCO_HISTORICO.forEach(zona => {
+            const pontosEncontrados = ZONAS_RISCO_HISTORICO.filter(zona => {
                 const dist = calcularDistanciaMetros(lat, lon, zona.lat, zona.lon);
-                if (dist < menorDistancia) {
-                    menorDistancia = dist;
-                    zonaProxima = zona;
-                }
+                zona.distanciaAtual = dist;
+                return dist <= raioMaximoMetros;
             });
 
-            // Se estiver a menos de 800m de uma área histórica de alagamento, aciona o alerta
-            if (menorDistancia <= 800 && zonaProxima) {
-                const distTxt = menorDistancia < 1000 ? `${Math.round(menorDistancia)}m` : `${(menorDistancia/1000).toFixed(1)}km`;
-                alertaEl.innerHTML = `⚠️ <b>Atenção Preventiva:</b> Seu GPS indica que você está a aproximadamente <b>${distTxt}</b> de uma área com histórico recorrente de alagamentos (<i>${zonaProxima.nome}</i>).`;
-                alertaEl.style.display = 'block';
+            if (pontosEncontrados.length === 0) {
+                exibirFeedbackModal(`🟢 Nenhuma área de risco histórico cadastrada foi encontrada a menos de ${(raioMaximoMetros/1000).toFixed(1)} km da sua posição.`, 'sucesso');
+                return;
             }
+
+            pontosEncontrados.sort((a, b) => a.distanciaAtual - b.distanciaAtual);
+
+            let htmlAviso = `⚠️ <b>Histórico de Risco Detectado:</b> Existem <b>${pontosEncontrados.length}</b> área(s) crítica(s) num raio de ${(raioMaximoMetros/1000).toFixed(1)} km:<ul style="margin: 6px 0 0 16px; padding: 0;">`;
+            
+            pontosEncontrados.forEach(p => {
+                const distTxt = p.distanciaAtual < 1000 
+                    ? `${Math.round(p.distanciaAtual)}m` 
+                    : `${(p.distanciaAtual/1000).toFixed(1)}km`;
+                htmlAviso += `<li><b>${p.nome}</b> (a ~${distTxt})</li>`;
+            });
+            
+            htmlAviso += `</ul>`;
+
+            alertaEl.innerHTML = htmlAviso;
+            alertaEl.style.display = 'block';
         }
 
         function scrollParaTrilha() {
@@ -758,6 +776,12 @@
             document.getElementById("modal-colaboracao").style.display = "none";
         }
 
+        function limparFeedbackModal() {
+            const el = document.getElementById("feedback-status");
+            el.style.display = 'none';
+            el.innerText = '';
+        }
+
         function exibirFeedbackModal(msg, tipo = 'erro') {
             const el = document.getElementById("feedback-status");
             el.style.display = 'block';
@@ -766,9 +790,10 @@
             el.style.color = tipo === 'sucesso' ? '#15803d' : '#b91c1c';
         }
 
-        // CAPTURA DE GPS COM VERIFICAÇÃO AUTOMÁTICA DE PROXIMIDADE
         function obterGPS() {
             const statusTxt = document.getElementById("status-gps");
+            limparFeedbackModal();
+
             if ("geolocation" in navigator) {
                 statusTxt.innerText = "Capturando... ⏳";
                 navigator.geolocation.getCurrentPosition(
@@ -779,16 +804,12 @@
                         
                         statusTxt.innerText = `✅ GPS OK (~${Math.round(precisaoGPS)}m)`;
                         statusTxt.style.color = "var(--green)";
-                        
-                        exibirFeedbackModal(`📍 Localização capturada! Precisão: ~${Math.round(precisaoGPS)}m`, 'sucesso');
-                        
-                        // DISPARA CHECAGEM DE ÁREA DE RISCO
-                        verificarProximidadeHistorica(latAtual, lonAtual);
+                        exibirFeedbackModal(`📍 Localização obtida com sucesso! (~${Math.round(precisaoGPS)}m)`, 'sucesso');
                     },
                     (err) => {
                         statusTxt.innerText = "❌ GPS Offline / Negado";
                         statusTxt.style.color = "var(--red)";
-                        exibirFeedbackModal('❌ Não foi possível obter seu GPS. Verifique a permissão do seu navegador.');
+                        exibirFeedbackModal('❌ Não foi possível obter seu GPS. Verifique as permissões do seu navegador.');
                     },
                     { enableHighAccuracy: true, timeout: 10000 }
                 );
@@ -821,8 +842,10 @@
 
         async function enviarOcorrencia(e) {
             e.preventDefault();
+            limparFeedbackModal();
+
             if (!latAtual || !lonAtual) {
-                exibirFeedbackModal('⚠️ Clique em "Capturar GPS" para geolocalizar seu relato.');
+                exibirFeedbackModal('⚠️ Por favor, clique em "1. Capturar GPS" antes de enviar.');
                 return;
             }
 
@@ -858,12 +881,12 @@
 
                 if (errDb) throw errDb;
 
-                exibirFeedbackModal('✅ Relato com foto enviado com sucesso! Aguardando aprovação na moderação.', 'sucesso');
+                exibirFeedbackModal('✅ Relato com foto enviado com sucesso! Registro na fila de moderação.', 'sucesso');
                 document.getElementById("form-foto").reset();
                 setTimeout(() => fecharModalColaboracao(), 2200);
 
             } catch (err) {
-                exibirFeedbackModal('❌ Erro no envio: ' + err.message);
+                exibirFeedbackModal('❌ Erro no envio da foto: ' + err.message);
             } finally {
                 btn.disabled = false; btn.innerText = "✅ Enviar Relato para Moderação";
             }
@@ -871,8 +894,10 @@
 
         async function enviarForum(e) {
             e.preventDefault();
+            limparFeedbackModal();
+
             if (!latAtual || !lonAtual) {
-                exibirFeedbackModal('⚠️ Clique em "Capturar GPS" para geolocalizar sua participação.');
+                exibirFeedbackModal('⚠️ Por favor, clique em "1. Capturar GPS" antes de responder ao fórum.');
                 return;
             }
 
@@ -894,12 +919,12 @@
 
                 if (errDb) throw errDb;
 
-                exibirFeedbackModal('✅ Resposta enviada ao fórum com sucesso! Aguardando moderação.', 'sucesso');
+                exibirFeedbackModal('✅ Resposta enviada ao fórum com sucesso! Registro na fila de moderação.', 'sucesso');
                 document.getElementById("form-forum").reset();
                 setTimeout(() => fecharModalColaboracao(), 2200);
 
             } catch (err) {
-                exibirFeedbackModal('❌ Erro ao enviar para o fórum: ' + err.message);
+                exibirFeedbackModal('❌ Erro ao enviar ao fórum: ' + err.message);
             } finally {
                 btn.disabled = false; btn.innerText = "💬 Enviar ao Fórum";
             }
