@@ -201927,5 +201927,156 @@ document.body.insertAdjacentHTML('beforeend', legendaHtml);
     }
 })();
 // --- FIM DO PATCH CORRIGIDO ---
+// =====================================================================
+// 5. FERRAMENTA DE FILTRO POR RAIO / DISTÂNCIA (CLIQUE + SLIDER)
+// =====================================================================
+var pontoReferencia = null;
+var circuloRaio = null;
+
+// Painel do Slider de Distância (HTML Flutuante)
+var sliderHtml = `
+<div id="painel-distancia" style="
+    position: fixed;
+    top: 20px;
+    left: 60px;
+    z-index: 9999;
+    background: rgba(255, 255, 255, 0.94);
+    backdrop-filter: blur(4px);
+    padding: 12px 16px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+    font-family: Arial, sans-serif;
+    font-size: 13px;
+    min-width: 240px;
+    color: #333;">
+    <strong style="display:block; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">
+        🎯 Raio de Alagamentos
+    </strong>
+    <div style="margin-bottom: 8px; font-size: 12px; color: #555;" id="status-clique">
+        Clique em qualquer local no mapa para definir o centro.
+    </div>
+    <label style="display:flex; justify-content:space-between; font-weight:bold; margin-bottom: 4px;">
+        <span>Distância:</span>
+        <span id="valor-distancia">2.0 km</span>
+    </label>
+    <input type="range" id="input-raio-distancia" min="0.5" max="10" step="0.5" value="2" style="width: 100%; cursor: pointer;">
+    <button id="btn-limpar-raio" style="
+        margin-top: 8px;
+        width: 100%;
+        padding: 4px;
+        background: #e74c3c;
+        color: white;
+        border: none;
+        border-radius: 4px;
+        cursor: pointer;
+        font-size: 11px;">Restaurar Visualização Completa</button>
+</div>`;
+
+document.body.insertAdjacentHTML('beforeend', sliderHtml);
+
+var inputRaio = document.getElementById("input-raio-distancia");
+var displayDistancia = document.getElementById("valor-distancia");
+var statusClique = document.getElementById("status-clique");
+var btnLimpar = document.getElementById("btn-limpar-raio");
+
+// Função para filtrar marcadores pela distância do ponto central
+function filtrarPontosPorRaio(latlngCentro, raioKm) {
+    var raioMetros = raioKm * 1000;
+
+    // Atualiza ou cria o círculo no mapa
+    if (circuloRaio) {
+        circuloRaio.setLatLng(latlngCentro);
+        circuloRaio.setRadius(raioMetros);
+    } else {
+        circuloRaio = L.circle(latlngCentro, {
+            radius: raioMetros,
+            color: '#e74c3c',
+            fillColor: '#e74c3c',
+            fillOpacity: 0.15,
+            weight: 2,
+            dashArray: '4, 4'
+        }).addTo(mapa);
+    }
+
+    // Varre todas as camadas de anos e ajusta a opacidade dos marcadores
+    Object.keys(overlayLayers).forEach(function(nomeCamada) {
+        var grupoAno = overlayLayers[nomeCamada];
+        if (grupoAno && grupoAno.eachLayer) {
+            grupoAno.eachLayer(function(marker) {
+                if (marker.getLatLng) {
+                    var dist = mapa.distance(latlngCentro, marker.getLatLng());
+                    var el = marker.getElement();
+                    if (el) {
+                        if (dist <= raioMetros) {
+                            el.style.opacity = "1.0";
+                            el.style.filter = "drop-shadow(0 0 4px rgba(231,76,60,0.8))";
+                        } else {
+                            el.style.opacity = "0.15";
+                            el.style.filter = "none";
+                        }
+                    }
+                }
+            });
+        }
+    });
+}
+
+// Evento de Clique no Mapa
+mapa.on('click', function(e) {
+    var latlng = e.latlng;
+    
+    if (pontoReferencia) {
+        pontoReferencia.setLatLng(latlng);
+    } else {
+        pontoReferencia = L.marker(latlng, {
+            icon: L.divIcon({
+                html: '<div style="font-size: 22px; text-shadow: 0 2px 4px rgba(0,0,0,0.5);">📍</div>',
+                className: 'ponto-centro-busca',
+                iconSize: [30, 30],
+                iconAnchor: [15, 30]
+            })
+        }).addTo(mapa);
+    }
+
+    statusClique.innerHTML = `Centro: <b>${latlng.lat.toFixed(4)}, ${latlng.lng.toFixed(4)}</b>`;
+    var raioAtual = parseFloat(inputRaio.value);
+    filtrarPontosPorRaio(latlng, raioAtual);
+});
+
+// Evento de mudança no Slider de Distância
+inputRaio.addEventListener('input', function() {
+    var raioKm = parseFloat(this.value);
+    displayDistancia.innerText = raioKm.toFixed(1) + " km";
+    if (pontoReferencia) {
+        filtrarPontosPorRaio(pontoReferencia.getLatLng(), raioKm);
+    }
+});
+
+// Botão para limpar a seleção por raio
+btnLimpar.addEventListener('click', function() {
+    if (circuloRaio) {
+        mapa.removeLayer(circuloRaio);
+        circuloRaio = null;
+    }
+    if (pontoReferencia) {
+        mapa.removeLayer(pontoReferencia);
+        pontoReferencia = null;
+    }
+    statusClique.innerText = "Clique em qualquer local no mapa para definir o centro.";
+    
+    // Restaura a opacidade de todos os pontos
+    Object.keys(overlayLayers).forEach(function(nomeCamada) {
+        var grupoAno = overlayLayers[nomeCamada];
+        if (grupoAno && grupoAno.eachLayer) {
+            grupoAno.eachLayer(function(marker) {
+                var el = marker.getElement();
+                if (el) {
+                    el.style.opacity = "1.0";
+                    el.style.filter = "none";
+                }
+            });
+        }
+    });
+});
 </script>
 </html>
