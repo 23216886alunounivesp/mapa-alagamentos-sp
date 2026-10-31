@@ -8,7 +8,6 @@
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/github-markdown-css/5.2.0/github-markdown.min.css">
     
     <!-- SDK DO SUPABASE -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
@@ -24,8 +23,6 @@
             --line: #e2e8f0;
             --cyan: #22d3ee;
             --cyan-deep: #0284c7;
-            --blue: #2563eb;
-            --purple: #7c3aed;
             --green: #16a34a;
             --red: #dc2626;
             --mono: 'JetBrains Mono', monospace;
@@ -34,8 +31,7 @@
         * { box-sizing: border-box; }
         html { scroll-behavior: smooth; }
         body {
-            margin: 0;
-            padding: 0;
+            margin: 0; padding: 0;
             font-family: var(--sans);
             color: var(--ink);
             background-color: var(--bg);
@@ -44,383 +40,140 @@
 
         /* HEADER GLOBAL */
         .app-header {
-            position: sticky;
-            top: 0;
-            z-index: 1000;
+            position: sticky; top: 0; z-index: 1000;
             background: rgba(15, 23, 42, 0.95);
             backdrop-filter: blur(8px);
-            color: #ffffff;
-            padding: 12px 20px;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
+            color: #ffffff; padding: 12px 20px;
+            display: flex; justify-content: space-between; align-items: center;
             border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
-        .app-brand {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            font-weight: 800;
-            font-size: 1.05em;
-        }
+        .app-brand { display: flex; align-items: center; gap: 10px; font-weight: 800; font-size: 1.05em; }
         .app-brand span { color: var(--cyan); }
         .app-badge-univesp {
-            font-family: var(--mono);
-            font-size: 0.7em;
-            background: rgba(255, 255, 255, 0.1);
-            padding: 3px 8px;
-            border-radius: 4px;
-            color: #94a3b8;
+            font-family: var(--mono); font-size: 0.7em;
+            background: rgba(255, 255, 255, 0.1); padding: 3px 8px;
+            border-radius: 4px; color: #94a3b8;
         }
 
         /* HERO ENXUTO */
         .hero {
             background: linear-gradient(160deg, var(--navy) 0%, var(--navy-surface) 100%);
-            color: #ffffff;
-            padding: 36px 20px 28px;
+            color: #ffffff; padding: 36px 20px 28px;
             border-bottom: 1px solid var(--line);
         }
         .hero-inner { max-width: 1180px; margin: 0 auto; }
-        .hero h1 {
-            font-size: clamp(1.4em, 3vw, 2.2em);
-            font-weight: 900;
-            margin: 0 0 8px;
-            letter-spacing: -0.02em;
-        }
-        .hero p {
-            color: #94a3b8;
-            font-size: 0.95em;
-            margin: 0 0 20px;
-            max-width: 760px;
-        }
-        .hero-stats-row {
-            display: flex;
-            gap: 16px;
-            flex-wrap: wrap;
-            margin-bottom: 20px;
-        }
+        .hero h1 { font-size: clamp(1.4em, 3vw, 2.2em); font-weight: 900; margin: 0 0 8px; }
+        .hero p { color: #94a3b8; font-size: 0.95em; margin: 0 0 20px; max-width: 760px; }
+        .hero-stats-row { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 20px; }
         .stat-chip {
-            background: rgba(255, 255, 255, 0.06);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            padding: 8px 14px;
-            border-radius: 8px;
-            font-size: 0.82em;
+            background: rgba(255, 255, 255, 0.06); border: 1px solid rgba(255, 255, 255, 0.1);
+            padding: 8px 14px; border-radius: 8px; font-size: 0.82em;
         }
         .stat-chip strong { color: var(--cyan); font-family: var(--mono); font-size: 1.1em; }
 
         .cta-group { display: flex; gap: 12px; flex-wrap: wrap; }
         .btn-primary {
-            background-color: var(--cyan-deep);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            padding: 10px 20px;
-            font-weight: 700;
-            font-size: 0.88em;
-            cursor: pointer;
-            transition: all 0.2s;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
+            background-color: var(--cyan-deep); color: white; border: none;
+            border-radius: 8px; padding: 10px 20px; font-weight: 700;
+            font-size: 0.88em; cursor: pointer; display: inline-flex; align-items: center; gap: 8px;
         }
-        .btn-primary:hover { background-color: #0369a1; transform: translateY(-1px); }
-        
+        .btn-primary:hover { background-color: #0369a1; }
         .btn-secondary {
-            background-color: transparent;
-            color: #f1f5f9;
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            border-radius: 8px;
-            padding: 10px 18px;
-            font-weight: 600;
-            font-size: 0.88em;
-            cursor: pointer;
+            background-color: transparent; color: #f1f5f9;
+            border: 1px solid rgba(255, 255, 255, 0.2); border-radius: 8px;
+            padding: 10px 18px; font-weight: 600; font-size: 0.88em; cursor: pointer;
         }
-        .btn-secondary:hover { background: rgba(255, 255, 255, 0.1); }
 
-        /* PAINEL PRINCIPAL & STEPPER 100% MAPAS */
+        /* STEPPER DE MAPAS */
         .wrapper { max-width: 1180px; margin: 20px auto 40px; padding: 0 20px; }
-        
-        .stepper-header {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            margin-bottom: 12px;
-        }
-        .stepper-title {
-            font-size: 0.85em;
-            font-weight: 700;
-            text-transform: uppercase;
-            letter-spacing: 0.05em;
-            color: var(--muted);
-        }
-        .about-link {
-            font-size: 0.82em;
-            color: var(--cyan-deep);
-            font-weight: 600;
-            text-decoration: none;
-            cursor: pointer;
-        }
-        .about-link:hover { text-decoration: underline; }
+        .stepper-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 12px; }
+        .stepper-title { font-size: 0.85em; font-weight: 700; text-transform: uppercase; letter-spacing: 0.05em; color: var(--muted); }
+        .about-link { font-size: 0.82em; color: var(--cyan-deep); font-weight: 600; cursor: pointer; text-decoration: none; }
 
-        /* RECOLHÍVEL NO MOBILE */
         .stepper-header-mobile { display: none; }
         .btn-toggle-stepper {
-            width: 100%;
-            padding: 12px 16px;
-            background: var(--navy);
-            color: white;
-            border: none;
-            border-radius: 8px;
-            font-weight: 700;
-            font-size: 0.88em;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            cursor: pointer;
-            box-shadow: 0 2px 6px rgba(0,0,0,0.1);
+            width: 100%; padding: 12px 16px; background: var(--navy); color: white;
+            border: none; border-radius: 8px; font-weight: 700; font-size: 0.9em;
+            display: flex; justify-content: space-between; align-items: center; cursor: pointer;
         }
 
         .stepper-nav {
-            display: flex;
-            gap: 8px;
-            overflow-x: auto;
-            padding-bottom: 12px;
-            border-bottom: 2px solid var(--line);
-            margin-bottom: 20px;
+            display: flex; gap: 8px; overflow-x: auto;
+            padding-bottom: 12px; border-bottom: 2px solid var(--line); margin-bottom: 20px;
         }
         .stepper-item {
-            background: #ffffff;
-            border: 1px solid var(--line);
-            padding: 10px 16px;
-            border-radius: 8px;
-            font-size: 0.84em;
-            font-weight: 600;
-            color: var(--muted);
-            cursor: pointer;
-            white-space: nowrap;
-            transition: all 0.2s;
+            background: #ffffff; border: 1px solid var(--line); padding: 10px 16px;
+            border-radius: 8px; font-size: 0.84em; font-weight: 600; color: var(--muted);
+            cursor: pointer; white-space: nowrap; transition: all 0.2s;
         }
-        .stepper-item:hover { border-color: var(--cyan-deep); color: var(--cyan-deep); }
-        .stepper-item.active {
-            background: var(--navy);
-            color: #ffffff;
-            border-color: var(--navy);
+        .stepper-item.active { background: var(--navy); color: #ffffff; border-color: var(--navy); }
+
+        /* REGRAS RESPONSIVAS PARA SANFONA MOBILE */
+        @media (max-width: 768px) {
+            .stepper-header-mobile { display: block !important; margin-bottom: 10px; }
+            .stepper-nav {
+                display: none !important;
+                flex-direction: column !important;
+                gap: 6px !important;
+                border-bottom: none !important;
+            }
+            .stepper-nav.open { display: flex !important; }
+            .stepper-item { width: 100%; text-align: left; }
+            .map-container { height: 480px !important; }
         }
 
-        /* CONTEÚDO DA ÁREA DE MAPA */
-        .map-card {
-            background: #ffffff;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 24px;
-            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.03);
-        }
-        .map-header-box {
-            margin-bottom: 16px;
-            border-bottom: 1px solid var(--line);
-            padding-bottom: 12px;
-        }
-        .map-question {
-            font-size: 1.25em;
-            font-weight: 800;
-            color: var(--navy);
-            margin: 0 0 6px;
-        }
-        .map-subtext {
-            color: var(--muted);
-            font-size: 0.9em;
-            margin: 0;
-        }
-
-        .map-container {
-            width: 100%;
-            height: 680px;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            overflow: hidden;
-            background: #f1f5f9;
-        }
+        /* CONTAINER DE MAPAS */
+        .map-card { background: #ffffff; border: 1px solid var(--line); border-radius: 12px; padding: 24px; box-shadow: 0 4px 12px rgba(0,0,0,0.03); }
+        .map-header-box { margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 12px; }
+        .map-question { font-size: 1.25em; font-weight: 800; color: var(--navy); margin: 0 0 6px; }
+        .map-subtext { color: var(--muted); font-size: 0.9em; margin: 0; }
+        .map-container { width: 100%; height: 680px; border: 1px solid var(--line); border-radius: 8px; overflow: hidden; background: #f1f5f9; }
         iframe { width: 100%; height: 100%; border: none; }
-
         .tab-content { display: none; }
         .tab-content.active { display: block; }
 
-        /* COMPONENTE: ESTRADA DA JORNADA DO USUÁRIO */
-        .user-road-wrapper {
-            background: #ffffff;
-            border: 1px solid var(--line);
-            border-radius: 12px;
-            padding: 24px;
-            margin: 20px 0;
-        }
-        .user-road-header h4 { margin: 0 0 4px; color: var(--navy); font-size: 1.1em; }
-        .user-road-header p { margin: 0 0 20px; color: var(--muted); font-size: 0.88em; }
-
-        .user-road-timeline {
-            display: flex;
-            gap: 12px;
-            overflow-x: auto;
-            padding-bottom: 12px;
-            position: relative;
-        }
-        .road-node {
-            min-width: 160px;
-            flex: 1;
-            background: #f8fafc;
-            border: 1px solid var(--line);
-            border-radius: 10px;
-            padding: 14px;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            position: relative;
-        }
-        .road-node:hover {
-            border-color: var(--cyan-deep);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(2, 132, 199, 0.12);
-        }
-        .road-node.highlight {
-            background: #f0fdf4;
-            border-color: #86efac;
-        }
-        .node-badge {
-            position: absolute; top: 10px; right: 10px;
-            width: 20px; height: 20px; border-radius: 50%;
-            background: var(--navy); color: white;
-            font-family: var(--mono); font-size: 0.7em; font-weight: bold;
-            display: flex; align-items: center; justify-content: center;
-        }
-        .road-node.highlight .node-badge { background: var(--green); }
-        .node-icon { font-size: 1.4em; display: block; margin-bottom: 6px; }
-        .node-body strong { display: block; font-size: 0.85em; color: var(--navy); margin-bottom: 4px; }
-        .node-body p { margin: 0; font-size: 0.76em; color: var(--muted); line-height: 1.3; }
-
-        .road-expansion {
-            background: #f1f5f9;
-            border-left: 4px solid var(--cyan-deep);
-            padding: 16px;
-            border-radius: 0 8px 8px 0;
-            margin-top: 16px;
-            font-size: 0.88em;
-        }
-        .road-expansion h5 { margin: 0 0 8px; color: var(--navy); font-size: 1em; }
-        .road-expansion ul { margin: 0; padding-left: 20px; }
-
-        /* CARDS DO PAINEL "SOBRE A FERRAMENTA" */
-        .about-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-            gap: 16px;
-            margin-top: 20px;
-        }
-        .about-card {
-            background: #f8fafc;
-            border: 1px solid var(--line);
-            border-radius: 8px;
-            padding: 16px;
-        }
-        .about-card h4 {
-            margin: 0 0 8px;
-            color: var(--navy);
-            font-size: 0.95em;
-        }
-        .about-card p {
-            margin: 0;
-            font-size: 0.85em;
-            color: var(--muted);
-        }
-
-        /* MODAL E FEEDBACK INLINE */
+        /* MODAL COM TABS (REPORTAR + FÓRUM) */
         .modal-overlay {
-            position: fixed; inset: 0;
-            background: rgba(15, 23, 42, 0.7);
-            backdrop-filter: blur(4px);
-            z-index: 9999;
-            display: none;
-            justify-content: center;
-            align-items: center;
-            padding: 16px;
+            position: fixed; inset: 0; background: rgba(15, 23, 42, 0.7);
+            backdrop-filter: blur(4px); z-index: 9999; display: none;
+            justify-content: center; align-items: center; padding: 16px;
         }
         .modal-card {
-            background: #ffffff;
-            border-radius: 12px;
-            width: 100%;
-            max-width: 480px;
-            padding: 24px;
-            position: relative;
-            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1);
+            background: #ffffff; border-radius: 12px; width: 100%;
+            max-width: 500px; padding: 24px; position: relative;
+            max-height: 90vh; overflow-y: auto;
         }
-        .modal-close {
-            position: absolute; top: 16px; right: 16px;
-            background: none; border: none; font-size: 1.5rem;
-            color: var(--muted); cursor: pointer;
+        .modal-close { position: absolute; top: 16px; right: 16px; background: none; border: none; font-size: 1.5rem; color: var(--muted); cursor: pointer; }
+
+        .modal-tabs { display: flex; gap: 8px; margin-bottom: 16px; border-bottom: 1px solid var(--line); padding-bottom: 8px; }
+        .modal-tab-btn {
+            flex: 1; padding: 8px 12px; border: 1px solid var(--line); background: #f8fafc;
+            border-radius: 6px; font-size: 0.85em; font-weight: 700; color: var(--muted); cursor: pointer;
         }
-        #feedback-status {
-            display: none; padding: 10px; border-radius: 6px;
-            font-size: 0.85em; font-weight: 600; margin-bottom: 12px;
-        }
-        #alerta-proximidade {
-            display: none;
-            background: #fffbebf8;
-            border: 1px solid #fcd34d;
-            border-left: 4px solid #d97706;
-            color: #92400e;
-            padding: 10px 12px;
-            border-radius: 6px;
-            font-size: 0.82em;
-            margin-bottom: 14px;
-            line-height: 1.4;
-        }
+        .modal-tab-btn.active { background: var(--navy); color: white; border-color: var(--navy); }
+
+        #feedback-status { display: none; padding: 10px; border-radius: 6px; font-size: 0.85em; font-weight: 600; margin-bottom: 12px; }
+        #alerta-proximidade { display: none; background: #fffbebf8; border-left: 4px solid #d97706; color: #92400e; padding: 10px; border-radius: 6px; font-size: 0.82em; margin-bottom: 12px; }
 
         /* FOOTER ACADÊMICO */
-        .footer-academic {
-            background: var(--navy);
-            color: #94a3b8;
-            padding: 40px 20px;
-            border-top: 1px solid rgba(255,255,255,0.1);
-            font-size: 0.85em;
-        }
+        .footer-academic { background: var(--navy); color: #94a3b8; padding: 40px 20px; border-top: 1px solid rgba(255,255,255,0.1); font-size: 0.85em; }
         .footer-inner { max-width: 1180px; margin: 0 auto; text-align: center; }
-        .footer-title { color: #ffffff; font-weight: 700; margin-bottom: 8px; }
-        
-        @media (max-width: 720px) {
-            .map-container { height: 480px; }
-            .hero { padding: 24px 16px; }
-            
-            /* RECOLHER E APRESENTAR STEPPER NO MOBILE */
-            .stepper-header-mobile { display: block; margin-bottom: 8px; }
-            .stepper-nav {
-                display: none;
-                flex-direction: column;
-                gap: 6px;
-                border-bottom: none;
-                margin-bottom: 14px;
-            }
-            .stepper-nav.open { display: flex; }
-            .stepper-item { text-align: left; }
-
-            .user-road-timeline {
-                flex-direction: column;
-                overflow-x: visible;
-            }
-            .road-node { min-width: 100%; }
-        }
     </style>
 </head>
 <body>
 
-    <!-- HEADER PERMANENTE -->
+    <!-- HEADER GLOBAL -->
     <header class="app-header">
         <div class="app-brand">
             🌊 GeoAlagamentos <span>SP</span>
             <span class="app-badge-univesp">UNIVESP · Polo Carrão</span>
         </div>
         <button class="btn-primary" onclick="abrirModalColaboracao()">
-            📢 Reportar Alagamento
+            📢 Colaborar / Fórum
         </button>
     </header>
 
-    <!-- HERO PRINCIPAL ENXUTO -->
+    <!-- HERO PRINCIPAL -->
     <section class="hero">
         <div class="hero-inner">
             <h1>Plataforma Geoespacial de Alagamentos e Vulnerabilidade Social</h1>
@@ -434,22 +187,21 @@
 
             <div class="cta-group">
                 <button class="btn-primary" onclick="scrollParaTrilha()">🗺️ Explorar Trilha de Mapas</button>
-                <button class="btn-secondary" onclick="scrollParaSobre()">ℹ️ Ver Origem dos Dados &amp; Metodologia</button>
+                <button class="btn-secondary" onclick="abrirModalColaboracao()">📢 Reportar ou Responder Fórum</button>
             </div>
         </div>
     </section>
 
-    <!-- NAVEGAÇÃO EXCLUSIVA DE MAPAS -->
+    <!-- NAVEGAÇÃO DE MAPAS -->
     <div class="wrapper" id="secao-trilha">
         <div class="stepper-header">
             <span class="stepper-title">Trilha de Análise Territorial</span>
-            <a onclick="scrollParaSobre()" class="about-link">ℹ️ Como esta ferramenta foi feita?</a>
         </div>
 
-        <!-- BOTÃO ALTERNÂNCIA RECOLHÍVEL (MOBILE) -->
+        <!-- BOTÃO SANFONA NO MOBILE -->
         <div class="stepper-header-mobile">
             <button type="button" class="btn-toggle-stepper" onclick="toggleStepperMobile()">
-                🗺️ Selecionar Mapa da Trilha <span id="stepper-arrow">▾</span>
+                🗺️ Alternar Mapa da Trilha <span id="stepper-arrow">▾</span>
             </button>
         </div>
 
@@ -464,263 +216,51 @@
             <button class="stepper-item" onclick="openTab(event, 'tab-mapainterativo')">🌐 8. Mapa ao Vivo (24h)</button>
         </nav>
 
-        <!-- MAPA 0 (PADRÃO DE ENTRADA) -->
+        <!-- MAPA 0 -->
         <div id="tab-mapa0" class="tab-content active">
             <div class="map-card">
                 <div class="map-header-box">
                     <h2 class="map-question">Onde a cidade mais alagou ao longo dos anos?</h2>
-                    <p class="map-subtext">Densidade de calor pura acumulando o histórico de ocorrências hídricas auditadas em SP.</p>
+                    <p class="map-subtext">Densidade de calor pura acumulando o histórico de ocorrências auditadas.</p>
                 </div>
-                <div class="map-container">
-                    <iframe src="mapa_calor_puro.html" title="Mapa de Calor Puro"></iframe>
-                </div>
+                <div class="map-container"><iframe src="mapa_calor_puro.html" title="Mapa de Calor"></iframe></div>
             </div>
         </div>
 
-        <!-- MAPA 1 -->
-        <div id="tab-mapa1" class="tab-content">
-            <div class="map-card">
-                <div class="map-header-box">
-                    <h2 class="map-question">Como os alagamentos se distribuem entre as 5 Macro-Zonas?</h2>
-                    <p class="map-subtext">Visão territorial agrupada por Macro-Zonas da capital paulista.</p>
-                </div>
-                <div class="map-container">
-                    <iframe src="mapa_zonas_interativo.html" title="Macro-Zonas"></iframe>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAPA 4 -->
-        <div id="tab-mapa4" class="tab-content">
-            <div class="map-card">
-                <div class="map-header-box">
-                    <h2 class="map-question">Em qual ano a sua região apresentou maior concentração de chamados?</h2>
-                    <p class="map-subtext">Filtro cronológico ano a ano contendo os registros de 2013 a 2026.</p>
-                </div>
-                <div class="map-container">
-                    <iframe src="mapa_alagamentos_seletor_por_ano.html" title="Seletor Anual"></iframe>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAPA 5 -->
-        <div id="tab-mapa5" class="tab-content">
-            <div class="map-card">
-                <div class="map-header-box">
-                    <h2 class="map-question">Qual é a relação entre a cota altimétrica e os pontos recorrentes?</h2>
-                    <p class="map-subtext">Cruzamento das ocorrências com o Modelo Digital de Elevação (MDE) de São Paulo.</p>
-                </div>
-                <div class="map-container">
-                    <iframe src="mapa_pontos_por_altitude.html" title="Altitude"></iframe>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAPA 6 -->
-        <div id="tab-mapa6" class="tab-content">
-            <div class="map-card">
-                <div class="map-header-box">
-                    <h2 class="map-question">Como a rede de drenagem e corpos d'água influenciam a mancha hídrica?</h2>
-                    <p class="map-subtext">Hidrografia oficial da capital (córregos, rios e galerias) sobreposta aos eventos.</p>
-                </div>
-                <div class="map-container">
-                    <iframe src="mapa_subprefeituras_com_drenagem_e_anos.html" title="Drenagem"></iframe>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAPA 8 -->
-        <div id="tab-mapa8" class="tab-content">
-            <div class="map-card">
-                <div class="map-header-box">
-                    <h2 class="map-question">Onde a manutenção de microdrenagem (AMLURB) é mais solicitada?</h2>
-                    <p class="map-subtext">Cruzamento dos chamados de desentupimento de bueiros e bocas de lobo com alagamentos.</p>
-                </div>
-                <div class="map-container">
-                    <iframe src="mapa_subprefeituras_com_alagamentos_e_bueiros.html" title="Bueiros AMLURB"></iframe>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAPA 9 (FINAL INTEGRADO) -->
-        <div id="tab-mapa9" class="tab-content">
-            <div class="map-card">
-                <div class="map-header-box">
-                    <h2 class="map-question">Onde vulnerabilidade social, infraestrutura e alagamentos se encontram?</h2>
-                    <p class="map-subtext">Matriz integrada sobrepondo o Índice Paulista de Vulnerabilidade Social (IPVS) semafórico por subprefeitura.</p>
-                </div>
-                <div class="map-container">
-                    <iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs_2.html" title="Matriz Integrada"></iframe>
-                </div>
-            </div>
-        </div>
-
-        <!-- MAPA AO VIVO COMUNITÁRIO (24H) -->
-        <div id="tab-mapainterativo" class="tab-content">
-            <div class="map-card">
-                <div class="map-header-box">
-                    <h2 class="map-question">O que está acontecendo na rua agora?</h2>
-                    <p class="map-subtext">Alertas comunitários enviados pela população e validados nas últimas 24 horas.</p>
-                </div>
-                <div class="map-container">
-                    <iframe src="mapa_alagamentos_independente.html" title="Mapa ao Vivo"></iframe>
-                </div>
-            </div>
-        </div>
-
-        <!-- SEÇÃO "SOBRE A FERRAMENTA & DADOS" (FORA DO STEPPER) -->
-        <div id="secao-sobre" class="map-card" style="margin-top: 32px;">
-            <h3 style="margin-top: 0; color: var(--navy); font-size: 1.2em;">ℹ️ Sobre a Ferramenta &amp; Origem dos Dados</h3>
-            <p style="color: var(--muted); font-size: 0.9em; margin-bottom: 16px;">Entenda o processo de extração, auditoria e cruzamento de dados públicos que sustentam esta plataforma.</p>
-
-            <!-- COMPONENTE: ESTRADA DA JORNADA DO USUÁRIO -->
-            <div class="user-road-wrapper">
-                <div class="user-road-header">
-                    <h4>🛣️ Trilha da Jornada: Do Dado Aberto ao Alerta na Rua</h4>
-                    <p>Clique em cada etapa para explorar a metodologia ou ir diretamente para o mapa correspondente.</p>
-                </div>
-
-                <div class="user-road-timeline">
-                    <!-- Parada 1: Expansível -->
-                    <div class="road-node" onclick="toggleRoadDetail('detalhe-fontes')">
-                        <div class="node-badge">1</div>
-                        <div class="node-body">
-                            <span class="node-icon">📂</span>
-                            <strong>Dados Abertos</strong>
-                            <p>Defesa Civil, GeoSampa, SEADE e AMLURB.</p>
-                        </div>
-                    </div>
-
-                    <!-- Parada 2: Expansível -->
-                    <div class="road-node" onclick="toggleRoadDetail('detalhe-auditoria')">
-                        <div class="node-badge">2</div>
-                        <div class="node-body">
-                            <span class="node-icon">🧹</span>
-                            <strong>Auditoria</strong>
-                            <p>Filtragem de 68k para 12.4k eventos auditados.</p>
-                        </div>
-                    </div>
-
-                    <!-- Parada 3: Navega para Mapa 0 -->
-                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa0')">
-                        <div class="node-badge">3</div>
-                        <div class="node-body">
-                            <span class="node-icon">🔥</span>
-                            <strong>Calor Histórico</strong>
-                            <p>Densidade acumulada de ocorrências.</p>
-                        </div>
-                    </div>
-
-                    <!-- Parada 4: Navega para Mapa 1 -->
-                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa1')">
-                        <div class="node-badge">4</div>
-                        <div class="node-body">
-                            <span class="node-icon">🏙️</span>
-                            <strong>Território</strong>
-                            <p>Macrozonas e 32 subprefeituras.</p>
-                        </div>
-                    </div>
-
-                    <!-- Parada 5: Navega para Mapa 4 -->
-                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa4')">
-                        <div class="node-badge">5</div>
-                        <div class="node-body">
-                            <span class="node-icon">⛰️</span>
-                            <strong>Tempo &amp; Relevo</strong>
-                            <p>Seletor anual e cota altimétrica.</p>
-                        </div>
-                    </div>
-
-                    <!-- Parada 6: Navega para Mapa 8 -->
-                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa8')">
-                        <div class="node-badge">6</div>
-                        <div class="node-body">
-                            <span class="node-icon">🔧</span>
-                            <strong>Infraestrutura</strong>
-                            <p>Drenagem e bueiros AMLURB.</p>
-                        </div>
-                    </div>
-
-                    <!-- Parada 7: Navega para Mapa 9 -->
-                    <div class="road-node road-action" onclick="irParaMapa('tab-mapa9')">
-                        <div class="node-badge">7</div>
-                        <div class="node-body">
-                            <span class="node-icon">🎯</span>
-                            <strong>Matriz Social</strong>
-                            <p>Índice IPVS × Alagamentos.</p>
-                        </div>
-                    </div>
-
-                    <!-- Parada 8: Navega para Mapa Ao Vivo -->
-                    <div class="road-node road-action highlight" onclick="irParaMapa('tab-mapainterativo')">
-                        <div class="node-badge">8</div>
-                        <div class="node-body">
-                            <span class="node-icon">📢</span>
-                            <strong>Na Rua Agora</strong>
-                            <p>Relatos comunitários moderados.</p>
-                        </div>
-                    </div>
-                </div>
-
-                <!-- PAINÉIS EXPANSÍVEIS (ETAPAS 1 E 2) -->
-                <div id="detalhe-fontes" class="road-expansion" style="display: none;">
-                    <h5>📂 1. Fontes de Dados Abertos Utilizadas</h5>
-                    <ul>
-                        <li><strong>GeoSampa:</strong> Camadas vetoriais de limites administrativos, hidrografia e bueiros.</li>
-                        <li><strong>Defesa Civil / SP156:</strong> Registros históricos de chamados e pontos recorrentes.</li>
-                        <li><strong>Fundação SEADE:</strong> Setores censitários do Índice Paulista de Vulnerabilidade Social (IPVS).</li>
-                    </ul>
-                </div>
-
-                <div id="detalhe-auditoria" class="road-expansion" style="display: none;">
-                    <h5>🧹 2. Processo de Limpeza e Auditoria Hídrica</h5>
-                    <p>A base bruta contava com 68.310 apontamentos genéricos. Após deduplicação geográfica, sanitização de coordenadas e filtro estrito de tipologia de enchente/alagamento, obteve-se a base consolidada de <strong>12.487 registros auditados</strong>.</p>
-                </div>
-            </div>
-
-            <div class="about-grid">
-                <div class="about-card">
-                    <h4>1. O que é</h4>
-                    <p>Ferramenta geoespacial cidadã para leitura analítica de alagamentos, vulnerabilidade social e infraestrutura hídrica em São Paulo.</p>
-                </div>
-                <div class="about-card">
-                    <h4>2. Fontes Abertas</h4>
-                    <p>Dados oficiais extraídos do GeoSampa, Defesa Civil, Portal SP156, Fundação SEADE (IPVS) e AMLURB (2013–2026).</p>
-                </div>
-                <div class="about-card">
-                    <h4>3. Recorte Hídrico</h4>
-                    <p>Filtragem estrita de 12.487 ocorrências hídricas auditadas a partir de um volume bruto inicial de 68.310 chamados.</p>
-                </div>
-                <div class="about-card">
-                    <h4>4. Limitações</h4>
-                    <p>O histórico de dados reflete registros oficiais acumulados e não substitui os alertas em tempo real da Defesa Civil.</p>
-                </div>
-            </div>
-
-            <h4 style="margin: 24px 0 12px; color: var(--navy);">⚙️ Diagrama da Arquitetura Geoespacial</h4>
-            <div class="map-container" style="height: 420px;">
-                <iframe src="diagrama_pipeline.html" title="Diagrama do Pipeline"></iframe>
-            </div>
-        </div>
+        <!-- DEMAIS MAPAS -->
+        <div id="tab-mapa1" class="tab-content"><div class="map-card"><div class="map-container"><iframe src="mapa_zonas_interativo.html"></iframe></div></div></div>
+        <div id="tab-mapa4" class="tab-content"><div class="map-card"><div class="map-container"><iframe src="mapa_alagamentos_seletor_por_ano.html"></iframe></div></div></div>
+        <div id="tab-mapa5" class="tab-content"><div class="map-card"><div class="map-container"><iframe src="mapa_pontos_por_altitude.html"></iframe></div></div></div>
+        <div id="tab-mapa6" class="tab-content"><div class="map-card"><div class="map-container"><iframe src="mapa_subprefeituras_com_drenagem_e_anos.html"></iframe></div></div></div>
+        <div id="tab-mapa8" class="tab-content"><div class="map-card"><div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_e_bueiros.html"></iframe></div></div></div>
+        <div id="tab-mapa9" class="tab-content"><div class="map-card"><div class="map-container"><iframe src="mapa_subprefeituras_com_alagamentos_bueiros_ipvs_2.html"></iframe></div></div></div>
+        <div id="tab-mapainterativo" class="tab-content"><div class="map-card"><div class="map-container"><iframe src="mapa_alagamentos_independente.html"></iframe></div></div></div>
     </div>
 
-    <!-- MODAL DE COLABORAÇÃO COMUNITÁRIA -->
+    <!-- MODAL INTEGRADO COM TABS (REPORTAR + FÓRUM + GPS) -->
     <div id="modal-colaboracao" class="modal-overlay">
         <div class="modal-card">
             <button class="modal-close" onclick="fecharModalColaboracao()">&times;</button>
-            <h3 style="margin-top: 0; color: var(--navy);">📢 Reportar Condição na Rua</h3>
+            
+            <!-- ABAS DO MODAL -->
+            <div class="modal-tabs">
+                <button type="button" class="modal-tab-btn active" id="btn-tab-reportar" onclick="mudarAbaModal('reportar')">📢 Reportar com Foto</button>
+                <button type="button" class="modal-tab-btn" id="btn-tab-forum" onclick="mudarAbaModal('forum')">💬 Fórum Rápido</button>
+            </div>
 
             <div id="feedback-status"></div>
             <div id="alerta-proximidade"></div>
 
+            <!-- SERVIÇO DE LOCALIZAÇÃO GPS COMPARTILHADO -->
             <div style="background: #f8fafc; border: 1px solid var(--line); padding: 12px; border-radius: 8px; margin-bottom: 16px; display: flex; justify-content: space-between; align-items: center;">
                 <div>
-                    <strong style="font-size: 0.85em; display: block; color: var(--navy);">📍 Posição GPS</strong>
-                    <small id="status-gps" style="color: var(--muted); font-size: 0.8em;">Aguardando captura...</small>
+                    <strong style="font-size: 0.85em; display: block; color: var(--navy);">📍 Serviço de Localização GPS</strong>
+                    <small id="status-gps" style="color: var(--muted); font-size: 0.8em;">Clique para obter coordenadas</small>
                 </div>
                 <button type="button" onclick="obterGPS()" class="btn-primary" style="padding: 6px 12px; font-size: 0.8em;">Capturar GPS</button>
             </div>
 
+            <!-- FORMULÁRIO 1: REPORTAR FOTO -->
             <form id="form-foto" onsubmit="enviarOcorrencia(event)">
                 <div style="margin-bottom: 12px;">
                     <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Situação do Local:</label>
@@ -730,31 +270,51 @@
                     </select>
                 </div>
                 <div style="margin-bottom: 12px;">
-                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Observação (Opcional - máx 280 chars):</label>
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Observação (Opcional):</label>
                     <input type="text" id="foto-observacao" maxlength="280" placeholder="Ex: Água na altura do pneu..." style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px;">
                 </div>
                 <div style="margin-bottom: 16px;">
                     <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Foto do Local:</label>
                     <input type="file" id="foto-local" accept="image/*" style="width: 100%; font-size: 0.85em;" required>
                 </div>
-                <button type="submit" id="btn-submit-colaboracao" class="btn-primary" style="width: 100%; justify-content: center;">✅ Enviar Relato</button>
+                <button type="submit" id="btn-submit-colaboracao" class="btn-primary" style="width: 100%; justify-content: center;">✅ Enviar Relato para Moderação</button>
             </form>
+
+            <!-- FORMULÁRIO 2: FÓRUM RÁPIDO -->
+            <form id="form-forum" onsubmit="enviarForum(event)" style="display: none;">
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Bairro / Região:</label>
+                    <input type="text" id="forum-bairro" placeholder="Ex: Tatuapé, Carrão..." style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px;" required>
+                </div>
+                <div style="margin-bottom: 12px;">
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Está chovendo no local?</label>
+                    <select id="forum-choveu" style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px;" required>
+                        <option value="true">🌧️ Sim, chuva forte / moderada</option>
+                        <option value="false">☀️ Não / Sem chuva</option>
+                    </select>
+                </div>
+                <div style="margin-bottom: 16px;">
+                    <label style="display: block; font-size: 0.85em; font-weight: bold; margin-bottom: 4px;">Há ponto de alagamento?</label>
+                    <select id="forum-alagou" style="width: 100%; padding: 8px; border: 1px solid var(--line); border-radius: 6px;" required>
+                        <option value="true">🌊 Sim, água acumulando / alagado</option>
+                        <option value="false">🟢 Não, escoamento normal</option>
+                    </select>
+                </div>
+                <button type="submit" id="btn-submit-forum" class="btn-primary" style="width: 100%; justify-content: center; background-color: var(--navy);">💬 Enviar ao Fórum</button>
+            </form>
+
         </div>
     </div>
 
-    <!-- RODAPÉ ACADÊMICO UNIVESP -->
+    <!-- RODAPÉ ACADÊMICO -->
     <footer class="footer-academic">
         <div class="footer-inner">
-            <div class="footer-title">UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO — UNIVESP</div>
-            <p>Projeto Integrador Extensionista IV (DRP14 - Turma 003) · Polo Carrão</p>
-            <p style="font-size: 0.9em; color: #64748b; margin-top: 12px;">
-                <strong>Pesquisadores:</strong> Daniel Martins Queiroz, Leonardo Tomaz de Souza Neto, Livia Maria Roncoleta, Mateus Fujita Silveira, Nailah Carolina Silva, Roberto Joaquim dos Santos, Rodrigo Jose de Melo, William Yang Chen Fan.<br>
-                <strong>Orientadora:</strong> Prof.ª Millena de Araujo Rodrigues
-            </p>
+            <div>UNIVERSIDADE VIRTUAL DO ESTADO DE SÃO PAULO — UNIVESP</div>
+            <p>Projeto Integrador Extensionista IV · Polo Carrão</p>
         </div>
     </footer>
 
-    <!-- LÓGICA JS DA APLICAÇÃO -->
+    <!-- SCRIPT JS -->
     <script>
         const SUPABASE_URL = 'https://ebknsiiirqpfsrjewpou.supabase.co';
         const SUPABASE_KEY = 'sb_publishable_KU-HNUH_WR3uagFDzubHvQ_AvACKYVO';
@@ -764,54 +324,17 @@
         let lonAtual = null;
         let precisaoGPS = null;
 
-        // PONTOS CRÍTICOS HISTÓRICOS PARA CÁLCULO DE PROXIMIDADE (SP)
-        const ZONAS_RISCO_HISTORICO = [
-            { nome: 'Av. Aricanduva (Córrego Aricanduva)', lat: -23.5658, lon: -46.5134 },
-            { nome: 'Praça da Bandeira (Centro)', lat: -23.5492, lon: -46.6389 },
-            { nome: 'Marginal Tietê (Ponte das Banderas)', lat: -23.5186, lon: -46.6322 },
-            { nome: 'Marginal Pinheiros (Ponte Cidade Jardim)', lat: -23.5852, lon: -46.6978 },
-            { nome: 'Av. Professor Luiz Ignácio Anhaia Mello', lat: -23.5871, lon: -46.5642 },
-            { nome: 'Av. Santo Amaro (Córrego Água Espraiada)', lat: -23.6214, lon: -46.6853 },
-            { nome: 'Vale do Anhangabaú', lat: -23.5463, lon: -46.6361 }
+        const ZONAS_RISCO = [
+            { nome: 'Av. Aricanduva', lat: -23.5658, lon: -46.5134 },
+            { nome: 'Praça da Bandeira', lat: -23.5492, lon: -46.6389 },
+            { nome: 'Marginal Tietê', lat: -23.5186, lon: -46.6322 }
         ];
-
-        // FÓRMULA DE HAVERSINE PARA DISTÂNCIA EM METROS
-        function calcularDistanciaMetros(lat1, lon1, lat2, lon2) {
-            const R = 6371000;
-            const dLat = (lat2 - lat1) * Math.PI / 180;
-            const dLon = (lon2 - lon1) * Math.PI / 180;
-            const a = Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-                      Math.cos(lat1 * Math.PI / 180) * Math.cos(lat2 * Math.PI / 180) *
-                      Math.sin(dLon / 2) * Math.sin(dLon / 2);
-            const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-            return R * c;
-        }
-
-        function scrollParaTrilha() {
-            document.getElementById('secao-trilha').scrollIntoView({ behavior: 'smooth' });
-        }
-
-        function scrollParaSobre() {
-            document.getElementById('secao-sobre').scrollIntoView({ behavior: 'smooth' });
-        }
 
         function toggleStepperMobile() {
             const nav = document.getElementById('stepper-menu');
             const arrow = document.getElementById('stepper-arrow');
             nav.classList.toggle('open');
             arrow.innerText = nav.classList.contains('open') ? '▴' : '▾';
-        }
-
-        function toggleRoadDetail(id) {
-            const target = document.getElementById(id);
-            const isOpen = target.style.display === 'block';
-            document.querySelectorAll('.road-expansion').forEach(el => el.style.display = 'none');
-            if (!isOpen) target.style.display = 'block';
-        }
-
-        function irParaMapa(tabId) {
-            openTab(null, tabId);
-            document.getElementById('secao-trilha').scrollIntoView({ behavior: 'smooth' });
         }
 
         function openTab(evt, tabName) {
@@ -821,36 +344,40 @@
             const items = document.getElementsByClassName("stepper-item");
             for (let i = 0; i < items.length; i++) items[i].classList.remove("active");
             
-            const targetTab = document.getElementById(tabName);
-            if (targetTab) {
-                targetTab.classList.add("active");
-                
-                const stepperBtns = document.querySelectorAll('.stepper-item');
-                stepperBtns.forEach(btn => {
-                    if (btn.getAttribute('onclick').includes(tabName)) {
-                        btn.classList.add('active');
-                    }
-                });
+            const target = document.getElementById(tabName);
+            if (target) {
+                target.classList.add("active");
+                if (evt && evt.currentTarget) evt.currentTarget.classList.add("active");
+            }
 
-                // Se estiver no mobile, recolhe o menu após selecionar
-                const nav = document.getElementById('stepper-menu');
-                if (window.innerWidth <= 720 && nav.classList.contains('open')) {
-                    toggleStepperMobile();
-                }
-
-                if (tabName === 'tab-mapainterativo') {
-                    setTimeout(() => { carregarPontosColaborativos(); }, 300);
-                }
+            const nav = document.getElementById('stepper-menu');
+            if (window.innerWidth <= 768 && nav.classList.contains('open')) {
+                toggleStepperMobile();
             }
         }
 
-        function abrirModalColaboracao() {
-            document.getElementById("modal-colaboracao").style.display = "flex";
+        function mudarAbaModal(tipo) {
+            const formFoto = document.getElementById('form-foto');
+            const formForum = document.getElementById('form-forum');
+            const btnReportar = document.getElementById('btn-tab-reportar');
+            const btnForum = document.getElementById('btn-tab-forum');
+
+            if (tipo === 'reportar') {
+                formFoto.style.display = 'block';
+                formForum.style.display = 'none';
+                btnReportar.classList.add('active');
+                btnForum.classList.remove('active');
+            } else {
+                formFoto.style.display = 'none';
+                formForum.style.display = 'block';
+                btnForum.classList.add('active');
+                btnReportar.classList.remove('active');
+            }
         }
 
-        function fecharModalColaboracao() {
-            document.getElementById("modal-colaboracao").style.display = "none";
-        }
+        function abrirModalColaboracao() { document.getElementById("modal-colaboracao").style.display = "flex"; }
+        function fecharModalColaboracao() { document.getElementById("modal-colaboracao").style.display = "none"; }
+        function scrollParaTrilha() { document.getElementById('secao-trilha').scrollIntoView({ behavior: 'smooth' }); }
 
         function exibirFeedbackModal(msg, tipo = 'erro') {
             const el = document.getElementById("feedback-status");
@@ -858,30 +385,6 @@
             el.innerText = msg;
             el.style.background = tipo === 'sucesso' ? '#dcfce7' : '#fee2e2';
             el.style.color = tipo === 'sucesso' ? '#15803d' : '#b91c1c';
-        }
-
-        function verificarProximidadeHistorica(lat, lon) {
-            const alertaEl = document.getElementById('alerta-proximidade');
-            alertaEl.style.display = 'none';
-            alertaEl.innerHTML = '';
-
-            let menorDistancia = Infinity;
-            let zonaProxima = null;
-
-            ZONAS_RISCO_HISTORICO.forEach(zona => {
-                const dist = calcularDistanciaMetros(lat, lon, zona.lat, zona.lon);
-                if (dist < menorDistancia) {
-                    menorDistancia = dist;
-                    zonaProxima = zona;
-                }
-            });
-
-            // Alerta ativado se a pessoa estiver a menos de 800m de um ponto histórico
-            if (menorDistancia <= 800 && zonaProxima) {
-                const distKm = menorDistancia < 1000 ? `${Math.round(menorDistancia)}m` : `${(menorDistancia/1000).toFixed(1)}km`;
-                alertaEl.innerHTML = `⚠️ <b>Atenção Preventiva:</b> Você está a aproximadamente <b>${distKm}</b> de uma área com histórico crítico de alagamentos (<i>${zonaProxima.nome}</i>).`;
-                alertaEl.style.display = 'block';
-            }
         }
 
         function obterGPS() {
@@ -895,132 +398,77 @@
                         precisaoGPS = pos.coords.accuracy;
                         statusTxt.innerText = `✅ GPS OK (~${Math.round(precisaoGPS)}m)`;
                         statusTxt.style.color = "var(--green)";
-                        
-                        // Executa checagem de proximidade
-                        verificarProximidadeHistorica(latAtual, lonAtual);
+                        exibirFeedbackModal(`📍 Localização obtida com sucesso! (~${Math.round(precisaoGPS)}m)`, 'sucesso');
                     },
                     (err) => {
-                        statusTxt.innerText = "❌ Permissão negada ou GPS offline";
-                        statusTxt.style.color = "var(--red)";
+                        statusTxt.innerText = "❌ GPS Offline / Negado";
+                        exibirFeedbackModal('❌ Falha ao obter GPS. Verifique a permissão do navegador.');
                     },
                     { enableHighAccuracy: true, timeout: 10000 }
                 );
             }
         }
 
-        function compressImage(file, maxWidth = 1200, quality = 0.8) {
-            return new Promise((resolve) => {
-                const reader = new FileReader();
-                reader.readAsDataURL(file);
-                reader.onload = (event) => {
-                    const img = new Image();
-                    img.src = event.target.result;
-                    img.onload = () => {
-                        const canvas = document.createElement('canvas');
-                        let width = img.width;
-                        let height = img.height;
-                        if (width > maxWidth) {
-                            height = Math.round((height * maxWidth) / width);
-                            width = maxWidth;
-                        }
-                        canvas.width = width; canvas.height = height;
-                        const ctx = canvas.getContext('2d');
-                        ctx.drawImage(img, 0, 0, width, height);
-                        canvas.toBlob((blob) => resolve(blob), 'image/jpeg', quality);
-                    };
-                };
-            });
-        }
-
         async function enviarOcorrencia(e) {
             e.preventDefault();
-            if (!latAtual || !lonAtual) {
-                exibirFeedbackModal('⚠️ Clique em "Capturar GPS" para geolocalizar.');
-                return;
-            }
-
+            if (!latAtual || !lonAtual) { exibirFeedbackModal('⚠️ Capture a localização GPS antes de enviar.'); return; }
+            
             const btn = document.getElementById("btn-submit-colaboracao");
-            btn.disabled = true;
-            btn.innerText = "Enviando... ⏳";
+            btn.disabled = true; btn.innerText = "Enviando... ⏳";
 
             try {
+                let fotoUrl = null;
                 const fileInput = document.getElementById("foto-local");
-                let fotoUrlPublica = null;
-
                 if (fileInput.files[0]) {
-                    const blob = await compressImage(fileInput.files[0]);
-                    const nome = `foto_${Date.now()}_${Math.random().toString(36).substring(7)}.jpg`;
-                    const { error: errUp } = await supabaseClient.storage.from('fotos-alagamentos').upload(nome, blob, { contentType: 'image/jpeg' });
+                    const nome = `foto_${Date.now()}.jpg`;
+                    const { error: errUp } = await supabaseClient.storage.from('fotos-alagamentos').upload(nome, fileInput.files[0]);
                     if (errUp) throw errUp;
-
-                    const { data: urlData } = supabaseClient.storage.from('fotos-alagamentos').getPublicUrl(nome);
-                    fotoUrlPublica = urlData.publicUrl;
+                    const { data } = supabaseClient.storage.from('fotos-alagamentos').getPublicUrl(nome);
+                    fotoUrl = data.publicUrl;
                 }
 
-                // GARANTIA EXPLICITA DE MODERAÇÃO PENDENTE
-                const { error: errDb } = await supabaseClient.from('confirmacoes_alagamento').insert([{
-                    ponto_id: 'report_usuario',
+                const { error } = await supabaseClient.from('confirmacoes_alagamento').insert([{
                     status: document.getElementById("status-local").value,
                     observacao: document.getElementById("foto-observacao").value || null,
-                    accuracy_m: precisaoGPS || null,
-                    latitude: latAtual,
-                    longitude: lonAtual,
-                    foto_url: fotoUrlPublica,
-                    created_at: new Date().toISOString(),
-                    aprovado: false,
-                    status_moderacao: 'pendente'
+                    latitude: latAtual, longitude: lonAtual, accuracy_m: precisaoGPS, foto_url: fotoUrl,
+                    status_moderacao: 'pendente', aprovado: false
                 }]);
+                if (error) throw error;
 
-                if (errDb) throw errDb;
-
-                exibirFeedbackModal('✅ Relato enviado! Aguardando aprovação na moderação.', 'sucesso');
-                setTimeout(() => fecharModalColaboracao(), 1800);
-
+                exibirFeedbackModal('✅ Relato com foto enviado com sucesso! Aguardando aprovação.', 'sucesso');
+                document.getElementById("form-foto").reset();
+                setTimeout(() => fecharModalColaboracao(), 2000);
             } catch (err) {
-                exibirFeedbackModal('Erro no envio: ' + err.message);
+                exibirFeedbackModal('❌ Erro no envio da foto: ' + err.message);
             } finally {
-                btn.disabled = false;
-                btn.innerText = "✅ Enviar Relato";
+                btn.disabled = false; btn.innerText = "✅ Enviar Relato para Moderação";
             }
         }
 
-        async function carregarPontosColaborativos() {
-            try {
-                const limite24h = new Date(Date.now() - 24 * 60 * 60 * 1000).toISOString();
-                const { data: pontos } = await supabaseClient
-                    .from('confirmacoes_alagamento')
-                    .select('*')
-                    .eq('status_moderacao', 'aprovado')
-                    .gte('created_at', limite24h);
+        async function enviarForum(e) {
+            e.preventDefault();
+            if (!latAtual || !lonAtual) { exibirFeedbackModal('⚠️ Capture a localização GPS antes de enviar.'); return; }
+            
+            const btn = document.getElementById("btn-submit-forum");
+            btn.disabled = true; btn.innerText = "Enviando... ⏳";
 
-                const iframe = document.querySelector('#tab-mapainterativo iframe');
-                if (iframe && pontos) plotaPontosNoIframe(iframe, pontos);
+            try {
+                const { error } = await supabaseClient.from('forum_choveu_alagou').insert([{
+                    bairro: document.getElementById("forum-bairro").value,
+                    choveu: document.getElementById("forum-choveu").value === 'true',
+                    alagou: document.getElementById("forum-alagou").value === 'true',
+                    latitude: latAtual, longitude: lonAtual, accuracy_m: precisaoGPS,
+                    status_moderacao: 'pendente', aprovado: false
+                }]);
+                if (error) throw error;
+
+                exibirFeedbackModal('✅ Resposta enviada ao fórum com sucesso! Aguardando moderação.', 'sucesso');
+                document.getElementById("form-forum").reset();
+                setTimeout(() => fecharModalColaboracao(), 2000);
             } catch (err) {
-                console.warn('Erro ao atualizar pontos:', err);
-            }
-        }
-
-        function plotaPontosNoIframe(iframeElement, listaPontos) {
-            try {
-                const win = iframeElement.contentWindow;
-                if (!win || !win.L) return;
-                const mapObj = Object.values(win).find(v => v && typeof v === 'object' && v._leaflet_id && v.addLayer);
-                if (!mapObj) return;
-
-                if (!win.__camadaColaborativa) {
-                    win.__camadaColaborativa = win.L.layerGroup().addTo(mapObj);
-                } else {
-                    win.__camadaColaborativa.clearLayers();
-                }
-
-                listaPontos.forEach(p => {
-                    const cor = p.status === 'alagado' ? '#dc2626' : '#16a34a';
-                    win.L.circleMarker([p.latitude, p.longitude], {
-                        radius: 8, fillColor: cor, color: '#fff', weight: 2, fillOpacity: 0.9
-                    }).bindPopup(`<b>${p.status === 'alagado' ? '🚨 Alagado' : '🟢 Liberado'}</b><br>${p.observacao || ''}`).addTo(win.__camadaColaborativa);
-                });
-            } catch (e) {
-                console.warn('Aguardando Leaflet no iframe...', e);
+                exibirFeedbackModal('❌ Erro no envio ao fórum: ' + err.message);
+            } finally {
+                btn.disabled = false; btn.innerText = "💬 Enviar ao Fórum";
             }
         }
     </script>
