@@ -201787,6 +201787,135 @@ var legendaHtml = `
         Subprefeituras (Mosaico)
     </div>
 </div>`;
-document.body.insertAdjacentHTML('beforeend', legendaHtml);   
+document.body.insertAdjacentHTML('beforeend', legendaHtml);  
+// --- INÍCIO DO PATCH COMPLETO (MOSAICO + LEGENDA + MARCADORES 📸/💬) ---
+(function() {
+    var mapa = map_fc13bfc8a334132618523c8dc645f5d6;
+    var controleCamadas = layer_control_01acd0664f63265ac7666b28a3d21fdb;
+
+    // 1. Mapeamento das camadas geojson e grupos de subprefeituras
+    var geojsonSubprefeituras = [
+        geo_json_9b373184dc0c17a7a39d689e3d0b1419, geo_json_3695645a25240e288b5ac336d7fc83f1,
+        geo_json_cc89437c4ff791ac61b31ee41e47f4b5, geo_json_6843b13d7d95374dacd02f82357a5135,
+        geo_json_d2b839327dd137fbad576fe999139d2a, geo_json_9fe48bfef63aed4d69ce463219381e6c,
+        geo_json_f6697aa32ac0d2769063343e6bfb9860, geo_json_de6b7577c1652c925bee8138a0e26d1a,
+        geo_json_c92a6a08c02ca40f5e5a71dce8015ee9, geo_json_3a69adb5970794a1eef6edcb50f20e32,
+        geo_json_0e4695f07ad241e03b651007b6276d27, geo_json_0f7a5ddc1e821bde03b1084fade1865d,
+        geo_json_8d8e38eab1668a105e674883a3a61ee0, geo_json_b3484954a2e0c2a8cdc3c03089503b90,
+        geo_json_80977d5bf8bb463a5d63765749e68914, geo_json_e4dadd2b82801096e1331a6a0a062b60,
+        geo_json_b003a3853e90b37198b9fa809de15680, geo_json_a881cfc50042e6ba1d96e17dcc26433e,
+        geo_json_2dbf255143f6b91ace1e242ecccf5700, geo_json_9368fca925b5f102b1f4b093405a5d05,
+        geo_json_016b53ac0036a44709df4cb002530ec6, geo_json_11ea88304a2d8ce8403393f1d9d669dd,
+        geo_json_1b5a385f2e7e24831a83e3dece416dd7, geo_json_7385018d5aec6a7dc12419dfdbc20153,
+        geo_json_d5090f798e33f5e28118d87a22ca4d0c, geo_json_9250a698fdb10f8d50885f38597e117b,
+        geo_json_3355633aa00e96efdc222091d38413a8, geo_json_4929de94ff3165892d05c635ae2dacf6,
+        geo_json_6694878fbd05cef5a5e32ca6e88ce5a0, geo_json_ab5d0be1a021de9cf9e78d9b26c89dd2,
+        geo_json_98d11752167cba11255614ccfa4ab595, geo_json_be5bb5382b98487a0a78b2c1025a3835,
+        geo_json_260e75d96c0270f64c4b682cb9d1c647
+    ];
+
+    var gruposSubprefeituras = [
+        feature_group_ef87dd726e34df42bdcb575a6f7f344c, feature_group_7d4d11e6b9fe71c0ff885023f63b31c0,
+        feature_group_c8582f93dfbe2280352573211d6f30ad, feature_group_842c234e758ae6afcbb9bfa1cd6f37e0,
+        feature_group_c09f619a5f121d04a7cd3f46ef892093, feature_group_e04e576a97f73205f0a095cbd19dcb40,
+        feature_group_43aa6c3f876f658b6bfcb158a1189446, feature_group_7c0fa3d4b960f8efb1892ced266db47f,
+        feature_group_ab64793e635c43586297c606be533dcd, feature_group_8484811bf4b6e3cbd7fa3dd25959b5a3,
+        feature_group_c690b7b1e3de3d29938e0d398b85f619, feature_group_7340e688dc4eb5ac6fff40b4cd476841,
+        feature_group_76dd2b53f1a44e1ff0ce5911075e9c93, feature_group_4bb82ec0e64ad16d8593e84da22a4327,
+        feature_group_7b966ba1044c1375169a9be44acd2643, feature_group_e1e806bfa5433c86db52af044690d675,
+        feature_group_632505087ff2888ef30a29af21714893, feature_group_100d7700e2b7d822b804ec7cf00ac59f,
+        feature_group_435b2b86d7c318865af7cb02eebbff2a, feature_group_d8afb67a1208acddea15327aeedb39b5,
+        feature_group_a187a9064e4a765d7fdd8ac83fc2c2d4, feature_group_3bcf2592d08ad589bca4ef3eb6301b09,
+        feature_group_a3069de919acb147251abe34784ee06b, feature_group_b482307e93b42a8859d77aa0d84c7320,
+        feature_group_5f9da1a16aaaf1577205b50515db4fda, feature_group_37d8f968a1bbff3b2db7e9d9b1c6cef5,
+        feature_group_6a25a658c20dde840f0af2e17373e1d8, feature_group_e9b2f3b9d29feea2813e95620873d7da,
+        feature_group_13267c14b608d236d3142a0c9e443373, feature_group_351c00fdc2773eac60c3ca0476c220d0,
+        feature_group_c72acab05965ba5566f7d18d4c280759, feature_group_4b95b055bcd1eade12b1a5849f883642,
+        feature_group_ab6272202718b35955b997bbb5b08bff
+    ];
+
+    // 2. Aplica visual pastel e destaque ao passar o mouse (Hover)
+    geojsonSubprefeituras.forEach(function(geoLayer) {
+        if (geoLayer && geoLayer.setStyle) {
+            geoLayer.setStyle({ fillColor: '#a6c8e0', color: '#3182bd', weight: 1.2, fillOpacity: 0.25 });
+            geoLayer.on({
+                mouseover: function(e) { e.target.setStyle({ fillColor: '#3182bd', fillOpacity: 0.50, weight: 2.0 }); },
+                mouseout: function(e) { e.target.setStyle({ fillColor: '#a6c8e0', fillOpacity: 0.25, weight: 1.2 }); }
+            });
+        }
+    });
+
+    // 3. Garante visibilidade das subprefeituras e remove checkboxes do menu
+    gruposSubprefeituras.forEach(function(group) {
+        group.addTo(mapa);
+        controleCamadas.removeLayer(group);
+    });
+
+    // 4. Substituição dinâmica dos pontos de ocorrência (📸 Foto vs 💬 Fórum)
+    var pontosParaSubstituir = [];
+    mapa.eachLayer(function(layer) {
+        if ((layer instanceof L.CircleMarker || layer instanceof L.Marker) && layer.getLatLng) {
+            var tooltipObj = layer.getTooltip();
+            var popupObj = layer.getPopup();
+            var textoTooltip = tooltipObj ? String(tooltipObj.getContent()) : "";
+            var textoPopup = popupObj ? String(popupObj.getContent()) : "";
+            var textoTotal = (textoTooltip + " " + textoPopup).toLowerCase();
+
+            var possuiFoto = textoTotal.includes("foto") || textoTotal.includes("img") || textoTotal.includes("http") || textoTotal.includes(".jpg");
+            var emoji = possuiFoto ? "📸" : "💬";
+            var corFundo = possuiFoto ? "#e74c3c" : "#2980b9";
+            var tamanho = possuiFoto ? 28 : 22;
+
+            var iconeCustomizado = L.divIcon({
+                html: `<div style="background-color: ${corFundo}; color: white; border-radius: 50%; width: ${tamanho}px; height: ${tamanho}px; display: flex; align-items: center; justify-content: center; font-size: ${possuiFoto ? '14px' : '11px'}; border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer;">${emoji}</div>`,
+                className: 'ponto-customizado-icon',
+                iconSize: [tamanho, tamanho],
+                iconAnchor: [tamanho / 2, tamanho / 2]
+            });
+
+            pontosParaSubstituir.push({
+                latlng: layer.getLatLng(),
+                icon: iconeCustomizado,
+                tooltip: textoTooltip,
+                popup: textoPopup,
+                camadaOriginal: layer
+            });
+        }
+    });
+
+    pontosParaSubstituir.forEach(function(item) {
+        var novoMarker = L.marker(item.latlng, { icon: item.icon });
+        if (item.tooltip) novoMarker.bindTooltip(item.tooltip, { sticky: true });
+        if (item.popup) novoMarker.bindPopup(item.popup);
+        mapa.removeLayer(item.camadaOriginal);
+        novoMarker.addTo(mapa);
+    });
+
+    // 5. Injeção da Legenda Flutuante
+    var legendaHtml = `
+    <div id="legenda-mapa-alagamentos" style="
+        position: fixed;
+        bottom: 25px;
+        left: 25px;
+        z-index: 9999;
+        background: rgba(255, 255, 255, 0.94);
+        backdrop-filter: blur(4px);
+        padding: 12px 16px;
+        border-radius: 8px;
+        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+        font-family: Arial, sans-serif;
+        font-size: 13px;
+        color: #333;">
+        <strong style="display:block; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">Legenda do Mapa</strong>
+        <div style="margin-bottom: 4px;"><span style="font-size: 15px;">📸</span> Relato com Foto</div>
+        <div style="margin-bottom: 6px;"><span style="font-size: 15px;">💬</span> Fórum Rápido</div>
+        <div style="display:flex; align-items:center; gap: 6px; font-size: 11px; color: #555;">
+            <span style="display:inline-block; width: 14px; height: 14px; background: #a6c8e0; opacity: 0.6; border: 1px solid #3182bd; border-radius: 2px;"></span>
+            Subprefeituras (Mosaico)
+        </div>
+    </div>`;
+    document.body.insertAdjacentHTML('beforeend', legendaHtml);
+})();
+// --- FIM DO PATCH COMPLETO --- 
 </script>
 </html>
