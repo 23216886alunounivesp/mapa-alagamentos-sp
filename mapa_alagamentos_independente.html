@@ -201789,11 +201789,13 @@ var legendaHtml = `
 </div>`;
 document.body.insertAdjacentHTML('beforeend', legendaHtml);  
 // --- INÍCIO DO PATCH COMPLETO (MOSAICO + LEGENDA + MARCADORES 📸/💬) ---
+// --- INÍCIO DO PATCH CORRIGIDO (MOSAICO + LEGENDA + MARCADORES 📸/💬) ---
 (function() {
     var mapa = map_fc13bfc8a334132618523c8dc645f5d6;
     var controleCamadas = layer_control_01acd0664f63265ac7666b28a3d21fdb;
+    var overlayLayers = layer_control_01acd0664f63265ac7666b28a3d21fdb_layers.overlays;
 
-    // 1. Mapeamento das camadas geojson e grupos de subprefeituras
+    // 1. Mapeamento das camadas GeoJSON das subprefeituras
     var geojsonSubprefeituras = [
         geo_json_9b373184dc0c17a7a39d689e3d0b1419, geo_json_3695645a25240e288b5ac336d7fc83f1,
         geo_json_cc89437c4ff791ac61b31ee41e47f4b5, geo_json_6843b13d7d95374dacd02f82357a5135,
@@ -201834,7 +201836,7 @@ document.body.insertAdjacentHTML('beforeend', legendaHtml);
         feature_group_ab6272202718b35955b997bbb5b08bff
     ];
 
-    // 2. Aplica visual pastel e destaque ao passar o mouse (Hover)
+    // Estilo pastel e hover para subprefeituras
     geojsonSubprefeituras.forEach(function(geoLayer) {
         if (geoLayer && geoLayer.setStyle) {
             geoLayer.setStyle({ fillColor: '#a6c8e0', color: '#3182bd', weight: 1.2, fillOpacity: 0.25 });
@@ -201845,77 +201847,85 @@ document.body.insertAdjacentHTML('beforeend', legendaHtml);
         }
     });
 
-    // 3. Garante visibilidade das subprefeituras e remove checkboxes do menu
+    // Remove subprefeituras do menu de checkboxes e mantém ativas no mapa
     gruposSubprefeituras.forEach(function(group) {
         group.addTo(mapa);
         controleCamadas.removeLayer(group);
     });
 
-    // 4. Substituição dinâmica dos pontos de ocorrência (📸 Foto vs 💬 Fórum)
-    var pontosParaSubstituir = [];
-    mapa.eachLayer(function(layer) {
-        if ((layer instanceof L.CircleMarker || layer instanceof L.Marker) && layer.getLatLng) {
-            var tooltipObj = layer.getTooltip();
-            var popupObj = layer.getPopup();
-            var textoTooltip = tooltipObj ? String(tooltipObj.getContent()) : "";
-            var textoPopup = popupObj ? String(popupObj.getContent()) : "";
-            var textoTotal = (textoTooltip + " " + textoPopup).toLowerCase();
+    // 2. ALTERAÇÃO DIRETA DOS ÍCONES DOS MARCADORES EM TODOS OS ANOS
+    Object.keys(overlayLayers).forEach(function(nomeCamada) {
+        var grupoAno = overlayLayers[nomeCamada];
+        
+        if (grupoAno && grupoAno.eachLayer) {
+            grupoAno.eachLayer(function(marker) {
+                if (marker.setIcon) {
+                    var tooltipObj = marker.getTooltip();
+                    var popupObj = marker.getPopup();
+                    var textoTooltip = tooltipObj ? String(tooltipObj.getContent()) : "";
+                    var textoPopup = popupObj ? String(popupObj.getContent()) : "";
+                    var textoTotal = (textoTooltip + " " + textoPopup).toLowerCase();
 
-            var possuiFoto = textoTotal.includes("foto") || textoTotal.includes("img") || textoTotal.includes("http") || textoTotal.includes(".jpg");
-            var emoji = possuiFoto ? "📸" : "💬";
-            var corFundo = possuiFoto ? "#e74c3c" : "#2980b9";
-            var tamanho = possuiFoto ? 28 : 22;
+                    // Identifica se possui indicação de foto
+                    var possuiFoto = textoTotal.includes("foto") || textoTotal.includes("img") || textoTotal.includes("http") || textoTotal.includes(".jpg");
 
-            var iconeCustomizado = L.divIcon({
-                html: `<div style="background-color: ${corFundo}; color: white; border-radius: 50%; width: ${tamanho}px; height: ${tamanho}px; display: flex; align-items: center; justify-content: center; font-size: ${possuiFoto ? '14px' : '11px'}; border: 2px solid #ffffff; box-shadow: 0 2px 5px rgba(0,0,0,0.3); cursor: pointer;">${emoji}</div>`,
-                className: 'ponto-customizado-icon',
-                iconSize: [tamanho, tamanho],
-                iconAnchor: [tamanho / 2, tamanho / 2]
-            });
+                    var emoji = possuiFoto ? "📸" : "💬";
+                    var corFundo = possuiFoto ? "#e74c3c" : "#2980b9";
+                    var tamanho = possuiFoto ? 30 : 24;
 
-            pontosParaSubstituir.push({
-                latlng: layer.getLatLng(),
-                icon: iconeCustomizado,
-                tooltip: textoTooltip,
-                popup: textoPopup,
-                camadaOriginal: layer
+                    var iconeCustomizado = L.divIcon({
+                        html: `<div style="
+                            background-color: ${corFundo};
+                            color: white;
+                            border-radius: 50%;
+                            width: ${tamanho}px;
+                            height: ${tamanho}px;
+                            display: flex;
+                            align-items: center;
+                            justify-content: center;
+                            font-size: ${possuiFoto ? '15px' : '12px'};
+                            border: 2px solid #ffffff;
+                            box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+                            cursor: pointer;">${emoji}</div>`,
+                        className: 'ponto-customizado-icon',
+                        iconSize: [tamanho, tamanho],
+                        iconAnchor: [tamanho / 2, tamanho / 2]
+                    });
+
+                    // Troca o ícone diretamente preservando o marcador no grupo do ano
+                    marker.setIcon(iconeCustomizado);
+                }
             });
         }
     });
 
-    pontosParaSubstituir.forEach(function(item) {
-        var novoMarker = L.marker(item.latlng, { icon: item.icon });
-        if (item.tooltip) novoMarker.bindTooltip(item.tooltip, { sticky: true });
-        if (item.popup) novoMarker.bindPopup(item.popup);
-        mapa.removeLayer(item.camadaOriginal);
-        novoMarker.addTo(mapa);
-    });
-
-    // 5. Injeção da Legenda Flutuante
-    var legendaHtml = `
-    <div id="legenda-mapa-alagamentos" style="
-        position: fixed;
-        bottom: 25px;
-        left: 25px;
-        z-index: 9999;
-        background: rgba(255, 255, 255, 0.94);
-        backdrop-filter: blur(4px);
-        padding: 12px 16px;
-        border-radius: 8px;
-        box-shadow: 0 4px 12px rgba(0,0,0,0.25);
-        font-family: Arial, sans-serif;
-        font-size: 13px;
-        color: #333;">
-        <strong style="display:block; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">Legenda do Mapa</strong>
-        <div style="margin-bottom: 4px;"><span style="font-size: 15px;">📸</span> Relato com Foto</div>
-        <div style="margin-bottom: 6px;"><span style="font-size: 15px;">💬</span> Fórum Rápido</div>
-        <div style="display:flex; align-items:center; gap: 6px; font-size: 11px; color: #555;">
-            <span style="display:inline-block; width: 14px; height: 14px; background: #a6c8e0; opacity: 0.6; border: 1px solid #3182bd; border-radius: 2px;"></span>
-            Subprefeituras (Mosaico)
-        </div>
-    </div>`;
-    document.body.insertAdjacentHTML('beforeend', legendaHtml);
+    // 3. Injeção da Legenda Flutuante no Canto Inferior
+    if (!document.getElementById("legenda-mapa-alagamentos")) {
+        var legendaHtml = `
+        <div id="legenda-mapa-alagamentos" style="
+            position: fixed;
+            bottom: 25px;
+            left: 25px;
+            z-index: 9999;
+            background: rgba(255, 255, 255, 0.94);
+            backdrop-filter: blur(4px);
+            padding: 12px 16px;
+            border-radius: 8px;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.25);
+            font-family: Arial, sans-serif;
+            font-size: 13px;
+            color: #333;">
+            <strong style="display:block; margin-bottom: 6px; border-bottom: 1px solid #ddd; padding-bottom: 4px;">Legenda do Mapa</strong>
+            <div style="margin-bottom: 4px;"><span style="font-size: 15px;">📸</span> Relato com Foto</div>
+            <div style="margin-bottom: 6px;"><span style="font-size: 15px;">💬</span> Fórum Rápido</div>
+            <div style="display:flex; align-items:center; gap: 6px; font-size: 11px; color: #555;">
+                <span style="display:inline-block; width: 14px; height: 14px; background: #a6c8e0; opacity: 0.6; border: 1px solid #3182bd; border-radius: 2px;"></span>
+                Subprefeituras (Mosaico)
+            </div>
+        </div>`;
+        document.body.insertAdjacentHTML('beforeend', legendaHtml);
+    }
 })();
-// --- FIM DO PATCH COMPLETO --- 
+// --- FIM DO PATCH CORRIGIDO ---
 </script>
 </html>
